@@ -21,6 +21,16 @@ class SwipeActivity : AppCompatActivity() {
                 super.onSwipeLeft()
                 Toast.makeText(this@SwipeActivity, "swipe left, load new picture", Toast.LENGTH_SHORT).show()
             }
+
+            override fun onSwipeRight() {
+                super.onSwipeRight()
+                Toast.makeText(this@SwipeActivity, "swipe right, star this notice", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onSwipeUp() {
+                super.onSwipeUp()
+                Toast.makeText(this@SwipeActivity, "swipe up, take a look at the bio", Toast.LENGTH_SHORT).show()
+            }
         })
 
 

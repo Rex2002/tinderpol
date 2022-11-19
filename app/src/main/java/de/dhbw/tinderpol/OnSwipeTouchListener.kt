@@ -60,10 +60,10 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
                 else{
                     if(abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD){
                         if(diffY > 0){
-                            onSwipeUp()
+                            onSwipeDown()
                         }
                         else{
-                            onSwipeDown()
+                            onSwipeUp()
                         }
                     }
                 }
