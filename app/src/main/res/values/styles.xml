@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="explain_text_box_item">
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginVertical">5dp</item>
+        <item name="android:layout_marginHorizontal">10dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="explain_text_box">
+        <item name="android:paddingVertical">10dp</item>
+    </style>
+</resources>
