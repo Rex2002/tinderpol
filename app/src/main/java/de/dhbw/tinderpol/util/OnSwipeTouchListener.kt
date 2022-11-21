@@ -11,26 +11,29 @@ import java.lang.Math.abs
 internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private val gestureDetector : GestureDetector
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-        return gestureDetector.onTouchEvent(p1)
+        return when (p1) {
+            null -> false
+            else -> gestureDetector.onTouchEvent(p1)
+        }
     }
     private inner class GestureListener : SimpleOnGestureListener(){
         private val SWIPE_THRESHOLD : Int = 100
         private val SWIPE_VELOCITY_THRESHOLD: Int = 100
 
-        override fun onDown(e: MotionEvent?): Boolean {
+        override fun onDown(e: MotionEvent): Boolean {
             return true
         }
-        override fun onSingleTapUp(e: MotionEvent?): Boolean {
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
             onClick()
             return super.onSingleTapUp(e)
         }
 
-        override fun onDoubleTap(e: MotionEvent?): Boolean {
+        override fun onDoubleTap(e: MotionEvent): Boolean {
             onDoubleClick()
             return super.onDoubleTap(e)
         }
 
-        override fun onLongPress(e: MotionEvent?) {
+        override fun onLongPress(e: MotionEvent) {
             onLongClick()
             super.onLongPress(e)
         }

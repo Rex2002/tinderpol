@@ -15,11 +15,11 @@ class NoticeViewModel(private val repository: NoticeRepository, id: String): Vie
 
     private var fetchJob: Job? = null
 
-    fun fetchArticles(id: String) {
+    fun fetchNotices(id: String) {
         fetchJob?.cancel()
         fetchJob = viewModelScope.launch {
             try {
-                val newsItems = repository.noticeFromID(id)
+                val notices = repository.fetchNotices();
                 // _uiState.update {
                     // TODO
                 // }
