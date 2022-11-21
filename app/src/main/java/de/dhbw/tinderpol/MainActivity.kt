@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
+import de.dhbw.tinderpol.view.SwipeActivity
 
 class MainActivity : AppCompatActivity() {
 

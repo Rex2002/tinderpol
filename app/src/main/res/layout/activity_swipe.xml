@@ -7,16 +7,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".SwipeActivity">
+        tools:context=".view.SwipeActivity">
 
-        <Button
-            android:id="@+id/button3"
+        <ImageView
+            android:id="@+id/noticeImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:imageUrl="https://ws-public.interpol.int/notices/v1/red/1972-538/images/53063552" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

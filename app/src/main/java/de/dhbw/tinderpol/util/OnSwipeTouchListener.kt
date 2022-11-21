@@ -1,4 +1,4 @@
-package de.dhbw.tinderpol
+package de.dhbw.tinderpol.util
 import android.content.Context;
 import android.util.Log
 import android.view.GestureDetector
