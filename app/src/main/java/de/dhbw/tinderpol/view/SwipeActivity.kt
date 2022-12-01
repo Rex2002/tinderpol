@@ -1,15 +1,17 @@
 package de.dhbw.tinderpol.view
 
+import android.R
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
 import coil.load
-import com.google.android.material.R.drawable.mtrl_ic_error
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import de.dhbw.tinderpol.NoticeInfo
-import de.dhbw.tinderpol.R
+import com.google.android.material.R.drawable.*
+import de.dhbw.tinderpol.ContactInterpolConfirmFragment
+import de.dhbw.tinderpol.NoticeInfoFragment
 import de.dhbw.tinderpol.R.drawable.ic_launcher_foreground
 import de.dhbw.tinderpol.SDO
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
@@ -36,19 +38,21 @@ class SwipeActivity : AppCompatActivity() {
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
             override fun onSwipeLeft() {
                 super.onSwipeLeft()
-                Toast.makeText(this@SwipeActivity, "swipe left, load new picture", Toast.LENGTH_SHORT).show()
-                binding.noticeImage.load(SDO.getNextImageURL())
+                binding.noticeImage.load(SDO.getNextImageURL()){
+                    placeholder(
+                        R.drawable.stat_sys_download)
+                    error(mtrl_ic_error)
+                }
             }
 
             override fun onSwipeRight() {
                 super.onSwipeRight()
-                Toast.makeText(this@SwipeActivity, "swipe right, contact Interpol", Toast.LENGTH_SHORT).show()
+                showReportConfirmDialog()
             }
 
             override fun onSwipeUp() {
                 super.onSwipeUp()
                 showBottomSheetDialog()
-                Toast.makeText(this@SwipeActivity, "swipe up, take a look at the bio", Toast.LENGTH_SHORT).show()
             }
 
             override fun onSwipeDown() {
@@ -61,10 +65,12 @@ class SwipeActivity : AppCompatActivity() {
 
     }
     fun showBottomSheetDialog(){
-        print("called show bottom sheet dialog")
-        val bottomSheetDialog = NoticeInfo();
-        val transaction = supportFragmentManager.beginTransaction();
-        transaction.add(bottomSheetDialog, "");
-        transaction.commit()
+        val bottomSheetDialog = NoticeInfoFragment()
+        supportFragmentManager.beginTransaction().add(bottomSheetDialog, "").commit()
+    }
+
+    fun showReportConfirmDialog(){
+        val confirmReportDialog = ContactInterpolConfirmFragment()
+        supportFragmentManager.beginTransaction().add(confirmReportDialog,"").commit()
     }
 }
