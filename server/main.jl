@@ -47,7 +47,6 @@ for cc in d
 			end
 		end
 	end
-	# println("$(cc): $(length(country_notices))")
 	push!(notices, country_notices...)
 end
 
