@@ -26,7 +26,7 @@ class ContactInterpolConfirmFragment : DialogFragment() {
         ) { dialog, which ->
             val openUrl = Intent(Intent.ACTION_VIEW)
             // TODO change URL to current notice url!!!!
-            openUrl.data = Uri.parse(SDO.getNextImageURL())
+            openUrl.data = Uri.parse(SDO.getCurrentImageURL())
             startActivity(openUrl)
         }
 

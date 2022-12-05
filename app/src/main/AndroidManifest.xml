@@ -14,7 +14,7 @@
         android:theme="@style/Theme.Tinderpol"
         tools:targetApi="31">
         <activity
-            android:name=".view.SwipeActivity"
+            android:name=".SwipeActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
