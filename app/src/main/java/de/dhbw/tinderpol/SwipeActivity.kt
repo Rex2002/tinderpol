@@ -1,19 +1,13 @@
-package de.dhbw.tinderpol.view
+package de.dhbw.tinderpol
 
 import android.R
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
-import android.widget.Toast
 import coil.load
 import com.google.android.material.R.drawable.*
-import de.dhbw.tinderpol.ContactInterpolConfirmFragment
-import de.dhbw.tinderpol.NoticeInfoFragment
 import de.dhbw.tinderpol.R.drawable.ic_launcher_foreground
-import de.dhbw.tinderpol.SDO
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
 
@@ -38,7 +32,8 @@ class SwipeActivity : AppCompatActivity() {
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
             override fun onSwipeLeft() {
                 super.onSwipeLeft()
-                binding.noticeImage.load(SDO.getNextImageURL()){
+                SDO.getNextNotice()
+                binding.noticeImage.load(SDO.getCurrentImageURL()){
                     placeholder(
                         R.drawable.stat_sys_download)
                     error(mtrl_ic_error)
