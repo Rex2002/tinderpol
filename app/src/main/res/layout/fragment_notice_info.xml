@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <data />
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -17,45 +17,29 @@
             android:padding="8dp">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/nameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:padding="8dp"/>
+                android:padding="8dp"
+                tools:text="@tools:sample/full_names" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/shareLinearLayout"
+            android:id="@+id/crimeDescrLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
             <TextView
+                android:id="@+id/crimeDescrText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Crime I committed"
                 android:layout_gravity="center_vertical"
-                android:padding="8dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/uploadLinearLaySout"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="I have last been seen on the dark side of the sun"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"/>
+                android:padding="8dp"
+                tools:text="@tools:sample/full_names" />
 
         </LinearLayout>
 
@@ -63,33 +47,54 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/copyLinearLayout"
+            android:id="@+id/lastSeenLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
+
             <TextView
+                android:id="@+id/lastSeenText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My home country is the dark abyss of hell"
                 android:layout_gravity="center_vertical"
-                android:padding="8dp"/>
+                android:padding="8dp"
+                tools:text="@tools:sample/lorem" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/delete"
+            android:id="@+id/physicalsLinearLayout"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/physicalsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                tools:text="@tools:sample/lorem" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/birthInfoLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
 
             <TextView
+                android:id="@+id/birthInfoText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="I have been born 1977 BC"
                 android:layout_gravity="center_vertical"
-                android:padding="8dp"/>
+                android:padding="8dp"
+                tools:text="@tools:sample/lorem" />
         </LinearLayout>
     </LinearLayout>
 </layout>

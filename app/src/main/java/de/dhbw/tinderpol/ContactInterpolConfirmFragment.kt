@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 
 class ContactInterpolConfirmFragment : DialogFragment() {
 
@@ -19,7 +18,7 @@ class ContactInterpolConfirmFragment : DialogFragment() {
         )
         alertDialogBuilder.setTitle("Report Criminal Sighting")
 
-        alertDialogBuilder.setMessage("You are about to report a sighting for \n [criminal name] \n You will be redirected to a website")
+        alertDialogBuilder.setMessage("You are about to report a sighting for \n ${SDO.getCurrentNotice().firstName} ${SDO.getCurrentNotice().lastName} \n You will be redirected to a website")
 
         alertDialogBuilder.setPositiveButton(
             "Continue"

@@ -16,25 +16,31 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // todo: use dataBinding (or another proper method) to set the correct texts in the fragment on create
-        //  based on the current SDO state
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_notice_info, container, false)
+    ): View {
         _binding = FragmentNoticeInfoBinding.inflate(inflater)
-        val notice = SDO.getCurrentNotice();
-        binding.nameText.text = notice.firstName.toString() + " " + notice.lastName
-        return binding.root;
-        //return inflater.inflate(R.layout.fragment_notice_info, container, false)
+        val notice = SDO.getCurrentNotice()
+        val nameText = "${notice.firstName.toString()} ${notice.lastName} (${notice.sex.toString()})"
+        binding.nameText.text = nameText
+        val crimeDescr = notice.charge
+        binding.crimeDescrText.text = crimeDescr
+        val birthInfo = "${notice.birthDate.toString()} in ${notice.birthPlace}, ${notice.birthCountry}"
+        binding.birthInfoText.text = birthInfo
+        val physicals = "Height: ${notice.height}, Weight: ${notice.weight}"
+        binding.physicalsText.text = physicals
+        binding.lastSeenText.text = notice.nationalities.toString()
+
+        return binding.root
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        _binding = null;
+        _binding = null
 
     }
 }

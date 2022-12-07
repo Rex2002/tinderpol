@@ -1,12 +1,12 @@
 package de.dhbw.tinderpol.util
-import android.content.Context;
+import android.content.Context
 import android.util.Log
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import java.lang.Math.abs
+import kotlin.math.abs
 
 internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private val gestureDetector : GestureDetector
@@ -71,7 +71,7 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
                     }
                 }
             }catch (exc : Exception){
-                exc.printStackTrace();
+                exc.printStackTrace()
             }
             return false
         }
@@ -85,8 +85,6 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private fun onLongClick() {}
 
     init {
-        print("gesture listener called");
-
-        gestureDetector = GestureDetector(c, GestureListener());
+        gestureDetector = GestureDetector(c, GestureListener())
     }
 }
