@@ -42,5 +42,15 @@
             app:srcCompat="?attr/homeAsUpIndicator"
             tools:ignore="ContentDescription" />
 
+        <TextView
+            android:id="@+id/textViewFullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="11dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/noticeImage"
+            tools:text="@tools:sample/full_names" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

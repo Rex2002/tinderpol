@@ -56,8 +56,6 @@ class SwipeActivity : AppCompatActivity() {
             }
         })
 
-
-
     }
     fun showBottomSheetDialog(){
         val bottomSheetDialog = NoticeInfoFragment()
@@ -70,6 +68,8 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     fun updateShownImg(){
+        val nameText = "${SDO.getCurrentNotice().firstName.toString()} ${SDO.getCurrentNotice().lastName} (${SDO.getCurrentNotice().sex.toString()})"
+        binding.textViewFullName.text = nameText
         binding.noticeImage.load(SDO.getCurrentImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)

@@ -14,6 +14,6 @@ data class Notice(
     val birthCountry: String? = null,
     val birthPlace: String? = null,
     val charge: String? = null,
-    val weight: Int? = null,
-    val height: Int? = null,
+    val weight: Int? = 60,
+    val height: Int? = 180,
 )

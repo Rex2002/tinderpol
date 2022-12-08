@@ -25,15 +25,16 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
     ): View {
         _binding = FragmentNoticeInfoBinding.inflate(inflater)
         val notice = SDO.getCurrentNotice()
-        val nameText = "${notice.firstName.toString()} ${notice.lastName} (${notice.sex.toString()})"
+        val nameText = "Name: ${notice.firstName.toString()} ${notice.lastName} (${notice.sex.toString()})"
         binding.nameText.text = nameText
-        val crimeDescr = notice.charge
+        val crimeDescr = "Charge: ${notice.charge}"
         binding.crimeDescrText.text = crimeDescr
-        val birthInfo = "${notice.birthDate.toString()} in ${notice.birthPlace}, ${notice.birthCountry}"
+        val birthInfo = "Born ${notice.birthDate.toString()} in ${notice.birthPlace}, ${notice.birthCountry}"
         binding.birthInfoText.text = birthInfo
-        val physicals = "Height: ${notice.height}, Weight: ${notice.weight}"
+        val physicals = "Height: ${notice.height}cm, Weight: ${notice.weight}kg"
         binding.physicalsText.text = physicals
-        binding.lastSeenText.text = notice.nationalities.toString()
+        val nationalities = "Nationalities: ${notice.nationalities.joinToString(separator = ", ") }"
+        binding.nationalitiesText.text = nationalities
 
         return binding.root
     }
