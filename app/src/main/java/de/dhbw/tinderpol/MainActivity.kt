@@ -28,12 +28,12 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             println("hello world")
             showReportConfirmDialog()
-            Toast.makeText(this, "settingsbutton calld", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "settingsbutton called", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun showReportConfirmDialog(){
-        val confirmReportDialog = ContactInterpolConfirmFragment()
-        supportFragmentManager.beginTransaction().add(confirmReportDialog,"").commit()
+    private fun showReportConfirmDialog(){
+        val settingsFragment = SettingsFragment()
+        supportFragmentManager.beginTransaction().replace(android.R.id.content,settingsFragment).addToBackStack("settings").commit()
     }
 }
