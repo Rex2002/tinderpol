@@ -78,8 +78,8 @@ async function getCountryCodes() {
 }
 
 function getPerc(num, denom, precision = 3) {
-	let factor = 100 * 10 ** precision; // times 100 to turn it into a percentage instead of a decimal number
-	return Math.floor((factor * num) / denom) / factor;
+	let factor = 10 ** precision;
+	return Math.floor((100 * factor * num) / denom) / factor;
 }
 
 async function getRemoteData() {
@@ -127,14 +127,7 @@ async function getRemoteData() {
 	// Sort notices
 	notices.sort((a, b) => a.entity_id - b.entity_id);
 	// Remove duplicate notices
-	for (let i = 0; i + 1 < notices.length; i++) {
-		if (notices[i].entity_id == notices[i + 1].entity_id) {
-			notices.splice(i + 1, 1);
-			i--;
-		}
-	}
-
-	return notices;
+	return notices.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
 }
 
 module.exports = getRemoteData;
