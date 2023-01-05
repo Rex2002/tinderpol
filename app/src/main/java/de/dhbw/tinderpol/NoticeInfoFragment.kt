@@ -36,8 +36,21 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         val nationalities = "Nationalities: ${notice.nationalities.joinToString(separator = ", ") }"
         binding.nationalitiesText.text = nationalities
 
+        binding.starNoticeImageButton.setImageResource(
+            if (SDO.noticeIsStarred(notice.id)) android.R.drawable.btn_star_big_on
+            else android.R.drawable.btn_star_big_off )
+        binding.starNoticeImageButton.setBackgroundResource(0)
+
+        binding.starNoticeImageButton.setOnClickListener{
+            SDO.toggleStarredNotice(notice.id)
+            binding.starNoticeImageButton.setImageResource(
+                if (SDO.noticeIsStarred(notice.id)) android.R.drawable.btn_star_big_on
+                else android.R.drawable.btn_star_big_off )
+        }
+
         return binding.root
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
