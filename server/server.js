@@ -10,7 +10,8 @@ const PORT = process.env.PORT || 80;
 const PAGE_SIZE = 100;
 const DATA_FILE = path.join(__dirname, 'data.json');
 const DATA_LIFETIME = 1000 * 60 * 60 * 15; // 15 days lifetime
-let lastUpdated = Date.now(); // To force an immediate update, set to 0
+let isCurrentlyUpdating = false;
+let lastUpdated = 0;
 let notices = [];
 
 // TODO:
@@ -18,25 +19,55 @@ let notices = [];
 // Then respond with the current entity_id instead of the current cursor
 // That way pagination should consist to work, even if the data changed
 
-async function getData() {
-	if (!fs.existsSync(DATA_FILE) || Date.now() > lastUpdated + DATA_LIFETIME) {
-		notices = await getRemoteData();
+async function getData(forceUpdate = false) {
+	if (forceUpdate || !fs.existsSync(DATA_FILE)) {
+		if (isCurrentlyUpdating) Promise.reject(new Error('The Data is currently being updated. Please try again soon.'));
+		else {
+			isCurrentlyUpdating = true;
+			notices = await getRemoteData();
+			return new Promise((resolve, reject) => {
+				const json = JSON.stringify(notices, null, 4);
+				fs.writeFile(DATA_FILE, json, { encoding: 'utf-8' }, (err) => {
+					if (err) {
+						console.error('Something went wrong, trying to save the newly updated data:');
+						console.error(err);
+					}
+					lastUpdated = Date.now();
+					isCurrentlyUpdating = false;
+					console.log('Data updated and written to file');
+					resolve(notices);
+				});
+			});
+		}
+	} else if (!notices || notices.length === 0) {
 		return new Promise((resolve, reject) => {
-			const json = JSON.stringify(notices, null, 4);
-			fs.writeFile(DATA_FILE, json, { encoding: 'utf-8' }, (err) => {
-				if (err) reject(err);
-				lastUpdated = Date.now();
-				console.log('Data updated and written to file');
-				resolve(notices);
+			fs.readFile(DATA_FILE, { encoding: 'utf-8' }, (err, data) => {
+				if (err) {
+					console.error('Something went wrong, trying to read the data from disk:');
+					console.error(err);
+					reject(new Error('An Error occured when fetching the error. Please try again in a few minutes.'));
+				}
+				const json = JSON.parse(data);
+				resolve(json);
 			});
 		});
-	} else return new Promise((resolve, reject) => resolve(notices));
+	} else return Promise.resolve(notices);
 }
 
-app.get('/all', async (req, res) => {
-	const data = await getData();
-	const resData = { notices: data };
-	res.send(resData);
+app.get('/all', (req, res) => {
+	let resData = { data: [], err: null, lastUpdate: lastUpdated };
+	let status = 200;
+	getData()
+		.then((data) => {
+			resData.data = data;
+		})
+		.catch((err) => {
+			resData.err = err.message;
+			status = 500;
+		})
+		.finally(() => {
+			res.status(status).json(resData);
+		});
 }).get('/data', async (req, res) => {
 	const cursor = Number(req.query?.page || 0);
 	const data = await getData();
@@ -49,9 +80,9 @@ app.get('/all', async (req, res) => {
 	res.send(resData);
 });
 
-getData().then(() => {
+getData(true).then(() => {
 	setInterval(() => {
-		getData();
+		getData(true);
 	}, DATA_LIFETIME);
 });
 
