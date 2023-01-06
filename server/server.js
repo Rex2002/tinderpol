@@ -54,31 +54,35 @@ async function getData(forceUpdate = false) {
 	} else return Promise.resolve(notices);
 }
 
-app.get('/all', (req, res) => {
-	let resData = { data: [], err: null, lastUpdate: lastUpdated };
-	let status = 200;
-	getData()
-		.then((data) => {
-			resData.data = data;
-		})
-		.catch((err) => {
-			resData.err = err.message;
-			status = 500;
-		})
-		.finally(() => {
-			res.status(status).json(resData);
-		});
-}).get('/data', async (req, res) => {
-	const cursor = Number(req.query?.page || 0);
-	const data = await getData();
-	const idx = PAGE_SIZE * cursor;
-	const maxCursor = Math.floor(data.length / PAGE_SIZE);
-	const nextCursor = cursor >= maxCursor ? maxCursor : cursor + 1;
+app.get('/', (req, res) => {
+	res.redirect('/all');
+})
+	.get('/all', (req, res) => {
+		let resData = { data: [], err: null, lastUpdate: lastUpdated };
+		let status = 200;
+		getData()
+			.then((data) => {
+				resData.data = data;
+			})
+			.catch((err) => {
+				resData.err = err.message;
+				status = 500;
+			})
+			.finally(() => {
+				res.status(status).json(resData);
+			});
+	})
+	.get('/data', async (req, res) => {
+		const cursor = Number(req.query?.page || 0);
+		const data = await getData();
+		const idx = PAGE_SIZE * cursor;
+		const maxCursor = Math.floor(data.length / PAGE_SIZE);
+		const nextCursor = cursor >= maxCursor ? maxCursor : cursor + 1;
 
-	const resData = { max_cursor: maxCursor, notices: [], current_page: cursor, next_page: nextCursor };
-	if (idx < data.length) resData.notices = data.slice(idx, idx + PAGE_SIZE);
-	res.send(resData);
-});
+		const resData = { max_cursor: maxCursor, notices: [], current_page: cursor, next_page: nextCursor };
+		if (idx < data.length) resData.notices = data.slice(idx, idx + PAGE_SIZE);
+		res.send(resData);
+	});
 
 getData(true).then(() => {
 	setInterval(() => {

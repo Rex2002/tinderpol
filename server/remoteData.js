@@ -1,5 +1,4 @@
 const http = require('https');
-const fs = require('fs');
 
 async function onRateLimit(waitTime = 5 * 60 * 1000) {
 	let min = Math.floor(waitTime / 60000);
@@ -82,10 +81,39 @@ function getPerc(num, denom, precision = 3) {
 	return Math.floor((100 * factor * num) / denom) / factor;
 }
 
+function normalizeNotice(notice, images = null) {
+	return {
+		id: notice?.entity_id ?? '',
+		firstName: notice?.forename ?? '',
+		lastName: notice?.name ?? '',
+		birthDate: notice?.date_of_birth ?? '',
+		nationalities: notice?.nationalities ?? [],
+		imgs: images ?? [],
+		sex: notice?.sex_id ?? 'U',
+		birthCountry: notice?.country_of_birth_id ?? '',
+		birthPlace: notice?.place_of_birth ?? '',
+		charges:
+			notice?.arrest_warrants?.map((x) => {
+				return {
+					country: x?.issuing_country_id ?? '',
+					charge: x?.charge ?? '',
+				};
+			}) ?? [],
+		weight: notice?.weight ?? 0,
+		heght: notice?.height ?? 0,
+	};
+}
+
+async function getImages(url = null) {
+	if (!url || typeof url !== 'string') return [];
+	const res = await getJSONReq(url);
+	return res?._embedded?.images?.map((x) => x?._links?.self?.href ?? null)?.filter((x) => x !== null) ?? [];
+}
+
 async function getRemoteData() {
 	const countryCodes = await getCountryCodes();
-	const notices = [];
 	const noticesURL = 'https://ws-public.interpol.int/notices/v1/red';
+	let notices = [];
 
 	async function req(...keyArgs) {
 		keyArgs = keyArgs.map((x) => String(x[0]) + '=' + String(x[1]));
@@ -124,10 +152,15 @@ async function getRemoteData() {
 		i++;
 	}
 
-	// Sort notices
+	// Sort notices & remove duplicate notices
 	notices.sort((a, b) => a.entity_id - b.entity_id);
-	// Remove duplicate notices
-	return notices.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+	notices = notices.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+	const res = [];
+	for await (const notice of notices) {
+		const images = await getImages(notice?._links?.images?.href);
+		res.push(normalizeNotice(notice, images));
+	}
+	return res;
 }
 
 module.exports = getRemoteData;

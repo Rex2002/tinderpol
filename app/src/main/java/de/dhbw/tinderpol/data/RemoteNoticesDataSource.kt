@@ -1,11 +1,31 @@
 package de.dhbw.tinderpol.data
 
-import androidx.core.net.toUri
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class RemoteNoticesDataSource {
-    suspend fun fetchNotices(): List<Notice> {
-        delay(2000)
-        return listOf(Notice("2018/46058", "Lastname", "Firstname", null, listOf("RU"), listOf("https://ws-public.interpol.int/notices/v1/red/2018-46058/images/61071213".toUri())))
+    companion object {
+        const val baseURL = "https://tinderpol.onrender.com/"
+    }
+
+    suspend fun fetchNotices(): Result<List<Notice>> {
+        return withContext(Dispatchers.Default) {
+            val api = Retrofit
+                .Builder()
+                .baseUrl(baseURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(APIService::class.java)
+
+            try {
+                val res = api.getAll().body()
+                    ?: return@withContext Result.failure(Exception("Something went wrong trying to load more Notices. Try again in a moment"))
+                return@withContext Result.success(res.data)
+            } catch (e: Throwable) {
+                return@withContext Result.failure(e)
+            }
+        }
     }
 }

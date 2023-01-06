@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.textViewExplainText1.setOnClickListener{
-            GlobalScope.launch { SDO.syncNotices() }
+            SDO.syncNotices()
         }
 
         binding.button.setOnClickListener {

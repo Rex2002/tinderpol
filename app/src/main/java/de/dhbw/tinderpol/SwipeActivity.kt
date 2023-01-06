@@ -3,12 +3,11 @@ package de.dhbw.tinderpol
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ImageView
 import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
-
+import kotlinx.coroutines.runBlocking
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -56,6 +55,10 @@ class SwipeActivity : AppCompatActivity() {
             }
         })
 
+        runBlocking {
+            SDO.syncNotices()
+            updateShownImg()
+        }
     }
     fun showBottomSheetDialog(){
         val bottomSheetDialog = NoticeInfoFragment()
@@ -68,7 +71,8 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     fun updateShownImg(){
-        val nameText = "${SDO.getCurrentNotice().firstName.toString()} ${SDO.getCurrentNotice().lastName} (${SDO.getCurrentNotice().sex.toString()})"
+        val notice = SDO.getCurrentNotice()
+        val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
         binding.textViewFullName.text = nameText
         binding.noticeImage.load(SDO.getCurrentImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
