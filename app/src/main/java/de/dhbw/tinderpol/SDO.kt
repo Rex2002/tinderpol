@@ -1,45 +1,52 @@
 package de.dhbw.tinderpol
 
-import androidx.core.net.toUri
+import android.util.Log
 import de.dhbw.tinderpol.data.Notice
-import java.net.URL
-import java.util.*
+import de.dhbw.tinderpol.data.NoticeRepository
+import kotlinx.coroutines.runBlocking
 
 class SDO {
     companion object {
-
+        val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
+        val emptyNotice = Notice("empty", imgs = listOf(noImg))
         var currentNoticeNr = 0
-        val notices : List<Notice> = listOf(
-            Notice("2018/46058", "Lastname1", "Firstname1", Date(1959, 10, 22), listOf("RU"), listOf("https://ws-public.interpol.int/notices/v1/red/1972-538/images/53063552".toUri()), charge="did something bad", birthPlace = "Sidney", birthCountry = "America"),
-            Notice("2019/46058", "Lastname2", "Firstname2", Date(1959, 10, 22), listOf("DE"), listOf("https://ws-public.interpol.int/notices/v1/red/2018-46058/images/61071213".toUri()), charge="did something even worse"),
-            Notice("2017/46058", "Lastname3", "Firstname3", Date(1959, 10, 22), listOf("MO"), listOf("https://ws-public.interpol.int/notices/v1/red/2022-77917/images/62602991".toUri()), charge="did the worst"))
+        var notices : List<Notice> = listOf()
 
         /**
          * synchronizes the notices stored in room with the API-available stuff ( in the background)
          */
         fun syncNotices() {
-            // currently just testing that internet is working
-            val response = URL("https://ws-public.interpol.int/notices/v1/red").openStream().bufferedReader().use { it.readText() }
-            println(response)
+            return runBlocking {
+                notices = NoticeRepository.fetchNotices()
+            }
         }
 
         fun getCurrentNotice() : Notice {
+            Log.i("API-Req", currentNoticeNr.toString())
+            if (notices.isNotEmpty()) Log.i("API-Req", notices[currentNoticeNr].toString())
+            if (notices.size <= currentNoticeNr) {
+                // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
+                if (notices.isNotEmpty()) currentNoticeNr = notices.size - 1
+                else return emptyNotice
+            }
             return notices[currentNoticeNr]
         }
 
         fun getNextNotice() : Notice {
             // will probably be different later on, when room is connected
             currentNoticeNr = (currentNoticeNr + 1) % notices.size
-            return notices[currentNoticeNr]
+            return getCurrentNotice()
         }
 
         fun getPrevNotice() : Notice{
             currentNoticeNr = (currentNoticeNr + (notices.size - 1)) % notices.size
-            return notices[currentNoticeNr]
+            return getCurrentNotice()
         }
 
         fun getCurrentImageURL(): String {
-            return notices[currentNoticeNr].imgURIs[0].toString()
+            val notice = getCurrentNotice()
+            return if (notice.imgs == null || notice.imgs.isEmpty()) noImg
+            else notice.imgs[0]
         }
     }
 }
