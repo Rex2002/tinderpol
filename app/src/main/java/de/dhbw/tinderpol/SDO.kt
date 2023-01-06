@@ -11,6 +11,7 @@ class SDO {
         val emptyNotice = Notice("empty", imgs = listOf(noImg))
         var currentNoticeNr = 0
         var notices : List<Notice> = listOf()
+        val starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
          * synchronizes the notices stored in room with the API-available stuff ( in the background)
