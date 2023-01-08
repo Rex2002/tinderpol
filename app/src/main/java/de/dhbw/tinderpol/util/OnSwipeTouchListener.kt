@@ -1,36 +1,39 @@
-package de.dhbw.tinderpol
-import android.content.Context;
+package de.dhbw.tinderpol.util
+import android.content.Context
 import android.util.Log
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import java.lang.Math.abs
+import kotlin.math.abs
 
 internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private val gestureDetector : GestureDetector
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-        return gestureDetector.onTouchEvent(p1)
+        return when (p1) {
+            null -> false
+            else -> gestureDetector.onTouchEvent(p1)
+        }
     }
     private inner class GestureListener : SimpleOnGestureListener(){
         private val SWIPE_THRESHOLD : Int = 100
         private val SWIPE_VELOCITY_THRESHOLD: Int = 100
 
-        override fun onDown(e: MotionEvent?): Boolean {
+        override fun onDown(e: MotionEvent): Boolean {
             return true
         }
-        override fun onSingleTapUp(e: MotionEvent?): Boolean {
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
             onClick()
             return super.onSingleTapUp(e)
         }
 
-        override fun onDoubleTap(e: MotionEvent?): Boolean {
+        override fun onDoubleTap(e: MotionEvent): Boolean {
             onDoubleClick()
             return super.onDoubleTap(e)
         }
 
-        override fun onLongPress(e: MotionEvent?) {
+        override fun onLongPress(e: MotionEvent) {
             onLongClick()
             super.onLongPress(e)
         }
@@ -68,7 +71,7 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
                     }
                 }
             }catch (exc : Exception){
-                exc.printStackTrace();
+                exc.printStackTrace()
             }
             return false
         }
@@ -82,8 +85,6 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private fun onLongClick() {}
 
     init {
-        print("gesture listener called");
-
-        gestureDetector = GestureDetector(c, GestureListener());
+        gestureDetector = GestureDetector(c, GestureListener())
     }
 }

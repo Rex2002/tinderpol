@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<Preference
+    android:key="notifications"
+    android:title="Enable App Notifications" />
+    <Preference
+        android:key="cache"
+        android:title="Clear App Cache"/>
+    <SwitchPreference android:key="checkBoxTestPreference"
+        android:title="checkbox test preference"
+        android:defaultValue="true" />
+
+</PreferenceScreen>
