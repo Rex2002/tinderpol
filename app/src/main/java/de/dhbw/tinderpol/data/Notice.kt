@@ -1,16 +1,28 @@
 package de.dhbw.tinderpol.data
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+
+@Entity
 data class Notice(
-    val id: String,
-    val lastName: String? = "",
-    val firstName: String? = "",
-    val birthDate: String? = "",
-    val nationalities: List<String>? = listOf(),
-    val imgs: List<String>? = listOf(),
-    val sex: SexID = SexID.U,
-    val birthCountry: String? = "",
-    val birthPlace: String? = "",
-    val charges: List<Charge>? = listOf(),
-    val weight: Int? = 60,
-    val height: Int? = 180,
-)
+    //TODO figure out solution for collection types
+    @PrimaryKey
+    var id: String,
+    var lastName: String?,
+    var firstName: String?,
+    var birthDate: String?,
+    @Ignore var nationalities: List<String>?,
+    @Ignore var imgs: List<String>?,
+    var sex: SexID,
+    var birthCountry: String?,
+    var birthPlace: String?,
+    @Ignore var charges: List<Charge>?,
+    var weight: Int?,
+    var height: Int?,
+) {
+    constructor(): this(
+        "", "", "", "", listOf(""), listOf(""), SexID.U,
+        "", "", listOf(Charge()), 80, 180
+    )
+}

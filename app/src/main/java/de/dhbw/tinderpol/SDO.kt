@@ -1,20 +1,25 @@
 package de.dhbw.tinderpol
 
 import android.util.Log
+import de.dhbw.tinderpol.data.Charge
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
+import de.dhbw.tinderpol.data.SexID
 import kotlinx.coroutines.runBlocking
 
 class SDO {
     companion object {
         val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
-        val emptyNotice = Notice("empty", imgs = listOf(noImg))
+        val emptyNotice = Notice(
+            "","","","",listOf(""), listOf(""), SexID.U, "",
+            "",listOf(Charge("","")), 0,0
+        )
         var currentNoticeNr = 0
         var notices : List<Notice> = listOf()
         val starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
-         * synchronizes the notices stored in room with the API-available stuff ( in the background)
+         * synchronizes the notices stored in Room with the API-available stuff (in the background)
          */
         fun syncNotices() {
             return runBlocking {
@@ -46,8 +51,8 @@ class SDO {
 
         fun getCurrentImageURL(): String {
             val notice = getCurrentNotice()
-            return if (notice.imgs == null || notice.imgs.isEmpty()) noImg
-            else notice.imgs[0]
+            return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
+            else notice.imgs!![0]
         }
 
         fun toggleStarredNotice(id : String){

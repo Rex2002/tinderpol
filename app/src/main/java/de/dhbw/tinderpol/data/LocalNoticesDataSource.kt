@@ -1,7 +1,5 @@
 package de.dhbw.tinderpol.data
 
-import androidx.core.net.toUri
-
 class LocalNoticesDataSource {
     fun lastUpdated(): Int {
         return 10
@@ -11,7 +9,7 @@ class LocalNoticesDataSource {
         // TODO
     }
 
-    fun fetchNotices(): List<Notice> {
-        return listOf(Notice("2018/46058", "Lastname", "Firstname", null, listOf("RU"), listOf("https://ws-public.interpol.int/notices/v1/red/2018-46058/images/61071213")))
+    fun fetchNotices(noticeDao: NoticeDao): List<Notice> {
+        return noticeDao.getAll()
     }
 }
