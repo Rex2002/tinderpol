@@ -1,7 +1,5 @@
 package de.dhbw.tinderpol.data
 
-import androidx.core.net.toUri
-
 class LocalNoticesDataSource {
     fun lastUpdated(): Int {
         return 10
@@ -11,7 +9,7 @@ class LocalNoticesDataSource {
         // TODO
     }
 
-    fun fetchNotices(): List<Notice> {
-        return listOf()
+    fun fetchNotices(noticeDao: NoticeDao): List<Notice> {
+        return noticeDao.getAll()
     }
 }
