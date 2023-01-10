@@ -25,7 +25,7 @@ async function getJSONReq(url) {
 				console.error('Error requesting URL:', url);
 				// If Rate-Limited, then access will be denied for a short period of time
 				// exact time is not documented sadly
-				if (statusCode === 403) {
+				if (400 <= statusCode && statusCode < 500) {
 					await onRateLimit();
 					const data = await getJSONReq(url);
 					return resolve(data);
