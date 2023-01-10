@@ -81,9 +81,24 @@ function getPerc(num, denom, precision = 3) {
 	return Math.floor((100 * factor * num) / denom) / factor;
 }
 
-function normalizeNotice(notice, images = null) {
+function normalizeNotice(notice, type, images = null) {
+	const charges = [];
+	if (Array.isArray(notice?.arrest_warrants)) {
+		charges.push(
+			...notice.arrest_warrants.map((x) => {
+				return {
+					country: x?.issuing_country_id ?? '',
+					charge: x?.charge ?? '',
+				};
+			})
+		);
+	} else if (type === 'un' && notice?.main_activity) {
+		charges.push([{ country: 'un', charge: notice.main_activity }]);
+	}
+
 	return {
 		id: notice?.entity_id ?? '',
+		type,
 		firstName: notice?.forename ?? '',
 		lastName: notice?.name ?? '',
 		birthDate: notice?.date_of_birth ?? '',
@@ -92,15 +107,10 @@ function normalizeNotice(notice, images = null) {
 		sex: notice?.sex_id ?? 'U',
 		birthCountry: notice?.country_of_birth_id ?? '',
 		birthPlace: notice?.place_of_birth ?? '',
-		charges:
-			notice?.arrest_warrants?.map((x) => {
-				return {
-					country: x?.issuing_country_id ?? '',
-					charge: x?.charge ?? '',
-				};
-			}) ?? [],
-		weight: notice?.weight ?? 0,
-		heght: notice?.height ?? 0,
+		spokenLanguages: notice?.languages_spoken_ids ?? [],
+		charges,
+		weight: notice?.weight ?? null,
+		height: notice?.height ?? null,
 	};
 }
 
@@ -110,9 +120,9 @@ async function getImages(url = null) {
 	return res?._embedded?.images?.map((x) => x?._links?.self?.href ?? null)?.filter((x) => x !== null) ?? [];
 }
 
-async function getRemoteData() {
+async function getNoticesOfType(type) {
 	const countryCodes = await getCountryCodes();
-	const noticesURL = 'https://ws-public.interpol.int/notices/v1/red';
+	const noticesURL = 'https://ws-public.interpol.int/notices/v1/' + type.toLowerCase();
 	let notices = [];
 
 	async function req(...keyArgs) {
@@ -162,11 +172,21 @@ async function getRemoteData() {
 	for await (const notice of notices) {
 		const images = await getImages(notice?._links?.images?.href);
 		const fullNotice = await getJSONReq(notice?._links?.self?.href);
-		const normalizedNotice = normalizeNotice(fullNotice ?? notice, images);
+		const normalizedNotice = normalizeNotice(fullNotice ?? notice, type, images);
 		res.push(normalizedNotice);
 
 		i++;
 		console.log(getPerc(i, notices.length) + '% done..');
+	}
+	return res;
+}
+
+async function getRemoteData() {
+	const res = [];
+	for await (const type of ['red', 'yellow', 'un']) {
+		console.log("Getting notices of type '" + type + "'");
+		const notices = await getNoticesOfType(type);
+		res.push(...notices);
 	}
 	return res;
 }
