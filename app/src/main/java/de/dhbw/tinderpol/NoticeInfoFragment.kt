@@ -27,14 +27,18 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         val notice = SDO.getCurrentNotice()
         val nameText = "Name: ${notice.firstName} ${notice.lastName} (${notice.sex})"
         binding.nameText.text = nameText
+        val noticeType = "Type of Notice: ${notice.type}"
+        binding.noticeTypeText.text = noticeType
         val crimeDescr = "Charges: \n${notice.charges?.joinToString(separator = "\n") { charge -> charge.charge }}"
         binding.crimeDescrText.text = crimeDescr
         val birthInfo = "Born ${notice.birthDate} in ${notice.birthPlace}, ${notice.birthCountry}"
         binding.birthInfoText.text = birthInfo
         val physicals = "Height: ${notice.height}cm, Weight: ${notice.weight}kg"
         binding.physicalsText.text = physicals
-        val nationalities = "Nationalities: ${notice.nationalities?.joinToString(separator = ", ") }"
+        val nationalities = "Nationalities: ${notice.nationalities?.joinToString(separator = ", ")}"
         binding.nationalitiesText.text = nationalities
+        val spokenLanguages = "Spoken Languages:  ${notice.spokenLanguages?.joinToString(separator = ", ")}"
+        binding.spokenLanguagesText.text = spokenLanguages
 
         binding.starNoticeImageButton.setImageResource(
             if (SDO.noticeIsStarred(notice.id)) android.R.drawable.btn_star_big_on
