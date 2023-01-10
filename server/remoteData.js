@@ -148,17 +148,25 @@ async function getRemoteData() {
 		}
 		notices.push(...country_notices);
 
-		console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
 		i++;
+		console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
 	}
 
 	// Sort notices & remove duplicate notices
+	console.log('Post-Processing all nodes...');
+	i = 0;
+
 	notices.sort((a, b) => a.entity_id - b.entity_id);
 	notices = notices.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
 	const res = [];
 	for await (const notice of notices) {
 		const images = await getImages(notice?._links?.images?.href);
-		res.push(normalizeNotice(notice, images));
+		const fullNotice = await getJSONReq(notice?._links?.self?.href);
+		const normalizedNotice = normalizeNotice(fullNotice ?? notice, images);
+		res.push(normalizedNotice);
+
+		i++;
+		console.log(getPerc(i, notices.length) + '% done..');
 	}
 	return res;
 }
