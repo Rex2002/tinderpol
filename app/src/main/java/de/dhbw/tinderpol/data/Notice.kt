@@ -13,6 +13,6 @@ data class Notice(
     val birthPlace: String? = "",
     val charges: List<Charge>? = listOf(),
     val spokenLanguages: List<String>? = listOf(),
-    val weight: Int? = 60,
-    val height: Int? = 180,
+    val weight: Number? = 60,
+    val height: Number? = 180,
 )
