@@ -50,17 +50,26 @@ class SDO {
             else notice.imgs[0]
         }
 
-        fun toggleStarredNotice(id : String){
-            if(starredNotices.any{it.id == id}){
-                starredNotices.remove(starredNotices.find{it.id == id})
-            }
-            else{
-                notices.find{it.id == id}?.let { starredNotices.add(it) }
-            }
+        fun currentNoticeIsStarred(): Boolean {
+            return getCurrentNotice().starred
         }
 
-        fun noticeIsStarred(id : String) : Boolean{
-            return starredNotices.any{it.id == id}
+        fun toggleStarredCurrentNotice() {
+            val notice = getCurrentNotice()
+            notice.starred = !notice.starred
         }
+
+//        fun toggleStarredNotice(id : String){
+//            if(starredNotices.any{it.id == id}){
+//                starredNotices.remove(starredNotices.find{it.id == id})
+//            }
+//            else{
+//                notices.find{it.id == id}?.let { starredNotices.add(it) }
+//            }
+//        }
+//
+//        fun noticeIsStarred(id : String) : Boolean{
+//            return starredNotices.any{it.id == id}
+//        }
     }
 }
