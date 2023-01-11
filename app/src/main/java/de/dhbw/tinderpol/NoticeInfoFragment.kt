@@ -106,14 +106,14 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         bindList(binding.spokenLanguagesText, notice.spokenLanguages, "Spoken Languages: ")
 
         binding.starNoticeImageButton.setImageResource(
-            if (SDO.noticeIsStarred(notice.id)) android.R.drawable.btn_star_big_on
+            if (SDO.isNoticeStarred()) android.R.drawable.btn_star_big_on
             else android.R.drawable.btn_star_big_off )
         binding.starNoticeImageButton.setBackgroundResource(0)
 
         binding.starNoticeImageButton.setOnClickListener{
-            SDO.toggleStarredNotice(notice.id)
+            SDO.toggleStarredNotice()
             binding.starNoticeImageButton.setImageResource(
-                if (SDO.noticeIsStarred(notice.id)) android.R.drawable.btn_star_big_on
+                if (SDO.isNoticeStarred()) android.R.drawable.btn_star_big_on
                 else android.R.drawable.btn_star_big_off )
         }
 

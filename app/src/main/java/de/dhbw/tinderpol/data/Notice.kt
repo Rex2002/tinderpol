@@ -15,4 +15,5 @@ data class Notice(
     val spokenLanguages: List<String>? = listOf(),
     val weight: Number? = 60,
     val height: Number? = 180,
+    var starred: Boolean = false,
 )
