@@ -38,6 +38,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:id="@+id/noticeTypeLinearLayout"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp">
+
+
+            <TextView
+                android:id="@+id/noticeTypeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                tools:text="@tools:sample/lorem" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:id="@+id/crimeDescrLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
@@ -99,6 +117,24 @@
 
             <TextView
                 android:id="@+id/birthInfoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                tools:text="@tools:sample/lorem" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/spokenLanguagesLinearLayout"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp">
+
+
+            <TextView
+                android:id="@+id/spokenLanguagesText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
