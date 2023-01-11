@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol.data
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -24,7 +25,9 @@ class RemoteNoticesDataSource {
                     ?: return@withContext Result.failure(Exception("Something went wrong trying to load more Notices. Try again in a moment"))
                 return@withContext Result.success(res.data)
             } catch (e: Throwable) {
-                return@withContext Result.failure(e)
+                Log.e("API-Req", e.toString())
+                throw e
+                // return@withContext Result.failure(e)
             }
         }
     }
