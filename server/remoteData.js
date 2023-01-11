@@ -120,7 +120,12 @@ async function getImages(url = null) {
 	return res?._embedded?.images?.map((x) => x?._links?.self?.href ?? null)?.filter((x) => x !== null) ?? [];
 }
 
-async function getNoticesOfType(type) {
+function uniqSorted(arr) {
+	arr.sort((a, b) => a.entity_id - b.entity_id);
+	return arr.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+}
+
+async function getNoticesOfType(type, singleReq = true) {
 	const countryCodes = await getCountryCodes();
 	const noticesURL = 'https://ws-public.interpol.int/notices/v1/' + type.toLowerCase();
 	let notices = [];
@@ -135,39 +140,43 @@ async function getNoticesOfType(type) {
 	for (let i = 19; i <= 60; i++) age_args.push([i, i]);
 	age_args.push([60, 120]);
 
-	let i = 0;
-	for await (const cc of countryCodes) {
-		const country_arg = ['nationality', cc];
-		const resPerPage_arg = ['resultsPerPage', 200];
+	if (!singleReq) {
+		let i = 0;
+		for await (const cc of countryCodes) {
+			const country_arg = ['nationality', cc];
+			const resPerPage_arg = ['resultsPerPage', 200];
 
-		const resp = await req(country_arg, resPerPage_arg);
-		let country_notices = resp._embedded.notices;
-		if (country_notices.length < resp.total) {
-			country_notices = [];
-			for await (let id of ['F', 'M', 'U']) {
-				let sd = await req(country_arg, resPerPage_arg, ['sexId', id]);
-				if (sd.total > sd._embedded.notices.length) {
-					for await (let age_arg of age_args) {
-						let asd = await req(country_arg, resPerPage_arg, ['ageMin', age_arg[0]], ['ageMax', age_arg[1]]);
-						country_notices.push(...asd._embedded.notices);
+			const resp = await req(country_arg, resPerPage_arg);
+			let country_notices = resp._embedded.notices;
+			if (country_notices.length < resp.total) {
+				country_notices = [];
+				for await (let id of ['F', 'M', 'U']) {
+					let sd = await req(country_arg, resPerPage_arg, ['sexId', id]);
+					if (sd.total > sd._embedded.notices.length) {
+						for await (let age_arg of age_args) {
+							let asd = await req(country_arg, resPerPage_arg, ['ageMin', age_arg[0]], ['ageMax', age_arg[1]]);
+							country_notices.push(...asd._embedded.notices);
+						}
+					} else {
+						country_notices.push(...sd._embedded.notices);
 					}
-				} else {
-					country_notices.push(...sd._embedded.notices);
 				}
 			}
-		}
-		notices.push(...country_notices);
+			notices.push(...country_notices);
 
-		i++;
-		console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
+			i++;
+			console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
+		}
+	} else {
+		const res = await req(['resultsPerPage', 200]);
+		notices.push(...res);
 	}
 
 	// Sort notices & remove duplicate notices
 	console.log('Post-Processing all nodes...');
-	i = 0;
+	let i = 0;
 
-	notices.sort((a, b) => a.entity_id - b.entity_id);
-	notices = notices.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+	notices = uniqSorted(notices);
 	const res = [];
 	for await (const notice of notices) {
 		const images = await getImages(notice?._links?.images?.href);
@@ -188,7 +197,7 @@ async function getRemoteData() {
 		const notices = await getNoticesOfType(type);
 		res.push(...notices);
 	}
-	return res;
+	return uniqSorted(res);
 }
 
 module.exports = getRemoteData;
