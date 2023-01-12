@@ -1,10 +1,13 @@
 package de.dhbw.tinderpol
 
 import android.os.Bundle
+import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.setPadding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.dhbw.tinderpol.data.SexID
 import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
@@ -37,15 +40,30 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun <T> bindList(uiEl: TextView, list: List<T>?, beforeStr: String? = null, afterStr: String? = null, joinStr: String = ", ") {
+    private fun changeTextViewVisibility(view: TextView, parent: LinearLayout, text: String? = null, show: Boolean = text == null) {
+        if (show) {
+            parent.setPadding(8)
+            view.setPadding(8)
+            view.text = text ?: ""
+            view.textSize = 15F
+            view.visibility = View.VISIBLE
+        } else {
+            parent.setPadding(0)
+            view.setPadding(0)
+            view.text = ""
+            view.textSize = 0F
+            view.visibility = View.GONE
+        }
+    }
+
+    private fun <T> bindList(uiEl: TextView, parent: LinearLayout, list: List<T>?, beforeStr: String? = null, afterStr: String? = null, joinStr: String = ", ") {
         if (list != null && list.isNotEmpty()) {
             var str = if (!isBlankStr(beforeStr)) beforeStr else ""
             str += list.joinToString(joinStr)
             if (!isBlankStr(afterStr)) str += afterStr
-            uiEl.visibility = View.VISIBLE
-            uiEl.text = str
+            changeTextViewVisibility(uiEl, parent, str, true)
         } else {
-            uiEl.visibility = View.GONE
+            changeTextViewVisibility(uiEl, parent)
         }
     }
 
@@ -63,30 +81,19 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         val nameText = if (isNameVisible) "Name: ${firstName + nameSeparator + lastName} ($sexStr)" else "Sex: $sexStr"
         binding.nameText.text = nameText
 
-        if (isBlankStr(notice.type)) {
-            binding.noticeTypeText.visibility = View.GONE
-        } else {
-            binding.noticeTypeText.visibility = View.VISIBLE
-            val noticeType = "Type of Notice: ${notice.type}"
-            binding.noticeTypeText.text = noticeType
-        }
+        changeTextViewVisibility(binding.noticeTypeText, binding.noticeTypeLinearLayout, "Type of Notice: ${notice.type}", !isBlankStr(notice.type))
 
-        bindList(binding.crimeDescrText, notice.charges?.map { charge -> charge.charge }, "Charges:\n", "", "\n")
+        bindList(binding.crimeDescrText, binding.crimeDescrLinearLayout, notice.charges?.map { charge -> charge.charge }, "Charges:\n", "", "\n")
 
         val birthDate = if (isBlankStr(notice.birthDate)) "" else notice.birthDate
         val birthPlace = if (isBlankStr(notice.birthPlace)) "" else notice.birthPlace
         val birthCountry = if (isBlankStr(notice.birthCountry)) "" else notice.birthCountry
         var birthLoc = birthPlace + if(!isBlankStr(birthPlace) && !isBlankStr(birthCountry)) ", " else "" + birthCountry
         if (!isBlankStr(birthLoc)) birthLoc = "in $birthLoc"
-        if (isBlankStr(birthDate) && isBlankStr(birthLoc)) {
-            binding.birthInfoText.visibility = View.GONE
-        } else {
-            binding.birthInfoText.visibility = View.VISIBLE
-            var birthInfo = "Born"
-            if (!isBlankStr(birthDate)) birthInfo += " $birthDate"
-            if (!isBlankStr(birthLoc)) birthInfo += " $birthLoc"
-            binding.birthInfoText.text = birthInfo
-        }
+        var birthInfo = "Born"
+        if (!isBlankStr(birthDate)) birthInfo += " $birthDate"
+        if (!isBlankStr(birthLoc)) birthInfo += " $birthLoc"
+        changeTextViewVisibility(binding.birthInfoText, binding.birthInfoLinearLayout, birthInfo, !isBlankStr(birthDate) || !isBlankStr(birthLoc))
 
         var physicals = ""
         if (!isBlankNum(notice.height)) physicals += "Height: ${notice.height}cm"
@@ -94,16 +101,11 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
             if (!isBlankStr(physicals)) physicals += ", "
             physicals += "Weight: ${notice.weight}kg"
         }
-        if (isBlankStr(physicals)) {
-            binding.physicalsText.visibility = View.GONE
-        } else {
-            binding.physicalsText.visibility = View.VISIBLE
-            binding.physicalsText.text = physicals
-        }
+        changeTextViewVisibility(binding.physicalsText, binding.physicalsLinearLayout, physicals, !isBlankStr(physicals))
 
-        bindList(binding.nationalitiesText, notice.nationalities, "Nationalities: ")
+        bindList(binding.nationalitiesText, binding.nationalitiesLinearLayout, notice.nationalities, "Nationalities: ")
 
-        bindList(binding.spokenLanguagesText, notice.spokenLanguages, "Spoken Languages: ")
+        bindList(binding.spokenLanguagesText, binding.spokenLanguagesLinearLayout, notice.spokenLanguages, "Spoken Languages: ")
 
         binding.starNoticeImageButton.setImageResource(
             if (SDO.isNoticeStarred()) android.R.drawable.btn_star_big_on
