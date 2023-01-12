@@ -4,13 +4,15 @@
     <string name="start_explain_text_1">Swipe left to see the next notice.</string>
     <string name="start_explain_text_2">Swipe right if you have information about the Wanted Person to contact Interpol.</string>
     <string name="start_explain_text_3">Swipe up to see more information about the Wanted Person.</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="shared_preferences_file">sharedPreferencesFileKey</string>
     <string name="settings">Settings</string>
     <string name="red_notices">Red Notices</string>
     <string name="yellow_notices">Yellow Notices</string>
     <string name="un_notices">UN Notices</string>
+    <string name="show_red_notices_shared_prefs">showRedNoticesSharedPref</string>
+    <string name="show_yellow_notices_shared_prefs">showYellowNoticesSharedPref</string>
+    <string name="show_UN_notices_shared_prefs">showUnNoticesSharedPref</string>
     <string name="clear_swipe_history">Clear Swipe History</string>
     <string name="clear_starred_notices">Clear Starred Notices</string>
 </resources>

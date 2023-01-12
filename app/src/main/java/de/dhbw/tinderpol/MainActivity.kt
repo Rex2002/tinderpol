@@ -26,9 +26,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.imageButtonSettings.setOnClickListener{
-            println("hello world")
             showReportConfirmDialog()
-            Toast.makeText(this, "settingsbutton called", Toast.LENGTH_SHORT).show()
         }
     }
 
