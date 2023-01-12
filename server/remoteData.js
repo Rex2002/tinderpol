@@ -125,7 +125,7 @@ function uniqSorted(arr) {
 	return arr.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
 }
 
-async function getNoticesOfType(type, singleReq = true) {
+async function getNoticesOfType(type, singleReq) {
 	const countryCodes = await getCountryCodes();
 	const noticesURL = 'https://ws-public.interpol.int/notices/v1/' + type.toLowerCase();
 	let notices = [];
@@ -140,11 +140,11 @@ async function getNoticesOfType(type, singleReq = true) {
 	for (let i = 19; i <= 60; i++) age_args.push([i, i]);
 	age_args.push([60, 120]);
 
+	const resPerPage_arg = ['resultsPerPage', 200];
 	if (!singleReq) {
 		let i = 0;
 		for await (const cc of countryCodes) {
 			const country_arg = ['nationality', cc];
-			const resPerPage_arg = ['resultsPerPage', 200];
 
 			const resp = await req(country_arg, resPerPage_arg);
 			let country_notices = resp._embedded.notices;
@@ -168,8 +168,8 @@ async function getNoticesOfType(type, singleReq = true) {
 			console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
 		}
 	} else {
-		const res = await req(['resultsPerPage', 200]);
-		notices.push(...res);
+		const res = await req(resPerPage_arg);
+		notices.push(...res._embedded.notices);
 	}
 
 	// Sort notices & remove duplicate notices
@@ -194,7 +194,7 @@ async function getRemoteData() {
 	const res = [];
 	for await (const type of ['red', 'yellow', 'un']) {
 		console.log("Getting notices of type '" + type + "'");
-		const notices = await getNoticesOfType(type);
+		const notices = await getNoticesOfType(type, type === 'un');
 		res.push(...notices);
 	}
 	return uniqSorted(res);
