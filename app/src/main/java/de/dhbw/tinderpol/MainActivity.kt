@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showReportConfirmDialog(){
-        val settingsFragment = SettingsFragment()
-        supportFragmentManager.beginTransaction().replace(android.R.id.content,settingsFragment).addToBackStack("settings").commit()
+        val settingsFragment = BottomSettingsFragment()
+        supportFragmentManager.beginTransaction().add(settingsFragment, "").commit()
     }
 }

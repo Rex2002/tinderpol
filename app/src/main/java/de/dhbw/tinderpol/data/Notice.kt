@@ -16,4 +16,8 @@ data class Notice(
     val weight: Number? = 60,
     val height: Number? = 180,
     var starred: Boolean = false,
-)
+){
+    override fun toString(): String {
+        return "Notice(id='$id', lastName=$lastName, firstName=$firstName, birthDate=$birthDate, nationalities=$nationalities, imgs=$imgs, sex=$sex, birthCountry=$birthCountry, birthPlace=$birthPlace, charges=$charges, weight=$weight, height=$height)"
+    }
+}

@@ -6,4 +6,5 @@
     <string name="start_explain_text_3">Swipe up to see more information about the Wanted Person.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="shared_preferences_file">sharedPreferencesFileKey</string>
 </resources>
