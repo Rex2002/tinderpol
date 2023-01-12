@@ -142,7 +142,7 @@ async function getNoticesOfType(type, singleReq) {
 	for (let i = 19; i <= 60; i++) age_args.push([i, i]);
 	age_args.push([60, 120]);
 
-	const resPerPage_arg = ['resultsPerPage', 200];
+	const resPerPage_arg = ['resultPerPage', 200];
 	if (!singleReq) {
 		let i = 0;
 		for await (const cc of countryCodes) {
