@@ -109,8 +109,8 @@ function normalizeNotice(notice, type, images = null) {
 		birthPlace: notice?.place_of_birth ?? '',
 		spokenLanguages: notice?.languages_spoken_ids ?? [],
 		charges,
-		weight: notice?.weight ?? null,
-		height: notice?.height ?? null,
+		weight: notice?.weight || null,
+		height: notice?.height || null,
 	};
 }
 
@@ -120,7 +120,14 @@ async function getImages(url = null) {
 	return res?._embedded?.images?.map((x) => x?._links?.self?.href ?? null)?.filter((x) => x !== null) ?? [];
 }
 
-async function getNoticesOfType(type) {
+// For sorting by ID as numbesr: cb = (str) => str?.split('/')?.map((x) => Number(x)) || [0, 0], cmp = (a, b) => a[0] - b[0] || a[1] - b[1]
+// For sorting by ID as strings: cb = (str) => str, cmp = (a, b) => a.localeCompare(b)
+function uniqSorted(arr, key = 'entity_id', cb = (str) => str?.split('/')?.map((x) => Number(x)) || [0, 0], cmp = (a, b) => a[0] - b[0] || a[1] - b[1]) {
+	arr.sort((a, b) => cmp(cb(a[key]), cb(b[key])));
+	return arr.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+}
+
+async function getNoticesOfType(type, singleReq) {
 	const countryCodes = await getCountryCodes();
 	const noticesURL = 'https://ws-public.interpol.int/notices/v1/' + type.toLowerCase();
 	let notices = [];
@@ -135,39 +142,43 @@ async function getNoticesOfType(type) {
 	for (let i = 19; i <= 60; i++) age_args.push([i, i]);
 	age_args.push([60, 120]);
 
-	let i = 0;
-	for await (const cc of countryCodes) {
-		const country_arg = ['nationality', cc];
-		const resPerPage_arg = ['resultsPerPage', 200];
+	const resPerPage_arg = ['resultPerPage', 200];
+	if (!singleReq) {
+		let i = 0;
+		for await (const cc of countryCodes) {
+			const country_arg = ['nationality', cc];
 
-		const resp = await req(country_arg, resPerPage_arg);
-		let country_notices = resp._embedded.notices;
-		if (country_notices.length < resp.total) {
-			country_notices = [];
-			for await (let id of ['F', 'M', 'U']) {
-				let sd = await req(country_arg, resPerPage_arg, ['sexId', id]);
-				if (sd.total > sd._embedded.notices.length) {
-					for await (let age_arg of age_args) {
-						let asd = await req(country_arg, resPerPage_arg, ['ageMin', age_arg[0]], ['ageMax', age_arg[1]]);
-						country_notices.push(...asd._embedded.notices);
+			const resp = await req(country_arg, resPerPage_arg);
+			let country_notices = resp._embedded.notices;
+			if (country_notices.length < resp.total) {
+				country_notices = [];
+				for await (let id of ['F', 'M', 'U']) {
+					let sd = await req(country_arg, resPerPage_arg, ['sexId', id]);
+					if (sd.total > sd._embedded.notices.length) {
+						for await (let age_arg of age_args) {
+							let asd = await req(country_arg, resPerPage_arg, ['ageMin', age_arg[0]], ['ageMax', age_arg[1]]);
+							country_notices.push(...asd._embedded.notices);
+						}
+					} else {
+						country_notices.push(...sd._embedded.notices);
 					}
-				} else {
-					country_notices.push(...sd._embedded.notices);
 				}
 			}
-		}
-		notices.push(...country_notices);
+			notices.push(...country_notices);
 
-		i++;
-		console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
+			i++;
+			console.log(cc + '  -  ' + getPerc(i, countryCodes.length) + '% done...');
+		}
+	} else {
+		const res = await req(resPerPage_arg);
+		notices.push(...res._embedded.notices);
 	}
 
 	// Sort notices & remove duplicate notices
 	console.log('Post-Processing all nodes...');
-	i = 0;
+	let i = 0;
 
-	notices.sort((a, b) => a.entity_id - b.entity_id);
-	notices = notices.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+	notices = uniqSorted(notices, 'entity_id');
 	const res = [];
 	for await (const notice of notices) {
 		const images = await getImages(notice?._links?.images?.href);
@@ -185,10 +196,10 @@ async function getRemoteData() {
 	const res = [];
 	for await (const type of ['red', 'yellow', 'un']) {
 		console.log("Getting notices of type '" + type + "'");
-		const notices = await getNoticesOfType(type);
+		const notices = await getNoticesOfType(type, type === 'un');
 		res.push(...notices);
 	}
-	return res;
+	return uniqSorted(res, 'id');
 }
 
 module.exports = getRemoteData;
