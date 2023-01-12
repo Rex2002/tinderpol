@@ -109,8 +109,8 @@ function normalizeNotice(notice, type, images = null) {
 		birthPlace: notice?.place_of_birth ?? '',
 		spokenLanguages: notice?.languages_spoken_ids ?? [],
 		charges,
-		weight: notice?.weight ?? null,
-		height: notice?.height ?? null,
+		weight: notice?.weight || null,
+		height: notice?.height || null,
 	};
 }
 
@@ -120,8 +120,10 @@ async function getImages(url = null) {
 	return res?._embedded?.images?.map((x) => x?._links?.self?.href ?? null)?.filter((x) => x !== null) ?? [];
 }
 
-function uniqSorted(arr) {
-	arr.sort((a, b) => a.entity_id - b.entity_id);
+// For sorting by ID as numbesr: cb = (str) => str?.split('/')?.map((x) => Number(x)) || [0, 0], cmp = (a, b) => a[0] - b[0] || a[1] - b[1]
+// For sorting by ID as strings: cb = (str) => str, cmp = (a, b) => a.localeCompare(b)
+function uniqSorted(arr, key = 'entity_id', cb = (str) => str?.split('/')?.map((x) => Number(x)) || [0, 0], cmp = (a, b) => a[0] - b[0] || a[1] - b[1]) {
+	arr.sort((a, b) => cmp(cb(a[key]), cb(b[key])));
 	return arr.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
 }
 
@@ -176,7 +178,7 @@ async function getNoticesOfType(type, singleReq) {
 	console.log('Post-Processing all nodes...');
 	let i = 0;
 
-	notices = uniqSorted(notices);
+	notices = uniqSorted(notices, 'entity_id');
 	const res = [];
 	for await (const notice of notices) {
 		const images = await getImages(notice?._links?.images?.href);
@@ -197,7 +199,7 @@ async function getRemoteData() {
 		const notices = await getNoticesOfType(type, type === 'un');
 		res.push(...notices);
 	}
-	return uniqSorted(res);
+	return uniqSorted(res, 'id');
 }
 
 module.exports = getRemoteData;
