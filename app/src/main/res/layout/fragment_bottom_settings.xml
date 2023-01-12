@@ -9,6 +9,7 @@
         android:layout_height="match_parent">
 
 
+
         <LinearLayout
             android:id="@+id/linearLayoutTitle"
             android:layout_width="match_parent"
@@ -16,7 +17,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:orientation="horizontal"
             android:padding="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayoutNoticeSwitches"
+            app:layout_constraintBottom_toTopOf="@+id/viewHorizontalDivider"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -25,21 +26,33 @@
                 android:id="@+id/textViewTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Settings"
+                android:text="@string/settings"
                 android:textAlignment="center"
                 android:textSize="24sp" />
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/linearLayoutNoticeSwitches"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutTitle"
+
+        <View
+            android:id="@+id/viewHorizontalDivider"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayoutNoticeSwitches"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/linearLayoutTitle"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="#c0c0c0"/>
+        <LinearLayout
+            android:id="@+id/linearLayoutNoticeSwitches"
+            app:layout_constraintTop_toBottomOf="@+id/viewHorizontalDivider"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/viewHorizontalDivider2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:baselineAligned="false">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -49,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Red Notices"
+                    android:text="@string/red_notices"
                     android:layout_gravity="center"/>
                 <Switch
                     android:id="@+id/switchRedNotices"
@@ -66,7 +79,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Yellow Notices"
+                    android:text="@string/yellow_notices"
                     android:layout_gravity="center"/>
                 <Switch
                     android:id="@+id/switchYellowNotices"
@@ -83,7 +96,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="UN Notices"
+                    android:text="@string/un_notices"
                     android:layout_gravity="center"/>
                 <Switch
                     android:id="@+id/switchUnNotices"
@@ -92,6 +105,39 @@
                     android:layout_gravity="center_horizontal"
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
             </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewHorizontalDivider2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#c0c0c0"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayoutNoticeSwitches"
+            app:layout_constraintBottom_toTopOf="@id/linearLayoutClearCache"
+            />
+        <LinearLayout
+            android:id="@+id/linearLayoutClearCache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/viewHorizontalDivider2">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/clear_swipe_history"
+                android:layout_margin="4dp"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/clear_starred_notices"
+                android:layout_margin="4dp"/>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
