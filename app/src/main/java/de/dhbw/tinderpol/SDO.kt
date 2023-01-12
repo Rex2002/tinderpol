@@ -35,12 +35,12 @@ class SDO {
 
         fun getNextNotice() : Notice {
             // will probably be different later on, when room is connected
-            currentNoticeNr = (currentNoticeNr + 1) % notices.size
+            if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + 1) % notices.size
             return getCurrentNotice()
         }
 
         fun getPrevNotice() : Notice{
-            currentNoticeNr = (currentNoticeNr + (notices.size - 1)) % notices.size
+            if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + (notices.size - 1)) % notices.size
             return getCurrentNotice()
         }
 

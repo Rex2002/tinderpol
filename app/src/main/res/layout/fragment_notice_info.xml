@@ -3,17 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data />
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
         <LinearLayout
+            android:id="@+id/nameLayout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/noticeTypeLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/nameLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -35,10 +39,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/noticeTypeLinearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/nameLayout"
+            app:layout_constraintBottom_toTopOf="@+id/crimeDescrLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/noticeTypeLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -53,10 +61,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/crimeDescrLinearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/noticeTypeLinearLayout"
+            app:layout_constraintBottom_toTopOf="@+id/nationalitiesLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/crimeDescrLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -71,10 +83,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nationalitiesLinearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/crimeDescrLinearLayout"
+            app:layout_constraintBottom_toTopOf="@+id/physicalsLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/nationalitiesLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -90,10 +106,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/physicalsLinearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/nationalitiesLinearLayout"
+            app:layout_constraintBottom_toTopOf="@+id/birthInfoLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/physicalsLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -107,10 +127,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/birthInfoLinearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/physicalsLinearLayout"
+            app:layout_constraintBottom_toTopOf="@+id/spokenLanguagesLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/birthInfoLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -125,10 +149,13 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/spokenLanguagesLinearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/birthInfoLinearLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/spokenLanguagesLinearLayout"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
@@ -141,5 +168,5 @@
                 android:padding="8dp"
                 tools:text="@tools:sample/lorem" />
         </LinearLayout>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
