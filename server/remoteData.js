@@ -93,7 +93,7 @@ function normalizeNotice(notice, type, images = null) {
 			})
 		);
 	} else if (type === 'un' && notice?.main_activity) {
-		charges.push([{ country: 'un', charge: notice.main_activity }]);
+		charges.push({ country: 'un', charge: notice.main_activity });
 	}
 
 	return {
