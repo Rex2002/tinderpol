@@ -1,11 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="?android:attr/listPreferredItemHeight"
+android:padding="6dip" >
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/textViewStarredNoticesListItem"
-        android:layout_width="match_parent"
+<ImageView
+    android:id="@+id/iconStarredNoticesListItem"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentTop="true"
+    android:layout_marginEnd="6dip"
+    android:contentDescription="TODO"
+    android:src="@drawable/ic_launcher_background" />
+
+<TextView
+    android:id="@+id/textViewBirthdateStarredNoticesListItem"
+    android:layout_width="fill_parent"
+    android:layout_height="26dip"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentEnd="true"
+    android:layout_toEndOf="@id/iconStarredNoticesListItem"
+    android:ellipsize="marquee"
+    android:text="Description"
+    android:textSize="12sp"
+    android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/textViewNameStarredNoticesListItem"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/textViewBirthdateStarredNoticesListItem"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toEndOf="@id/iconStarredNoticesListItem"
+        android:gravity="center_vertical"
+        android:text="place holder"
         android:textSize="16sp"
-        android:gravity="center"
-    />
+        />
+
+
+</RelativeLayout>

@@ -46,7 +46,11 @@ class SDO {
 
         fun getCurrentImageURL(): String {
             val notice = getCurrentNotice()
-            return if (notice.imgs == null || notice.imgs.isEmpty()) noImg
+            return getImageURL(notice)
+        }
+
+        fun getImageURL(notice: Notice): String{
+            return if(notice.imgs == null || notice.imgs.isEmpty()) noImg
             else notice.imgs[0]
         }
 
