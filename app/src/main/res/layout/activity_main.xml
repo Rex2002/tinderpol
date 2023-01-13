@@ -20,7 +20,7 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.74" />
+            app:layout_constraintVertical_bias="0.62" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +31,7 @@
             app:layout_constraintBottom_toTopOf="@+id/button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.75">
+            app:layout_constraintVertical_bias="0.86">
 
             <TextView
                 android:id="@+id/textViewExplainText1"
@@ -170,6 +170,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_menu_preferences"
             tools:ignore="ContentDescription" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewStarredNoticesList"
+            android:layout_width="match_parent"
+            android:layout_height="207dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

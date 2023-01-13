@@ -85,7 +85,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    fun checkMinNoticesSelected() : Boolean{
+    private fun checkMinNoticesSelected() : Boolean{
         val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
         return if(sharedPref != null){
             sharedPref.getBoolean(getString(R.string.show_red_notices_shared_prefs), true) || sharedPref.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true) || sharedPref.getBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
