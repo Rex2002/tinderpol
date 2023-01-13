@@ -1,7 +1,6 @@
 package de.dhbw.tinderpol
 
 import android.os.Bundle
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +8,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setPadding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import de.dhbw.tinderpol.data.SexID
 import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
+import de.dhbw.tinderpol.util.Util.Companion.isBlankStr
+import de.dhbw.tinderpol.util.Util.Companion.isBlankNum
+import de.dhbw.tinderpol.util.Util.Companion.sexToStr
+
 
 class NoticeInfoFragment : BottomSheetDialogFragment() {
 
@@ -24,21 +26,6 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
 
     }
 
-    private fun isBlankStr(s: String?): Boolean {
-        return s == null || s.isBlank()
-    }
-
-    private fun isBlankNum(n: Number?): Boolean {
-        return n == null || n != 0
-    }
-
-    private fun sexToStr(id: SexID?): String {
-        return when (id) {
-            SexID.F -> "Female"
-            SexID.M -> "Male"
-            else -> "unknown"
-        }
-    }
 
     private fun changeTextViewVisibility(view: TextView, parent: LinearLayout, text: String? = null, show: Boolean = text == null) {
         if (show) {
