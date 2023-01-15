@@ -19,7 +19,7 @@ data class Notice(
     var birthCountry: String? = "",
     var birthPlace: String? = "",
     @Ignore var charges: List<Charge>? = listOf(),
-    var spokenLanguages: List<String>? = listOf()
+    var spokenLanguages: List<String>? = listOf(),
     var weight: Number? = 60,
     var height: Number? = 180,
     var starred: Boolean = false,
