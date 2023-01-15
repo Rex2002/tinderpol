@@ -1,19 +1,14 @@
 package de.dhbw.tinderpol
 
 import android.util.Log
-import de.dhbw.tinderpol.data.Charge
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
-import de.dhbw.tinderpol.data.SexID
 import kotlinx.coroutines.runBlocking
 
 class SDO {
     companion object {
         val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
-        val emptyNotice = Notice(
-            "","","","","",listOf(""), listOf(""), SexID.U, "",
-            "",listOf(Charge("","")), listOf(""),0,0
-        )
+        val emptyNotice = Notice()
         var currentNoticeNr = 0
         var notices : List<Notice> = listOf()
         val starredNotices: MutableList<Notice> = mutableListOf()
