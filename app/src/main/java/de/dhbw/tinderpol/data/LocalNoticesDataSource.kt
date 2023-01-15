@@ -1,5 +1,7 @@
 package de.dhbw.tinderpol.data
 
+import de.dhbw.tinderpol.data.room.NoticeDao
+
 class LocalNoticesDataSource {
     fun lastUpdated(): Int {
         return 10
