@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Notice(
-    //TODO figure out solution for collection types
     @PrimaryKey
     var id: String,
     var type: String? = "",
@@ -18,15 +17,15 @@ data class Notice(
     var sex: SexID = SexID.U,
     var birthCountry: String? = "",
     var birthPlace: String? = "",
-    @Ignore var charges: List<Charge>? = listOf(),
-    var spokenLanguages: List<String>? = listOf(),
-    var weight: Number? = 60,
-    var height: Number? = 180,
+    @Ignore var charges: List<Charge>? = listOf(Charge()),
+    @Ignore var spokenLanguages: List<String>? = listOf(),
+    var weight: Double? = 0.0,
+    var height: Double? = 0.0,
     var starred: Boolean = false,
 ) {
     constructor(): this(
         "", "", "", "", "", listOf(""), listOf(""), SexID.U,
-        "", "", listOf(Charge()), listOf(), 80, 180, false
+        "", "", listOf(Charge()), listOf(), 0.0, 0.0, false
     )
 
     override fun toString(): String {
