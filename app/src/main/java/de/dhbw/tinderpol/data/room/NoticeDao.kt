@@ -15,6 +15,8 @@ interface NoticeDao {
     @Query("SELECT * FROM notice")
     fun getAll(): List<Notice>
 
+    //TODO add methods for filtered get
+
     @Delete
     fun delete(notice: Notice)
 }
