@@ -3,9 +3,8 @@ package de.dhbw.tinderpol
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.room.Room
-import de.dhbw.tinderpol.data.NoticeDatabase
+import de.dhbw.tinderpol.data.room.NoticeDatabase
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
 
@@ -41,15 +40,16 @@ class MainActivity : AppCompatActivity() {
         //db-stuff probably goes somewhere else in future revisions
         val db = Room.databaseBuilder(
             applicationContext, NoticeDatabase::class.java, "db-tinderPol"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
         val noticeDao = db.noticeDao()
 
-        /*noticeDao.insertAll(
+        /*noticeDao.insertNotices(
             Notice(
-                "007", "Kruse", "Eckhardt", "24.12.0000",
+                "007", "red", "Kruse", "Eckhardt", "24.12.0000",
                 listOf("German"), null, SexID.M, "Germany", "Bethlehem",
-                listOf(Charge("UN", "Sharpness")), 70, 176
+                listOf(Charge("UN", "Sharpness")), listOf("German", "English", "Klingon"),
+                70.0, 1.76
             )
         )*/
     }
