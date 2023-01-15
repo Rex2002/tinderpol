@@ -1,13 +1,14 @@
 package de.dhbw.tinderpol.util
 
-import android.content.ClipData.Item
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import de.dhbw.tinderpol.NoticeInfoFragment
@@ -38,6 +39,12 @@ class StarredNoticesListItemAdapter (private val context : Context, private val 
            error(com.google.android.material.R.drawable.mtrl_ic_error)
         }
         holder.iconImage.setOnClickListener{
+            val bottomSheetDialog = NoticeInfoFragment()
+            val a : AppCompatActivity = it.context as AppCompatActivity
+            val args = Bundle()
+            args.putString("notice", item.id)
+            bottomSheetDialog.arguments = args
+            a.supportFragmentManager.beginTransaction().add(bottomSheetDialog, "").commit()
             Toast.makeText(context, "You selected: ${item.firstName}. Imagine an info fragment popping up. Thx", Toast.LENGTH_SHORT).show()
 
         }

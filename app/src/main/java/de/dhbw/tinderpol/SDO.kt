@@ -33,6 +33,15 @@ class SDO {
             return notices[currentNoticeNr]
         }
 
+        fun getNotice(id: String? = ""): Notice {
+            if(id == "" || id == null){
+                return getCurrentNotice()
+            }
+            val notice = notices.find{it.id == id} ?: emptyNotice
+            Log.i("API-Req", notice.toString())
+            return notice
+        }
+
         fun getNextNotice() : Notice {
             // will probably be different later on, when room is connected
             if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + 1) % notices.size
