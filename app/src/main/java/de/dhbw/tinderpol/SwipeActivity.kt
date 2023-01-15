@@ -74,7 +74,7 @@ class SwipeActivity : AppCompatActivity() {
         val notice = SDO.getCurrentNotice()
         val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
         binding.textViewFullName.text = nameText
-        binding.noticeImage.load(SDO.getCurrentImageURL()){
+        binding.noticeImage.load(SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
         }

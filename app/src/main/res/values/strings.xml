@@ -15,4 +15,5 @@
     <string name="show_UN_notices_shared_prefs">showUnNoticesSharedPref</string>
     <string name="clear_swipe_history">Clear Swipe History</string>
     <string name="clear_starred_notices">Clear Starred Notices</string>
+    <string name="starred_notices">Starred Notices</string>
 </resources>

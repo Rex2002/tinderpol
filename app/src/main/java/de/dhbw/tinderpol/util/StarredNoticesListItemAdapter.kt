@@ -33,10 +33,10 @@ class StarredNoticesListItemAdapter (private val context : Context, private val 
         val item = dataset[position]
         holder.textViewName.text = "${item.firstName} ${item.lastName}"
         holder.textViewBirthdate.text =  if (Util.isBlankStr(item.birthDate)) "" else item.birthDate
-        //holder.iconImage.load(SDO.getImageURL(item)){
-        //    placeholder(android.R.drawable.stat_sys_download)
-        //   error(com.google.android.material.R.drawable.mtrl_ic_error)
-        //}
+        holder.iconImage.load(SDO.getImageURL(item)){
+            placeholder(android.R.drawable.stat_sys_download)
+           error(com.google.android.material.R.drawable.mtrl_ic_error)
+        }
         holder.iconImage.setOnClickListener{
             Toast.makeText(context, "You selected: ${item.firstName}. Imagine an info fragment popping up. Thx", Toast.LENGTH_SHORT).show()
 
