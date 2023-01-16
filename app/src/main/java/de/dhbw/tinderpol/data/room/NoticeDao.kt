@@ -11,46 +11,7 @@ import de.dhbw.tinderpol.data.Notice
 interface NoticeDao {
     //TODO figure out which methods are required by defining how db update is done
 
-    fun insertAll(vararg notices: Notice){
-        insertNotices(*notices)
-        val languageMaps: ArrayList<NoticeLanguageMap> = ArrayList()
-        val imageMaps: ArrayList<NoticeImageMap> = ArrayList()
-        val nationalityMaps: ArrayList<NoticeNationalityMap> = ArrayList()
-        notices.forEach {notice ->
-            notice.spokenLanguages?.forEach {
-                languageMaps.add(NoticeLanguageMap(notice.id, it))
-            }
-            notice.imgs?.forEach{
-                imageMaps.add(NoticeImageMap(notice.id, it))
-            }
-            notice.nationalities?.forEach {
-                nationalityMaps.add(NoticeNationalityMap(notice.id, it))
-            }
-            notice.charges?.forEach {
-                val chargeId: Int = getChargeId(it.country, it.charge)
-                if (chargeId != null){
-                    insertChargeMaps(NoticeChargeMap(notice.id, chargeId))
-                } else {
-                    insertCharges(it)
-                    insertChargeMaps(NoticeChargeMap(notice.id, getChargeId(it.country, it.charge)))
-                }
-                //TODO reduce db calls by making primary key of charge concatenation of country & charge
-            }
-        }
-        insertLanguages(*languageMaps.toTypedArray())
-        insertImages(*imageMaps.toTypedArray())
-        insertNationalities(*nationalityMaps.toTypedArray())
-    }
-
-    fun deleteAll(){
-        deleteAllCharges()
-        deleteAllImages()
-        deleteAllLanguages()
-        deleteAllChargeMaps()
-        deleteAllNotices()
-        deleteAllNationalities()
-    }
-
+    //Insert methods
     @Insert
     fun insertNotices(vararg notices: Notice)
 
@@ -69,14 +30,34 @@ interface NoticeDao {
     @Insert
     fun insertCharges(vararg charges: Charge)
 
+    //Get methods
     @Query("SELECT id FROM charge WHERE country is :country AND charge is :charge")
     fun getChargeId(country: String, charge: String): Int
 
     @Query("SELECT * FROM notice")
-    fun getAll(): List<Notice>
+    fun getAllNotices(): List<Notice>
+
+    @Query("SELECT nationality FROM noticenationalitymap WHERE noticeId IS :id")
+    fun getNationalitiesByNoticeId(id: String): List<String>
+
+    @Query("SELECT image FROM noticeimagemap WHERE noticeId IS :id")
+    fun getImagesByNoticeId(id: String): List<String>
+
+    @Query("SELECT chargeId FROM noticechargemap WHERE noticeId IS :id")
+    fun getChargeIdsByNoticeId(id: String): List<Int>
+
+    @Query("SELECT * FROM charge WHERE id IN (:ids)")
+    fun getChargesByIds(ids: List<Int>): List<Charge>
+
+    @Query("SELECT language FROM noticelanguagemap WHERE noticeId IS :id")
+    fun getLanguagesByNoticeId(id: String): List<String>
+
+    @Query("SELECT * FROM notice WHERE starred")
+    fun getStarredNotices(): MutableList<Notice>
 
     //TODO add methods for filtered get
 
+    //Delete methods
     @Delete
     fun delete(notice: Notice)
 

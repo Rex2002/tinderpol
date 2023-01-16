@@ -56,7 +56,6 @@ class SwipeActivity : AppCompatActivity() {
         })
 
         runBlocking {
-            SDO.syncNotices()
             updateShownImg()
         }
     }

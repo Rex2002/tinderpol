@@ -7,52 +7,70 @@ import kotlinx.coroutines.runBlocking
 
 class SDO {
     companion object {
-        val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
-        val emptyNotice = Notice()
-        var currentNoticeNr = 0
-        var notices : List<Notice> = listOf()
-        val starredNotices: MutableList<Notice> = mutableListOf()
+        private val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
+        private var currentNoticeIndex = 0
+        private var notices : List<Notice> = listOf()
+        var starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
-         * synchronizes the notices stored in Room with the API-available stuff (in the background)
+         * Gets notices stored in Room and updates Room API on the first call of the day (in the background)
          */
-        fun syncNotices() {
+        fun loadNotices() {
             return runBlocking {
-                notices = NoticeRepository.fetchNotices()
+                notices = NoticeRepository.fetchAllNotices()
+                initStarredNotices()
             }
+        }
+
+        private fun initStarredNotices() {
+            starredNotices = notices.filter { it.starred }.toMutableList()
         }
 
         fun getCurrentNotice() : Notice {
-            Log.i("API-Req", currentNoticeNr.toString())
-            if (notices.isNotEmpty()) Log.i("API-Req", notices[currentNoticeNr].toString())
-            if (notices.size <= currentNoticeNr) {
-                // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
-                if (notices.isNotEmpty()) currentNoticeNr = notices.size - 1
-                else return emptyNotice
+            if (notices.size <= currentNoticeIndex) {
+                // Realistically only the else branch will ever be used here, but it's checked just in case to prevent any bugs
+                if (notices.isNotEmpty()) currentNoticeIndex = notices.size - 1
+                else return Notice()
             }
-            return notices[currentNoticeNr]
+            return notices[currentNoticeIndex]
         }
 
         fun getNextNotice() : Notice {
-            // will probably be different later on, when room is connected
-            if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + 1) % notices.size
+            if (notices.isNotEmpty())
+                currentNoticeIndex++
+
+            if (currentNoticeIndex == notices.size) {
+                currentNoticeIndex = notices.size -1
+                throw Exception("Reached last notice in local cache")
+                //TODO create meaningful UI event for after last notice
+            }
+
+            Log.i("Notice-Call", currentNoticeIndex.toString())
+            if (notices.isNotEmpty())
+                Log.i("Notice-Call", notices[currentNoticeIndex].toString())
+
             return getCurrentNotice()
         }
 
         fun getPrevNotice() : Notice{
-            if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + (notices.size - 1)) % notices.size
+            if (notices.isNotEmpty())
+                currentNoticeIndex--
+            if (currentNoticeIndex < 0) {
+                currentNoticeIndex = 0
+                throw Exception("Already on first notice in local cache")
+                //TODO create meaningful UI event for before first notice
+            }
+
+            Log.i("Notice-Call", currentNoticeIndex.toString())
+            if (notices.isNotEmpty())
+                Log.i("Notice-Call", notices[currentNoticeIndex].toString())
+
             return getCurrentNotice()
         }
 
         fun getCurrentImageURL(): String {
             val notice = getCurrentNotice()
             return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
-            else notice.imgs!![0]
-            return getImageURL(notice)
-        }
-
-        fun getImageURL(notice: Notice): String{
-            return if(notice.imgs == null || notice.imgs!!.isEmpty()) noImg
             else notice.imgs!![0]
         }
 

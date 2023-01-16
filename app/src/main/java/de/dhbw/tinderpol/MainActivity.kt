@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.room.Room
+import de.dhbw.tinderpol.data.LocalNoticesDataSource
 import de.dhbw.tinderpol.data.room.NoticeDatabase
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
@@ -18,8 +19,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val db = Room.databaseBuilder(
+            applicationContext, NoticeDatabase::class.java, "db-tinderPol"
+        ).fallbackToDestructiveMigration().build()
+        LocalNoticesDataSource.dao = db.noticeDao()
+
         binding.textViewExplainText1.setOnClickListener{
-            SDO.syncNotices()
+            SDO.loadNotices()
         }
 
         binding.button.setOnClickListener {
@@ -30,19 +36,13 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             showReportConfirmDialog()
         }
-        SDO.syncNotices()
+        SDO.loadNotices()
 
-        val starredNotices = SDO.notices
+        val starredNotices = SDO.starredNotices
         val recyclerView = binding.recyclerViewStarredNoticesList
         recyclerView.adapter = StarredNoticesListItemAdapter(this, starredNotices)
         recyclerView.setHasFixedSize(true)
 
-        //db-stuff probably goes somewhere else in future revisions
-        val db = Room.databaseBuilder(
-            applicationContext, NoticeDatabase::class.java, "db-tinderPol"
-        ).fallbackToDestructiveMigration().build()
-
-        val noticeDao = db.noticeDao()
 
         /*noticeDao.insertNotices(
             Notice(
