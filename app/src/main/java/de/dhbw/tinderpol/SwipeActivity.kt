@@ -7,7 +7,6 @@ import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
-import kotlinx.coroutines.runBlocking
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -19,8 +18,6 @@ class SwipeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        updateShownImg()
-
 
         binding.imageButtonPrev.setOnClickListener{
             SDO.getPrevNotice()
@@ -55,11 +52,14 @@ class SwipeActivity : AppCompatActivity() {
             }
         })
 
-        runBlocking {
-            SDO.syncNotices()
-            updateShownImg()
+        updateShownImg()
+        SDO.onUpdate {
+            runOnUiThread {
+                updateShownImg()
+            }
         }
     }
+
     fun showBottomSheetDialog(){
         val bottomSheetDialog = NoticeInfoFragment()
         supportFragmentManager.beginTransaction().add(bottomSheetDialog, "").commit()
