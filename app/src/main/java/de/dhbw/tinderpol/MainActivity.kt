@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -16,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.textViewExplainText1.setOnClickListener{
+        GlobalScope.launch {
             SDO.syncNotices()
         }
 
@@ -28,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             showReportConfirmDialog()
         }
-        SDO.syncNotices()
 
         val starredNotices = SDO.notices
         val recyclerView = binding.recyclerViewStarredNoticesList

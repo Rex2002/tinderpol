@@ -1,9 +1,11 @@
 package de.dhbw.tinderpol
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
-import kotlinx.coroutines.runBlocking
+import java.util.function.Consumer
 
 class SDO {
     companion object {
@@ -11,15 +13,20 @@ class SDO {
         val emptyNotice = Notice("empty", imgs = listOf(noImg))
         var currentNoticeNr = 0
         var notices : List<Notice> = listOf()
+        var onUpdate: Consumer<Notice>? = null
         val starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
          * synchronizes the notices stored in room with the API-available stuff ( in the background)
          */
-        fun syncNotices() {
-            return runBlocking {
-                notices = NoticeRepository.fetchNotices()
-            }
+        @RequiresApi(Build.VERSION_CODES.N)
+        suspend fun syncNotices() {
+            notices = NoticeRepository.fetchNotices()
+            onUpdate?.accept(getCurrentNotice())
+        }
+
+        fun onUpdate(callback: Consumer<Notice>?) {
+            onUpdate = callback
         }
 
         fun getCurrentNotice() : Notice {
