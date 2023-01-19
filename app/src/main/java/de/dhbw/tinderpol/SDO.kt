@@ -14,6 +14,7 @@ class SDO {
         private var notices : List<Notice> = listOf()
         val emptyNotice = Notice("empty", imgs = listOf(noImg))
         var onUpdate: Consumer<Notice>? = null
+        private var isListeningToUpdates = false
         var starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
@@ -21,12 +22,22 @@ class SDO {
          */
         @RequiresApi(Build.VERSION_CODES.N)
         suspend fun syncNotices() {
-            notices = NoticeRepository.fetchNotices()
+            Log.i("SDO", "Syncing Notices...")
+            if (!isListeningToUpdates) {
+                NoticeRepository.listenToUpdates { update(it) }
+                isListeningToUpdates = true
+            }
+            NoticeRepository.syncNotices()
+        }
+
+        private fun update(newNotices: List<Notice>) {
+            Log.i("SDO", "Notices updated...")
+            notices = newNotices
             onUpdate?.accept(getCurrentNotice())
             initStarredNotices()
         }
 
-        fun onUpdate(callback: Consumer<Notice>?) {
+        fun listenToUpdates(callback: Consumer<Notice>?) {
             onUpdate = callback
         }
 

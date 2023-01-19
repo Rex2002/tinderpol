@@ -24,6 +24,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        GlobalScope.launch {
+            SDO.syncNotices()
+        }
+
         val db = Room.databaseBuilder(
             applicationContext, NoticeDatabase::class.java, "db-tinderPol"
         ).fallbackToDestructiveMigration().build()
@@ -33,10 +37,6 @@ class MainActivity : AppCompatActivity() {
             GlobalScope.launch {
                 SDO.syncNotices()
             }
-        }
-
-        GlobalScope.launch {
-            SDO.syncNotices()
         }
 
         binding.button.setOnClickListener {
