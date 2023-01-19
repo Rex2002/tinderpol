@@ -1,10 +1,7 @@
 package de.dhbw.tinderpol.data
 
 import android.util.Log
-import de.dhbw.tinderpol.util.Observer
-import de.dhbw.tinderpol.util.Subject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.function.Consumer
