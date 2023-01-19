@@ -1,8 +1,10 @@
 package de.dhbw.tinderpol
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
 import kotlinx.coroutines.GlobalScope
@@ -13,6 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
