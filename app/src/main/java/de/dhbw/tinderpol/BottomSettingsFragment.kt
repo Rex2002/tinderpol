@@ -77,6 +77,15 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+
+        binding.buttonClearStarredNotices.setOnClickListener{
+            SDO.clearStarredNotices()
+            Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT).show()
+        }
+        binding.buttonClearSwipeHistory.setOnClickListener{
+            SDO.clearSwipeHistory()
+            Toast.makeText(activity, "Successfully cleared swipe history", Toast.LENGTH_SHORT).show()
+        }
         return binding.root
     }
 

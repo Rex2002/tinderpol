@@ -76,5 +76,13 @@ class SDO {
             if (n.starred) starredNotices.add(n)
             else starredNotices.remove(starredNotices.find{it.id == n.id})
         }
+
+        fun clearStarredNotices(){
+            // TODO implement
+        }
+
+        fun clearSwipeHistory(){
+            // TODO implement
+        }
     }
 }

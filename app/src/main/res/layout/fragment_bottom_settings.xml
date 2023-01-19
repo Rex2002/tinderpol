@@ -129,11 +129,13 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/viewHorizontalDivider2">
             <Button
+                android:id="@+id/buttonClearSwipeHistory"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/clear_swipe_history"
                 android:layout_margin="4dp"/>
             <Button
+                android:id="@+id/buttonClearStarredNotices"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/clear_starred_notices"

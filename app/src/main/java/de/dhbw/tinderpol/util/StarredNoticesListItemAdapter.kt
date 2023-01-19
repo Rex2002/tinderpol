@@ -45,7 +45,6 @@ class StarredNoticesListItemAdapter (private val context : Context, private val 
             args.putString("notice", item.id)
             bottomSheetDialog.arguments = args
             a.supportFragmentManager.beginTransaction().add(bottomSheetDialog, "").commit()
-            Toast.makeText(context, "You selected: ${item.firstName}. Imagine an info fragment popping up. Thx", Toast.LENGTH_SHORT).show()
 
         }
     }
