@@ -30,8 +30,8 @@ class SDO {
         }
 
         fun getCurrentNotice() : Notice {
-            Log.i("API-Req", currentNoticeNr.toString())
-            if (notices.isNotEmpty()) Log.i("API-Req", notices[currentNoticeNr].toString())
+            Log.i("SDO", currentNoticeNr.toString())
+            if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeNr].toString())
             if (notices.size <= currentNoticeNr) {
                 // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
                 if (notices.isNotEmpty()) currentNoticeNr = notices.size - 1
@@ -45,7 +45,7 @@ class SDO {
                 return getCurrentNotice()
             }
             val notice = notices.find{it.id == id} ?: emptyNotice
-            Log.i("API-Req", notice.toString())
+            Log.i("SDO", notice.toString())
             return notice
         }
 
