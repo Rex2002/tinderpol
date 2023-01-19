@@ -22,12 +22,6 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
-
     private fun changeTextViewVisibility(view: TextView, parent: LinearLayout, text: String? = null, show: Boolean = text == null) {
         if (show) {
             parent.setPadding(8)

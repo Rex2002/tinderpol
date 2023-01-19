@@ -140,6 +140,12 @@
                 android:layout_height="match_parent"
                 android:text="@string/clear_starred_notices"
                 android:layout_margin="4dp"/>
+            <Button
+                android:id="@+id/buttonSyncLocalStorages"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/sync_notices"
+                android:layout_margin="4dp"/>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

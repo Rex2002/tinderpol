@@ -29,6 +29,10 @@ class SDO {
             onUpdate = callback
         }
 
+        fun getStarredNoticesList(): List<Notice> {
+            return notices
+        }
+
         fun getCurrentNotice() : Notice {
             Log.i("SDO", currentNoticeNr.toString())
             if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeNr].toString())
@@ -78,10 +82,12 @@ class SDO {
         }
 
         fun clearStarredNotices(){
+            Log.i("SDO", "cleared starred notices")
             // TODO implement
         }
 
         fun clearSwipeHistory(){
+            Log.i("SDO", "cleared swipe history")
             // TODO implement
         }
     }

@@ -16,4 +16,5 @@
     <string name="clear_swipe_history">Clear Swipe History</string>
     <string name="clear_starred_notices">Clear Starred Notices</string>
     <string name="starred_notices">Starred Notices</string>
+    <string name="sync_notices">Sync Notices</string>
 </resources>

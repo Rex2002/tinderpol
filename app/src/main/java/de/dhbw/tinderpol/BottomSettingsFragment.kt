@@ -86,6 +86,9 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             SDO.clearSwipeHistory()
             Toast.makeText(activity, "Successfully cleared swipe history", Toast.LENGTH_SHORT).show()
         }
+        binding.buttonSyncLocalStorages.setOnClickListener{
+            // TODO add sync with possible callback for success message
+        }
         return binding.root
     }
 
