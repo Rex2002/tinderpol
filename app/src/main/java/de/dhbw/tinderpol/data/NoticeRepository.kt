@@ -32,6 +32,7 @@ class NoticeRepository {
         }
 
         private suspend fun updateRemoteNotices(notices: List<Notice>) {
+            updateNotices(notices)
             //TODO implement more efficient updating
             Log.i("API-Req", "Received new Remote Notices...")
             localDataSource.deleteAll()
@@ -39,7 +40,6 @@ class NoticeRepository {
             localDataSource.insert(*notices.toTypedArray())
             Log.i("API-Req", "Added new notices to local DB...")
             lastUpdated = LocalDate.now()
-            updateNotices(notices)
         }
 
         private fun updateNotices(notices: List<Notice>) {

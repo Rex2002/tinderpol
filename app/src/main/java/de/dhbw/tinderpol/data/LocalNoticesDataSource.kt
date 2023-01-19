@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol.data
 
+import android.util.Log
 import de.dhbw.tinderpol.data.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,7 +12,9 @@ class LocalNoticesDataSource {
 
     suspend fun getAll(): List<Notice> {
         return withContext(Dispatchers.IO) {
+            Log.i("API-Req", "Retrieving all local notices...")
             val notices: List<Notice> = dao.getAllNotices()
+            Log.i("API-Req", "Amount of local notices: " + notices.size)
 
             notices.forEach {
                 it.nationalities = dao.getNationalitiesByNoticeId(it.id)
