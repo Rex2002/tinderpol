@@ -124,7 +124,7 @@ async function getImages(url = null) {
 // For sorting by ID as strings: cb = (str) => str, cmp = (a, b) => a.localeCompare(b)
 function uniqSorted(arr, key = 'entity_id', cb = (str) => str?.split('/')?.map((x) => Number(x)) || [0, 0], cmp = (a, b) => a[0] - b[0] || a[1] - b[1]) {
 	arr.sort((a, b) => cmp(cb(a[key]), cb(b[key])));
-	return arr.filter((notice, idx, arr) => !idx || notice != arr[idx - 1]);
+	return arr.filter((notice, idx, arr) => !idx || notice[key] != arr[idx - 1][key]);
 }
 
 async function getNoticesOfType(type, singleReq) {

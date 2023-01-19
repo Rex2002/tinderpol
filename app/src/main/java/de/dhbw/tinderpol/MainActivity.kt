@@ -1,19 +1,24 @@
 package de.dhbw.tinderpol
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalNoticesDataSource
 import de.dhbw.tinderpol.data.room.NoticeDatabase
+import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -25,7 +30,13 @@ class MainActivity : AppCompatActivity() {
         LocalNoticesDataSource.dao = db.noticeDao()
 
         binding.textViewExplainText1.setOnClickListener{
-            SDO.loadNotices()
+            GlobalScope.launch {
+                SDO.syncNotices()
+            }
+        }
+
+        GlobalScope.launch {
+            SDO.syncNotices()
         }
 
         binding.button.setOnClickListener {
@@ -36,7 +47,6 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             showReportConfirmDialog()
         }
-        SDO.loadNotices()
 
         val starredNotices = SDO.starredNotices
         val recyclerView = binding.recyclerViewStarredNoticesList

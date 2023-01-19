@@ -7,7 +7,6 @@ import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
-import kotlinx.coroutines.runBlocking
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -19,8 +18,6 @@ class SwipeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        updateShownImg()
-
 
         binding.imageButtonPrev.setOnClickListener{
             SDO.getPrevNotice()
@@ -55,10 +52,15 @@ class SwipeActivity : AppCompatActivity() {
             }
         })
 
-        runBlocking {
-            updateShownImg()
+        updateShownImg()
+
+        SDO.onUpdate {
+            runOnUiThread {
+                updateShownImg()
+            }
         }
     }
+
     fun showBottomSheetDialog(){
         val bottomSheetDialog = NoticeInfoFragment()
         supportFragmentManager.beginTransaction().add(bottomSheetDialog, "").commit()
@@ -73,7 +75,7 @@ class SwipeActivity : AppCompatActivity() {
         val notice = SDO.getCurrentNotice()
         val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
         binding.textViewFullName.text = nameText
-        binding.noticeImage.load(SDO.getCurrentImageURL()){
+        binding.noticeImage.load(SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
         }

@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setPadding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
 import de.dhbw.tinderpol.util.Util.Companion.isBlankStr
 import de.dhbw.tinderpol.util.Util.Companion.isBlankNum
@@ -59,7 +60,8 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentNoticeInfoBinding.inflate(inflater)
-        val notice = SDO.getCurrentNotice()
+        val notice : Notice = SDO.getNotice(arguments?.getString("notice", ""))
+
         val firstName = if (isBlankStr(notice.firstName)) "" else notice.firstName
         val lastName = if (isBlankStr(notice.lastName)) "" else notice.lastName
         val nameSeparator = if (isBlankStr(firstName) || isBlankStr(lastName)) "" else " "

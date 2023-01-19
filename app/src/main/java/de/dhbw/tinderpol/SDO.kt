@@ -1,25 +1,33 @@
 package de.dhbw.tinderpol
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
-import kotlinx.coroutines.runBlocking
+import java.util.function.Consumer
 
 class SDO {
     companion object {
         private val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
         private var currentNoticeIndex = 0
         private var notices : List<Notice> = listOf()
+        val emptyNotice = Notice("empty", imgs = listOf(noImg))
+        var onUpdate: Consumer<Notice>? = null
         var starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
          * Gets notices stored in Room and updates Room API on the first call of the day (in the background)
          */
-        fun loadNotices() {
-            return runBlocking {
-                notices = NoticeRepository.fetchAllNotices()
-                initStarredNotices()
-            }
+        @RequiresApi(Build.VERSION_CODES.N)
+        suspend fun syncNotices() {
+            notices = NoticeRepository.fetchNotices()
+            onUpdate?.accept(getCurrentNotice())
+            initStarredNotices()
+        }
+
+        fun onUpdate(callback: Consumer<Notice>?) {
+            onUpdate = callback
         }
 
         private fun initStarredNotices() {
@@ -27,19 +35,30 @@ class SDO {
         }
 
         fun getCurrentNotice() : Notice {
+            Log.i("SDO", currentNoticeIndex.toString())
+            if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeIndex].toString())
             if (notices.size <= currentNoticeIndex) {
-                // Realistically only the else branch will ever be used here, but it's checked just in case to prevent any bugs
+                // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
                 if (notices.isNotEmpty()) currentNoticeIndex = notices.size - 1
-                else return Notice()
+                else return emptyNotice
             }
             return notices[currentNoticeIndex]
+        }
+
+        fun getNotice(id: String? = ""): Notice {
+            if(id == "" || id == null){
+                return getCurrentNotice()
+            }
+            val notice = notices.find{it.id == id} ?: emptyNotice
+            Log.i("SDO", notice.toString())
+            return notice
         }
 
         fun getNextNotice() : Notice {
             if (notices.isNotEmpty())
                 currentNoticeIndex++
 
-            if (currentNoticeIndex == notices.size) {
+            if (currentNoticeIndex >= notices.size) {
                 currentNoticeIndex = notices.size -1
                 throw Exception("Reached last notice in local cache")
                 //TODO create meaningful UI event for after last notice
@@ -68,8 +87,8 @@ class SDO {
             return getCurrentNotice()
         }
 
-        fun getCurrentImageURL(): String {
-            val notice = getCurrentNotice()
+        fun getImageURL(n: Notice?  = null): String {
+            val notice = n ?: getCurrentNotice()
             return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
             else notice.imgs!![0]
         }
