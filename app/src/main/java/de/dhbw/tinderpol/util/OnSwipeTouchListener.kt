@@ -10,10 +10,10 @@ import kotlin.math.abs
 
 internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private val gestureDetector : GestureDetector
-    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-        return when (p1) {
+    override fun onTouch(p0: View?, event: MotionEvent?): Boolean {
+        return when (event) {
             null -> false
-            else -> gestureDetector.onTouchEvent(p1)
+            else -> gestureDetector.onTouchEvent(event)
         }
     }
     private inner class GestureListener : SimpleOnGestureListener(){
@@ -44,29 +44,28 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            Log.d("onSwipeListener", "${e1},${e2}, ${velocityX}, ${velocityY}")
+            Log.d("onSwipeListener", "$e1, $e2, $velocityX, $velocityY")
             try{
-                print("swiping is happening")
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
 
                 if(abs(diffX) > abs(diffY)){
                     if(abs(diffX) > SWIPE_THRESHOLD && abs(velocityX) > SWIPE_VELOCITY_THRESHOLD){
                         if(diffX > 0){
-                            onSwipeRight()
+                            onSwipedRight()
                         }
                         else{
-                            onSwipeLeft()
+                            onSwipedLeft()
                         }
                     }
                 }
                 else{
                     if(abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD){
                         if(diffY > 0){
-                            onSwipeDown()
+                            onSwipedDown()
                         }
                         else{
-                            onSwipeUp()
+                            onSwipedUp()
                         }
                     }
                 }
@@ -76,10 +75,10 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
             return false
         }
     }
-    open fun onSwipeRight() {}
-    open fun onSwipeLeft() {}
-    open fun onSwipeDown() {}
-    open fun onSwipeUp() {}
+    open fun onSwipedRight() {}
+    open fun onSwipedLeft() {}
+    open fun onSwipedDown() {}
+    open fun onSwipedUp() {}
     private fun onClick() {}
     private fun onDoubleClick() {}
     private fun onLongClick() {}

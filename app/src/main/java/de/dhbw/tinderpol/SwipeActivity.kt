@@ -30,24 +30,24 @@ class SwipeActivity : AppCompatActivity() {
         }
 
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
-            override fun onSwipeLeft() {
-                super.onSwipeLeft()
+            override fun onSwipedLeft() {
+                super.onSwipedLeft()
                 SDO.getNextNotice()
                 updateShownImg()
             }
 
-            override fun onSwipeRight() {
-                super.onSwipeRight()
+            override fun onSwipedRight() {
+                super.onSwipedRight()
                 showReportConfirmDialog()
             }
 
-            override fun onSwipeUp() {
-                super.onSwipeUp()
+            override fun onSwipedUp() {
+                super.onSwipedUp()
                 showBottomSheetDialog()
             }
 
-            override fun onSwipeDown() {
-                super.onSwipeDown()
+            override fun onSwipedDown() {
+                super.onSwipedDown()
                 finish()
             }
         })
