@@ -97,7 +97,7 @@
                 android:id="@+id/star0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_off"
+                app:srcCompat="@android:drawable/btn_star_big_on"
                 tools:layout_editor_absoluteX="26dp"
                 tools:layout_editor_absoluteY="123dp" />
 
@@ -110,7 +110,7 @@
                 android:id="@+id/star1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_off"
+                app:srcCompat="@android:drawable/btn_star_big_on"
                 tools:layout_editor_absoluteX="26dp"
                 tools:layout_editor_absoluteY="123dp" />
 
@@ -123,7 +123,7 @@
                 android:id="@+id/star2"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@android:drawable/btn_star_big_off"
+                app:srcCompat="@android:drawable/btn_star_big_on"
                 tools:layout_editor_absoluteX="26dp"
                 tools:layout_editor_absoluteY="123dp" />
 
@@ -136,7 +136,7 @@
                 android:id="@+id/star3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_off"
+                app:srcCompat="@android:drawable/btn_star_big_on"
                 tools:layout_editor_absoluteX="26dp"
                 tools:layout_editor_absoluteY="123dp" />
 
@@ -149,7 +149,7 @@
                 android:id="@+id/star4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_off"
+                app:srcCompat="@android:drawable/btn_star_big_on"
                 tools:layout_editor_absoluteX="26dp"
                 tools:layout_editor_absoluteY="123dp" />
 
@@ -191,6 +191,15 @@
                 android:gravity="center"
                 android:text="@string/starred_notices"
                 android:textSize="24sp" />
+            <TextView
+                android:id="@+id/textViewEmptyStarredList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_notices_starred"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:layout_marginTop="4dp"
+                />
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewStarredNoticesList"
                 android:layout_width="match_parent"

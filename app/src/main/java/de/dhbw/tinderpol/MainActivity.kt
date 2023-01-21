@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalNoticesDataSource
 import de.dhbw.tinderpol.data.room.NoticeDatabase
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView = binding.recyclerViewStarredNoticesList
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
+        binding.textViewEmptyStarredList.visibility =if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
     }
 
     private fun showReportConfirmDialog(){
@@ -60,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         adapter.updateData(SDO.starredNotices)
+        binding.textViewEmptyStarredList.visibility =if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
         Log.i("main", "resumed main activity")
         Log.i("main", SDO.starredNotices.toString())
         super.onResume()
