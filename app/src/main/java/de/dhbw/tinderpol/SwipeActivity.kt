@@ -32,7 +32,9 @@ class SwipeActivity : AppCompatActivity() {
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
             override fun onSwipeLeft() {
                 super.onSwipeLeft()
-                SDO.getNextNotice()
+                val notice = SDO.getNextNotice()
+                val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
+                binding.textViewFullName.text = nameText
                 updateShownImg()
             }
 
@@ -72,9 +74,6 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     fun updateShownImg(){
-        val notice = SDO.getCurrentNotice()
-        val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
-        binding.textViewFullName.text = nameText
         binding.noticeImage.load(SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)

@@ -11,7 +11,7 @@ class NoticeRepository {
     companion object {
         private val localDataSource = LocalNoticesDataSource()
         private val remoteDataSource = RemoteNoticesDataSource()
-        private const val dataLifetimeInMillis: Long = 86400
+        private const val dataLifetimeInMillis: Long = 86400000
         private var onUpdate: Consumer<List<Notice>>? = null
 
         fun listenToUpdates(callback: Consumer<List<Notice>>) {
@@ -22,11 +22,15 @@ class NoticeRepository {
             val lastUpdated: Long = sharedPref?.getLong("lastUpdated", 0) ?: 0
 
             if (forceSync || System.currentTimeMillis() - lastUpdated > dataLifetimeInMillis) {
+                Log.i("noticeRepository", "syncing notices with remote data sources")
+                Log.i("noticeRepository", "force Sync: $forceSync")
+                Log.i("noticeRepository", "lastUpdated: $lastUpdated")
+                Log.i("noticeRepository", "diff: " + (System.currentTimeMillis() - lastUpdated))
                 CoroutineScope(coroutineContext).launch {
                     val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
                     if (remoteNotices.isNotEmpty()) {
                         updateRemoteNotices(remoteNotices)
-                        Log.i("main", "updating notices due to expired lifetime")
+                        Log.i("noticeRepository", "updating notices due to expired lifetime")
                         sharedPref?.edit()?.putLong("lastUpdated", System.currentTimeMillis())?.apply()
                     }
                 }
