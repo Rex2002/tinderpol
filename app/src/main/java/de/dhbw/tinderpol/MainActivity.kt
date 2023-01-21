@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalNoticesDataSource
 import de.dhbw.tinderpol.data.room.NoticeDatabase
 import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
 import kotlinx.coroutines.GlobalScope
@@ -18,6 +20,9 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
+    private lateinit var recyclerView : RecyclerView
+    private lateinit var adapter: StarredNoticesListItemAdapter
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,15 +47,21 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             showReportConfirmDialog()
         }
-
-        val starredNotices = SDO.starredNotices
-        val recyclerView = binding.recyclerViewStarredNoticesList
-        recyclerView.adapter = StarredNoticesListItemAdapter(this, starredNotices)
+        adapter = StarredNoticesListItemAdapter(this, SDO.starredNotices)
+        recyclerView = binding.recyclerViewStarredNoticesList
+        recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
     }
 
     private fun showReportConfirmDialog(){
         val settingsFragment = BottomSettingsFragment()
         supportFragmentManager.beginTransaction().add(settingsFragment, "").commit()
+    }
+
+    override fun onResume() {
+        adapter.updateData(SDO.starredNotices)
+        Log.i("main", "resumed main activity")
+        Log.i("main", SDO.starredNotices.toString())
+        super.onResume()
     }
 }

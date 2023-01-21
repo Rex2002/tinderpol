@@ -47,7 +47,6 @@ class SDO {
         }
 
         fun getCurrentNotice() : Notice {
-            Log.i("SDO", currentNoticeIndex.toString())
             if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeIndex].toString())
             if (notices.size <= currentNoticeIndex) {
                 // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
