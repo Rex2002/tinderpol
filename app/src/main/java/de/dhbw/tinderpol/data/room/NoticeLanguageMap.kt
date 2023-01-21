@@ -1,9 +1,17 @@
 package de.dhbw.tinderpol.data.room
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import de.dhbw.tinderpol.data.Notice
 
-@Entity
+@Entity(foreignKeys = [ForeignKey(
+    entity = Notice::class,
+    parentColumns = arrayOf("id"),
+    childColumns = arrayOf("noticeId"),
+    onDelete = ForeignKey.CASCADE,
+    onUpdate = ForeignKey.CASCADE
+)])
 data class NoticeLanguageMap(
     @PrimaryKey(autoGenerate = true)
     var id: Int,

@@ -31,14 +31,14 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        GlobalScope.launch {
-            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
-        }
-
         val db = Room.databaseBuilder(
             applicationContext, NoticeDatabase::class.java, "db-tinderPol"
         ).fallbackToDestructiveMigration().build()
         LocalNoticesDataSource.dao = db.noticeDao()
+
+        GlobalScope.launch {
+            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
+        }
 
         binding.button.setOnClickListener {
             val intentToStartShit = Intent(this, SwipeActivity::class.java)

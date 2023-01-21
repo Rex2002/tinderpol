@@ -31,6 +31,7 @@ class SDO {
             NoticeRepository.syncNotices(sharedPref, forceSync)
         }
 
+        @RequiresApi(Build.VERSION_CODES.N)
         private fun update(newNotices: List<Notice>) {
             Log.i("SDO", "Notices updated...")
             notices = newNotices

@@ -13,15 +13,16 @@ class LocalNoticesDataSource {
     suspend fun getAll(): List<Notice> {
         return withContext(Dispatchers.IO) {
             Log.i("API-Req", "Retrieving all local notices...")
-            val notices: List<Notice> = dao.getAllNotices()
-            Log.i("API-Req", "Amount of local notices: " + notices.size)
-
-            notices.forEach {
-                it.nationalities = dao.getNationalitiesByNoticeId(it.id)
-                it.imgs = dao.getImagesByNoticeId(it.id)
-                it.charges = dao.getChargesByIds(dao.getChargeIdsByNoticeId(it.id))
-                it.spokenLanguages = dao.getLanguagesByNoticeId(it.id)
+            val noticesWithLists: List<NoticeWithLists> = dao.getNoticesWithLists()
+            val notices: MutableList<Notice> = mutableListOf()
+            noticesWithLists.forEach {
+                it.notice.spokenLanguages = it.getLanguages()
+                it.notice.imgs = it.getImages()
+                it.notice.nationalities = it.getNationalities()
+                it.notice.charges = it.charges
+                notices.add(it.notice)
             }
+
 
             return@withContext notices
         }
@@ -44,14 +45,9 @@ class LocalNoticesDataSource {
                     nationalityMaps.add(NoticeNationalityMap(notice.id, it))
                 }
                 notice.charges?.forEach {
-                    val chargeId: Int = dao.getChargeId(it.country, it.charge)
-                    if (chargeId != null){
-                        dao.insertChargeMaps(NoticeChargeMap(notice.id, chargeId))
-                    } else {
-                        dao.insertCharges(it)
-                        dao.insertChargeMaps(NoticeChargeMap(notice.id, dao.getChargeId(it.country, it.charge)))
-                    }
-                    //TODO reduce db calls by making primary key of charge concatenation of country & charge
+                    val chargeId: String = it.country + it.charge
+                    dao.insertChargeMaps(NoticeChargeMap(notice.id, chargeId))
+                    dao.insertCharges(it)
                 }
             }
             dao.insertLanguages(*languageMaps.toTypedArray())
