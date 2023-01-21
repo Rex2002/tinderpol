@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol
 
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -21,13 +22,13 @@ class SDO {
          * Gets notices stored in Room and updates Room API on the first call of the day (in the background)
          */
         @RequiresApi(Build.VERSION_CODES.N)
-        suspend fun syncNotices() {
+        suspend fun syncNotices(sharedPref: SharedPreferences?, forceSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
             if (!isListeningToUpdates) {
                 NoticeRepository.listenToUpdates { update(it) }
                 isListeningToUpdates = true
             }
-            NoticeRepository.syncNotices()
+            NoticeRepository.syncNotices(sharedPref, forceSync)
         }
 
         private fun update(newNotices: List<Notice>) {
