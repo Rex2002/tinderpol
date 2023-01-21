@@ -34,6 +34,8 @@ class LocalNoticesDataSource {
             val languageMaps: ArrayList<NoticeLanguageMap> = ArrayList()
             val imageMaps: ArrayList<NoticeImageMap> = ArrayList()
             val nationalityMaps: ArrayList<NoticeNationalityMap> = ArrayList()
+            val chargeMaps: ArrayList<NoticeChargeMap> = ArrayList()
+            val charges: ArrayList<Charge> = ArrayList()
             notices.forEach {notice ->
                 notice.spokenLanguages?.forEach {
                     languageMaps.add(NoticeLanguageMap(notice.id, it))
@@ -46,13 +48,15 @@ class LocalNoticesDataSource {
                 }
                 notice.charges?.forEach {
                     val chargeId: String = it.country + it.charge
-                    dao.insertChargeMaps(NoticeChargeMap(notice.id, chargeId))
-                    dao.insertCharges(it)
+                    chargeMaps.add(NoticeChargeMap(notice.id, chargeId))
+                    charges.add(it)
                 }
             }
             dao.insertLanguages(*languageMaps.toTypedArray())
             dao.insertImages(*imageMaps.toTypedArray())
             dao.insertNationalities(*nationalityMaps.toTypedArray())
+            dao.insertChargeMaps(*chargeMaps.toTypedArray())
+            dao.insertCharges(*charges.toTypedArray())
         }
     }
 
