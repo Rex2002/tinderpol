@@ -53,7 +53,8 @@ class SwipeActivity : AppCompatActivity() {
         })
 
         updateShownImg()
-        SDO.onUpdate {
+
+        SDO.listenToUpdates {
             runOnUiThread {
                 updateShownImg()
             }

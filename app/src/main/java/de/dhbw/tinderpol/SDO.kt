@@ -9,39 +9,51 @@ import java.util.function.Consumer
 
 class SDO {
     companion object {
-        val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
+        private val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
+        private var currentNoticeIndex = 0
+        private var notices : List<Notice> = listOf()
         val emptyNotice = Notice("empty", imgs = listOf(noImg))
-        var currentNoticeNr = 0
-        var notices : List<Notice> = listOf()
         var onUpdate: Consumer<Notice>? = null
-        val starredNotices: MutableList<Notice> = mutableListOf()
+        private var isListeningToUpdates = false
+        var starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
-         * synchronizes the notices stored in room with the API-available stuff ( in the background)
+         * Gets notices stored in Room and updates Room API on the first call of the day (in the background)
          */
         @RequiresApi(Build.VERSION_CODES.N)
         suspend fun syncNotices() {
-            notices = NoticeRepository.fetchNotices()
-            onUpdate?.accept(getCurrentNotice())
+            Log.i("SDO", "Syncing Notices...")
+            if (!isListeningToUpdates) {
+                NoticeRepository.listenToUpdates { update(it) }
+                isListeningToUpdates = true
+            }
+            NoticeRepository.syncNotices()
         }
 
-        fun onUpdate(callback: Consumer<Notice>?) {
+        private fun update(newNotices: List<Notice>) {
+            Log.i("SDO", "Notices updated...")
+            notices = newNotices
+            onUpdate?.accept(getCurrentNotice())
+            initStarredNotices()
+        }
+
+        fun listenToUpdates(callback: Consumer<Notice>?) {
             onUpdate = callback
         }
 
-        fun getStarredNoticesList(): List<Notice> {
-            return notices
+        private fun initStarredNotices() {
+            starredNotices = notices.filter { it.starred }.toMutableList()
         }
 
         fun getCurrentNotice() : Notice {
-            Log.i("SDO", currentNoticeNr.toString())
-            if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeNr].toString())
-            if (notices.size <= currentNoticeNr) {
+            Log.i("SDO", currentNoticeIndex.toString())
+            if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeIndex].toString())
+            if (notices.size <= currentNoticeIndex) {
                 // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
-                if (notices.isNotEmpty()) currentNoticeNr = notices.size - 1
+                if (notices.isNotEmpty()) currentNoticeIndex = notices.size - 1
                 else return emptyNotice
             }
-            return notices[currentNoticeNr]
+            return notices[currentNoticeIndex]
         }
 
         fun getNotice(id: String? = ""): Notice {
@@ -54,20 +66,42 @@ class SDO {
         }
 
         fun getNextNotice() : Notice {
-            // will probably be different later on, when room is connected
-            if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + 1) % notices.size
+            if (notices.isNotEmpty())
+                currentNoticeIndex++
+
+            if (currentNoticeIndex >= notices.size) {
+                currentNoticeIndex = notices.size -1
+                throw Exception("Reached last notice in local cache")
+                //TODO create meaningful UI event for after last notice
+            }
+
+            Log.i("Notice-Call", currentNoticeIndex.toString())
+            if (notices.isNotEmpty())
+                Log.i("Notice-Call", notices[currentNoticeIndex].toString())
+
             return getCurrentNotice()
         }
 
         fun getPrevNotice() : Notice{
-            if (notices.isNotEmpty()) currentNoticeNr = (currentNoticeNr + (notices.size - 1)) % notices.size
+            if (notices.isNotEmpty())
+                currentNoticeIndex--
+            if (currentNoticeIndex < 0) {
+                currentNoticeIndex = 0
+                throw Exception("Already on first notice in local cache")
+                //TODO create meaningful UI event for before first notice
+            }
+
+            Log.i("Notice-Call", currentNoticeIndex.toString())
+            if (notices.isNotEmpty())
+                Log.i("Notice-Call", notices[currentNoticeIndex].toString())
+
             return getCurrentNotice()
         }
 
         fun getImageURL(n: Notice?  = null): String {
             val notice = n ?: getCurrentNotice()
-            return if(notice.imgs == null || notice.imgs.isEmpty()) noImg
-            else notice.imgs[0]
+            return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
+            else notice.imgs!![0]
         }
 
         fun isNoticeStarred(notice: Notice? = null): Boolean {

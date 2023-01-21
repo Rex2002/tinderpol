@@ -1,21 +1,50 @@
 package de.dhbw.tinderpol.data
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.function.Consumer
+import kotlin.coroutines.coroutineContext
 
 class NoticeRepository {
     companion object {
         private val localDataSource = LocalNoticesDataSource()
         private val remoteDataSource = RemoteNoticesDataSource()
+        private var lastUpdated: LocalDate = LocalDate.of(2000, 1, 1)
+        private const val dataLifetimeInDays: Long = 10
+        private var onUpdate: Consumer<List<Notice>>? = null
 
-        suspend fun fetchNotices(): List<Notice> {
-            val res = remoteDataSource.fetchNotices().getOrDefault(emptyList())
-            Log.i("API-Req", res.size.toString())
-            if (res.size > 6) Log.i("API-Req", res.subList(0, 5).toString())
-            return res
-            // if (localDataSource.lastUpdated() > 100) {
-            //     localDataSource.update(remoteDataSource.fetchNotices())
-            // }
-            // return localDataSource.fetchNotices()
+        fun listenToUpdates(callback: Consumer<List<Notice>>) {
+            onUpdate = callback
+        }
+
+        suspend fun syncNotices() {
+            if (lastUpdated.plusDays(dataLifetimeInDays) < LocalDate.now()) {
+                CoroutineScope(coroutineContext).launch {
+                    val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
+                    if (remoteNotices.isNotEmpty()) {
+                        updateRemoteNotices(remoteNotices)
+                    }
+                }
+            }
+            updateNotices(localDataSource.getAll())
+        }
+
+        private suspend fun updateRemoteNotices(notices: List<Notice>) {
+            updateNotices(notices)
+            //TODO implement more efficient updating
+            Log.i("API-Req", "Received new Remote Notices...")
+            localDataSource.deleteAll()
+            Log.i("API-Req", "Cleared Local DB...")
+            localDataSource.insert(*notices.toTypedArray())
+            Log.i("API-Req", "Added new notices to local DB...")
+            lastUpdated = LocalDate.now()
+        }
+
+        private fun updateNotices(notices: List<Notice>) {
+            Log.i("API-Req", "Updating Notices...")
+            onUpdate?.accept(notices)
         }
     }
 }
