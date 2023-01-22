@@ -103,10 +103,10 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
                 else android.R.drawable.btn_star_big_off )
         }
 
-      /*  binding.btnMap.setOnClickListener {
-            val intentionalStuffHappening = Intent(this, MapsActivity::class.java)
+       binding.btnMap.setOnClickListener {
+            val intentionalStuffHappening = Intent(context, MapsActivity::class.java)
             startActivity(intentionalStuffHappening)
-        }*/
+        }
         return binding.root
     }
 

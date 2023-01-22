@@ -9,9 +9,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import de.dhbw.tinderpol.databinding.ActivityMapsBinding
-import de.dhbw.tinderpol.data.Notice
-import de.dhbw.tinderpol.util.OnSwipeTouchListener
-import com.google.android.material.R.drawable.*
+//import de.dhbw.tinderpol.data.Notice
+//import de.dhbw.tinderpol.util.OnSwipeTouchListener
+//import com.google.android.material.R.drawable.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
