@@ -122,8 +122,8 @@ class SDO {
         }
 
         fun clearStarredNotices(){
+            starredNotices.forEach { it.starred = false }
             Log.i("SDO", "cleared starred notices")
-            // TODO implement
         }
 
         fun clearSwipeHistory(){
