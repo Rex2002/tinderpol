@@ -18,4 +18,5 @@
     <string name="starred_notices">Starred Notices</string>
     <string name="sync_notices">Sync Notices</string>
     <string name="no_notices_starred">No Notices Starred</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

@@ -8,6 +8,7 @@ import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
 import java.util.function.Consumer
 
+
 class SDO {
     companion object {
         private const val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
@@ -130,5 +131,6 @@ class SDO {
             Log.i("SDO", "cleared swipe history")
             // TODO implement
         }
+
     }
 }
