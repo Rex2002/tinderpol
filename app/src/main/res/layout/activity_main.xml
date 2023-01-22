@@ -195,7 +195,7 @@
                 android:id="@+id/textViewEmptyStarredList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_notices_starred"
+                android:text="@string/loading_starred_notices"
                 android:gravity="center"
                 android:textSize="20sp"
                 android:layout_marginTop="4dp"
