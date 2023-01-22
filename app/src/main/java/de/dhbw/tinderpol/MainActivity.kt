@@ -17,7 +17,6 @@ import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
@@ -38,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         GlobalScope.launch {
             SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
+            SDO.initStarredNotices()
         }
 
         binding.button.setOnClickListener {

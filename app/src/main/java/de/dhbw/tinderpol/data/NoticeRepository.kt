@@ -32,7 +32,7 @@ class NoticeRepository {
                 CoroutineScope(coroutineContext).launch {
                     val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
                     if (remoteNotices.isNotEmpty()) {
-                        updateRemoteNotices(remoteNotices)
+                        updateFromRemoteNotices(remoteNotices)
                         sharedPref?.edit()?.putLong("lastUpdated", System.currentTimeMillis())?.apply()
                     }
                 }
@@ -42,7 +42,7 @@ class NoticeRepository {
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
-        private suspend fun updateRemoteNotices(notices: List<Notice>) {
+        private suspend fun updateFromRemoteNotices(notices: List<Notice>) {
             updateNotices(notices)
             //TODO implement more efficient updating
             Log.i("API-Req", "Received new Remote Notices...")
@@ -50,6 +50,10 @@ class NoticeRepository {
             Log.i("API-Req", "Cleared Local DB...")
             localDataSource.insert(*notices.toTypedArray())
             Log.i("API-Req", "Added new notices to local DB...")
+        }
+
+        suspend fun updateStatus(vararg notices: Notice) {
+            localDataSource.updateAll(*notices)
         }
 
         @RequiresApi(Build.VERSION_CODES.N)

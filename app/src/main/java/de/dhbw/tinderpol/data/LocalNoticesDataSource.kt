@@ -22,8 +22,6 @@ class LocalNoticesDataSource {
                 it.notice.charges = it.charges
                 notices.add(it.notice)
             }
-
-
             return@withContext notices
         }
     }
@@ -60,6 +58,11 @@ class LocalNoticesDataSource {
         }
     }
 
+    suspend fun updateAll(vararg notices: Notice){
+        withContext(Dispatchers.IO){
+            dao.update(*notices)
+        }
+    }
     suspend fun deleteAll(){
         withContext(Dispatchers.IO){
             dao.deleteAllCharges()

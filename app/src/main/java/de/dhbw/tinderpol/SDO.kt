@@ -10,16 +10,16 @@ import java.util.function.Consumer
 
 class SDO {
     companion object {
-        private val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
+        private const val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
         private var currentNoticeIndex = 0
         private var notices : List<Notice> = listOf()
-        val emptyNotice = Notice("empty", imgs = listOf(noImg))
+        private val emptyNotice = Notice("empty", imgs = listOf(noImg))
         var onUpdate: Consumer<Notice>? = null
         private var isListeningToUpdates = false
         var starredNotices: MutableList<Notice> = mutableListOf()
 
         /**
-         * Gets notices stored in Room and updates Room API on the first call of the day (in the background)
+         * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
         @RequiresApi(Build.VERSION_CODES.N)
         suspend fun syncNotices(sharedPref: SharedPreferences?, forceSync: Boolean = false) {
@@ -36,15 +36,20 @@ class SDO {
             Log.i("SDO", "Notices updated...")
             notices = newNotices
             onUpdate?.accept(getCurrentNotice())
-            initStarredNotices()
+        }
+
+        suspend fun persistStarredNotices() {
+            Log.i("SDO", "saving current starred notices to Room")
+            NoticeRepository.updateStatus(*starredNotices.toTypedArray())
         }
 
         fun listenToUpdates(callback: Consumer<Notice>?) {
             onUpdate = callback
         }
 
-        private fun initStarredNotices() {
+        fun initStarredNotices() {
             starredNotices = notices.filter { it.starred }.toMutableList()
+            Log.i("SDO", "initialized starredNotices list")
         }
 
         fun getCurrentNotice() : Notice {
@@ -109,11 +114,11 @@ class SDO {
             return (notice ?: getCurrentNotice()).starred
         }
 
-        fun toggleStarredNotice(notice: Notice? = null) {
-            val n = notice ?: getCurrentNotice()
-            n.starred = !n.starred
-            if (n.starred) starredNotices.add(n)
-            else starredNotices.remove(starredNotices.find{it.id == n.id})
+        fun toggleStarredNotice(n: Notice? = null) {
+            val notice = n ?: getCurrentNotice()
+            notice.starred = !notice.starred
+            if (notice.starred) starredNotices.add(notice)
+            else starredNotices.remove(starredNotices.find{it.id == notice.id})
         }
 
         fun clearStarredNotices(){

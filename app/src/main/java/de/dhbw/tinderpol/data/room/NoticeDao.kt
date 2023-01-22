@@ -45,14 +45,15 @@ interface NoticeDao {
     @Query("SELECT language FROM noticeLanguageMap WHERE noticeId IS :id")
     fun getLanguagesByNoticeId(id: String): List<String>
 
-    @Query("SELECT * FROM notice WHERE starred")
-    fun getStarredNotices(): MutableList<Notice>
-
     @Transaction
     @Query("SELECT * FROM notice")
     fun getNoticesWithLists(): List<NoticeWithLists>
 
     //TODO add methods for filtered get
+
+    //Update methods
+    @Update
+    fun update(vararg notices: Notice)
 
     //Delete methods
     @Delete

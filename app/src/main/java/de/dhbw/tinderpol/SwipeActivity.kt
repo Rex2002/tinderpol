@@ -7,6 +7,8 @@ import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -77,6 +79,13 @@ class SwipeActivity : AppCompatActivity() {
         binding.noticeImage.load(SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        GlobalScope.launch {
+            SDO.persistStarredNotices()
         }
     }
 }
