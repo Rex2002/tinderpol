@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,7 +15,6 @@ import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
 import de.dhbw.tinderpol.util.Util.Companion.isBlankStr
 import de.dhbw.tinderpol.util.Util.Companion.isBlankNum
 import de.dhbw.tinderpol.util.Util.Companion.sexToStr
-
 
 class NoticeInfoFragment : BottomSheetDialogFragment() {
 
@@ -103,11 +103,10 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
                 else android.R.drawable.btn_star_big_off )
         }
 
-      //  binding.btnMap.setOnClickListener {
-        //   val intent = Intent (this@NoticeInfoFragment, MapsActivity::class.java)
-        //    startActivity(intent)
-      //  }
-
+      /*  binding.btnMap.setOnClickListener {
+            val intentionalStuffHappening = Intent(this, MapsActivity::class.java)
+            startActivity(intentionalStuffHappening)
+        }*/
         return binding.root
     }
 

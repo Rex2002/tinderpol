@@ -9,6 +9,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import de.dhbw.tinderpol.databinding.ActivityMapsBinding
+import de.dhbw.tinderpol.util.OnSwipeTouchListener
+import com.google.android.material.R.drawable.*
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -38,8 +41,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val location = LatLng(20.5, 78.9)
+        val lo = 7.5
+        val lan = 8.9
+        val location = LatLng(lo,lan)
         mMap.addMarker(MarkerOptions().position(location).title("Former Location"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
     }
+/*
+need to be able to leave map after
+
+    binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
+        override fun onSwipeLeft() {
+            super.onSwipeLeft()
+            val notice = SDO.getNextNotice()
+            val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
+            binding.textViewFullName.text = nameText
+            SwipeActivity.updateShownImg()
+        }}*/
 }
