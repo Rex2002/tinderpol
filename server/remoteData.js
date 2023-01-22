@@ -1,4 +1,5 @@
 const http = require('https');
+const { readFileSync } = require('fs');
 
 async function onRateLimit(waitTime = 5 * 60 * 1000) {
 	let min = Math.floor(waitTime / 60000);
@@ -63,17 +64,8 @@ async function getJSONReq(url) {
 	});
 }
 
-async function getCountryCodes() {
-	return new Promise((resolve, reject) => {
-		try {
-			const ccAPIUrl = 'https://restcountries.com/v3.1/all';
-			getJSONReq(ccAPIUrl).then((res) => {
-				resolve(res.map((x) => x['cca2']));
-			});
-		} catch (e) {
-			reject(e);
-		}
-	});
+function getCountries() {
+	return JSON.parse(readFileSync('countries.json').toString());
 }
 
 function getPerc(num, denom, precision = 3) {
@@ -128,7 +120,7 @@ function uniqSorted(arr, key = 'entity_id', cb = (str) => str?.split('/')?.map((
 }
 
 async function getNoticesOfType(type, singleReq) {
-	const countryCodes = await getCountryCodes();
+	const countries = Object.keys(getCountries());
 	const noticesURL = 'https://ws-public.interpol.int/notices/v1/' + type.toLowerCase();
 	let notices = [];
 
@@ -145,7 +137,7 @@ async function getNoticesOfType(type, singleReq) {
 	const resPerPage_arg = ['resultPerPage', 200];
 	if (!singleReq) {
 		let i = 0;
-		for await (const cc of countryCodes) {
+		for await (const cc of countries) {
 			const country_arg = ['nationality', cc];
 
 			const resp = await req(country_arg, resPerPage_arg);
@@ -202,4 +194,4 @@ async function getRemoteData() {
 	return uniqSorted(res, 'id');
 }
 
-module.exports = getRemoteData;
+module.exports = { getRemoteData, getCountries };

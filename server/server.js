@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const app = express();
-const getRemoteData = require('./remoteData.js');
+const { getRemoteData, getCountries } = require('./remoteData.js');
 
 app.use(express.json());
 
@@ -82,6 +82,10 @@ app.get('/', (req, res) => {
 		const resData = { max_cursor: maxCursor, notices: [], current_page: cursor, next_page: nextCursor };
 		if (idx < data.length) resData.notices = data.slice(idx, idx + PAGE_SIZE);
 		res.send(resData);
+	})
+	.get('/countries', async (req, res) => {
+		const data = getCountries();
+		res.send(data);
 	});
 
 getData(true).then(() => {
