@@ -120,7 +120,7 @@ function uniqSorted(arr, key = 'entity_id', cb = (str) => str?.split('/')?.map((
 }
 
 async function getNoticesOfType(type, singleReq) {
-	const countries = Object.keys(getCountries());
+	const countryCodes = Object.keys(getCountries());
 	const noticesURL = 'https://ws-public.interpol.int/notices/v1/' + type.toLowerCase();
 	let notices = [];
 
@@ -137,7 +137,7 @@ async function getNoticesOfType(type, singleReq) {
 	const resPerPage_arg = ['resultPerPage', 200];
 	if (!singleReq) {
 		let i = 0;
-		for await (const cc of countries) {
+		for await (const cc of countryCodes) {
 			const country_arg = ['nationality', cc];
 
 			const resp = await req(country_arg, resPerPage_arg);
