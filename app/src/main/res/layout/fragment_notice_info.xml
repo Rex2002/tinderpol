@@ -146,6 +146,13 @@
                 android:layout_gravity="center_vertical"
                 android:padding="8dp"
                 tools:text="@tools:sample/lorem" />
+
+            <Button
+                android:id="@+id/btnMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Map" />
+
         </LinearLayout>
 
         <LinearLayout

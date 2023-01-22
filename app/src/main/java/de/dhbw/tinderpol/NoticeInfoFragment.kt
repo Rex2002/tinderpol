@@ -102,6 +102,10 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
                 else android.R.drawable.btn_star_big_off )
         }
 
+        binding.btnMap.setOnClickListener {
+            mapCriminalNational()
+        }
+
         return binding.root
     }
 
