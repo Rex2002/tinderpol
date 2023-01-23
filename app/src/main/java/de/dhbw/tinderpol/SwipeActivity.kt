@@ -7,6 +7,8 @@ import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -32,7 +34,9 @@ class SwipeActivity : AppCompatActivity() {
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
             override fun onSwipedLeft() {
                 super.onSwipedLeft()
-                SDO.getNextNotice()
+                val notice = SDO.getNextNotice()
+                val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
+                binding.textViewFullName.text = nameText
                 updateShownImg()
             }
 
@@ -82,12 +86,16 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     fun updateShownImg(){
-        val notice = SDO.getCurrentNotice()
-        val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
-        binding.textViewFullName.text = nameText
         binding.noticeImage.load(SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        GlobalScope.launch {
+            SDO.persistStarredNotices()
         }
     }
 }

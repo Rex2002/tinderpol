@@ -1,28 +1,32 @@
 package de.dhbw.tinderpol.data
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.data.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.function.Predicate
 
 class LocalNoticesDataSource {
     companion object {
         lateinit var dao : NoticeDao
     }
 
-    suspend fun getAll(): List<Notice> {
+    @RequiresApi(Build.VERSION_CODES.N)
+    suspend fun getAll(filter: Predicate<Notice>): List<Notice> {
         return withContext(Dispatchers.IO) {
             Log.i("API-Req", "Retrieving all local notices...")
-            val notices: List<Notice> = dao.getAllNotices()
-            Log.i("API-Req", "Amount of local notices: " + notices.size)
-
-            notices.forEach {
-                it.nationalities = dao.getNationalitiesByNoticeId(it.id)
-                it.imgs = dao.getImagesByNoticeId(it.id)
-                it.charges = dao.getChargesByIds(dao.getChargeIdsByNoticeId(it.id))
-                it.spokenLanguages = dao.getLanguagesByNoticeId(it.id)
+            val noticesWithLists: List<NoticeWithLists> = dao.getNoticesWithLists()
+            val notices: MutableList<Notice> = mutableListOf()
+            noticesWithLists.forEach {
+                it.notice.spokenLanguages = it.getLanguages()
+                it.notice.imgs = it.getImages()
+                it.notice.nationalities = it.getNationalities()
+                it.notice.charges = it.charges
+                if (filter.test(it.notice))
+                    notices.add(it.notice)
             }
-
             return@withContext notices
         }
     }
@@ -33,6 +37,8 @@ class LocalNoticesDataSource {
             val languageMaps: ArrayList<NoticeLanguageMap> = ArrayList()
             val imageMaps: ArrayList<NoticeImageMap> = ArrayList()
             val nationalityMaps: ArrayList<NoticeNationalityMap> = ArrayList()
+            val chargeMaps: ArrayList<NoticeChargeMap> = ArrayList()
+            val charges: ArrayList<Charge> = ArrayList()
             notices.forEach {notice ->
                 notice.spokenLanguages?.forEach {
                     languageMaps.add(NoticeLanguageMap(notice.id, it))
@@ -44,22 +50,24 @@ class LocalNoticesDataSource {
                     nationalityMaps.add(NoticeNationalityMap(notice.id, it))
                 }
                 notice.charges?.forEach {
-                    val chargeId: Int = dao.getChargeId(it.country, it.charge)
-                    if (chargeId != null){
-                        dao.insertChargeMaps(NoticeChargeMap(notice.id, chargeId))
-                    } else {
-                        dao.insertCharges(it)
-                        dao.insertChargeMaps(NoticeChargeMap(notice.id, dao.getChargeId(it.country, it.charge)))
-                    }
-                    //TODO reduce db calls by making primary key of charge concatenation of country & charge
+                    val chargeId: String = it.country + it.charge
+                    chargeMaps.add(NoticeChargeMap(notice.id, chargeId))
+                    charges.add(it)
                 }
             }
             dao.insertLanguages(*languageMaps.toTypedArray())
             dao.insertImages(*imageMaps.toTypedArray())
             dao.insertNationalities(*nationalityMaps.toTypedArray())
+            dao.insertChargeMaps(*chargeMaps.toTypedArray())
+            dao.insertCharges(*charges.toTypedArray())
         }
     }
 
+    suspend fun updateAll(vararg notices: Notice){
+        withContext(Dispatchers.IO){
+            dao.update(*notices)
+        }
+    }
     suspend fun deleteAll(){
         withContext(Dispatchers.IO){
             dao.deleteAllCharges()

@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +9,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setPadding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.dhbw.tinderpol.data.MapsData
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
 import de.dhbw.tinderpol.util.Util.Companion.isBlankStr
 import de.dhbw.tinderpol.util.Util.Companion.isBlankNum
 import de.dhbw.tinderpol.util.Util.Companion.sexToStr
-
 
 class NoticeInfoFragment : BottomSheetDialogFragment() {
 
@@ -102,6 +103,13 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
                 else android.R.drawable.btn_star_big_off )
         }
 
+        binding.btnMap.setOnClickListener {
+            val intentionalStuffHappening = Intent(context, MapsActivity::class.java)
+            val notice = SDO.getCurrentNotice()
+            val data = MapsData(notice.nationalities ?: listOf(), notice.charges?.map { it.country } ?: listOf(), notice.birthCountry, notice.birthPlace)
+            intentionalStuffHappening.putExtra("data", MapsData.serialize(data))
+            startActivity(intentionalStuffHappening)
+        }
         return binding.root
     }
 

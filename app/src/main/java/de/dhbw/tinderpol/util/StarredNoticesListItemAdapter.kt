@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -16,7 +15,7 @@ import de.dhbw.tinderpol.R
 import de.dhbw.tinderpol.SDO
 import de.dhbw.tinderpol.data.Notice
 
-class StarredNoticesListItemAdapter (private val context : Context, private val dataset: List<Notice>) :
+class StarredNoticesListItemAdapter (private val context : Context, private var dataset: List<Notice>) :
     RecyclerView.Adapter<StarredNoticesListItemAdapter.ItemViewHolder>(){
 
     class ItemViewHolder(view : View) : RecyclerView.ViewHolder(view){
@@ -47,6 +46,11 @@ class StarredNoticesListItemAdapter (private val context : Context, private val 
             a.supportFragmentManager.beginTransaction().add(bottomSheetDialog, "").commit()
 
         }
+    }
+
+    fun updateData(newData : List<Notice>){
+        dataset = newData
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
