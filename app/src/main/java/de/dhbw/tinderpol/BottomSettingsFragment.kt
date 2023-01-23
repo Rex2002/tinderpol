@@ -3,6 +3,7 @@ package de.dhbw.tinderpol
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +12,10 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.dhbw.tinderpol.databinding.FragmentBottomSettingsBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BottomSettingsFragment : BottomSheetDialogFragment() {
 
@@ -83,15 +86,24 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         }
 
         binding.buttonClearStarredNotices.setOnClickListener{
-            SDO.clearStarredNotices()
-            Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT).show()
+            Log.i("BottomSettingsFragment", "clearing starred notices")
+            GlobalScope.launch(Dispatchers.IO){
+                SDO.clearStarredNotices()
+                withContext(Dispatchers.Main){
+                    val a : MainActivity? = if (activity == null) null else activity as MainActivity
+                    a?.updateStarredNoticesList()
+                    Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         binding.buttonClearSwipeHistory.setOnClickListener{
+
             SDO.clearSwipeHistory()
+
             Toast.makeText(activity, "Successfully cleared swipe history", Toast.LENGTH_SHORT).show()
         }
         binding.buttonSyncLocalStorages.setOnClickListener{
-            GlobalScope.launch {
+            GlobalScope.launch(Dispatchers.IO) {
                 SDO.syncNotices(activity?.getSharedPreferences(
                     getString(R.string.shared_preferences_file),
                     Context.MODE_PRIVATE), true

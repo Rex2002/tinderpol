@@ -4,9 +4,11 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import de.dhbw.tinderpol.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.function.Consumer
+import java.util.function.Predicate
 import kotlin.coroutines.coroutineContext
 
 class NoticeRepository {
@@ -24,6 +26,15 @@ class NoticeRepository {
         suspend fun syncNotices(sharedPref: SharedPreferences?, forceSync: Boolean = false) {
             val lastUpdated: Long = sharedPref?.getLong("lastUpdated", 0) ?: 0
 
+            val redFilter: Boolean = sharedPref?.getBoolean(R.string.show_red_notices_shared_prefs.toString(), true) == true
+            val yellowFilter: Boolean = sharedPref?.getBoolean("ShowYellowNoticesSharedPref", true) == true
+            val unFilter: Boolean = sharedPref?.getBoolean("ShowUnNoticesSharedPref", true) == true
+            val filter: Predicate<Notice> = Predicate {
+                (it.type.equals("red") && redFilter) ||
+                        (it.type.equals("yellow") && yellowFilter) ||
+                        (it.type.equals("un") && unFilter)
+            }
+
             if (forceSync || System.currentTimeMillis() - lastUpdated > dataLifetimeInMillis) {
                 Log.i("noticeRepository", "syncing notices with remote data sources")
                 Log.i("noticeRepository", "force Sync: $forceSync")
@@ -38,7 +49,7 @@ class NoticeRepository {
                 }
                 Log.i("noticeRepository", "sync successful")
             }
-            updateNotices(localDataSource.getAll())
+            updateNotices(localDataSource.getAll(filter))
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
