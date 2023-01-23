@@ -1,16 +1,20 @@
 package de.dhbw.tinderpol.data
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.data.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.function.Predicate
 
 class LocalNoticesDataSource {
     companion object {
         lateinit var dao : NoticeDao
     }
 
-    suspend fun getAll(): List<Notice> {
+    @RequiresApi(Build.VERSION_CODES.N)
+    suspend fun getAll(filter: Predicate<Notice>): List<Notice> {
         return withContext(Dispatchers.IO) {
             Log.i("API-Req", "Retrieving all local notices...")
             val noticesWithLists: List<NoticeWithLists> = dao.getNoticesWithLists()
@@ -20,7 +24,8 @@ class LocalNoticesDataSource {
                 it.notice.imgs = it.getImages()
                 it.notice.nationalities = it.getNationalities()
                 it.notice.charges = it.charges
-                notices.add(it.notice)
+                if (filter.test(it.notice))
+                    notices.add(it.notice)
             }
             return@withContext notices
         }
