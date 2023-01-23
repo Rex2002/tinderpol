@@ -37,17 +37,18 @@ class MainActivity : AppCompatActivity() {
         ).fallbackToDestructiveMigration().build()
         LocalNoticesDataSource.dao = db.noticeDao()
 
+        adapter = StarredNoticesListItemAdapter(this, SDO.starredNotices)
+        recyclerView = binding.recyclerViewStarredNoticesList
+        recyclerView.adapter = adapter
+        recyclerView.setHasFixedSize(true)
+        binding.textViewEmptyStarredList.visibility = if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
+
+
         GlobalScope.launch(Dispatchers.IO) {
             SDO.loadCountriesData(resources)
-            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
-            SDO.initStarredNotices()
-            withContext(Dispatchers.Main){
-                updateStarredNoticesList()
-                binding.textViewEmptyStarredList.text = getString(R.string.no_notices_starred)
-            }
-
-
         }
+
+        syncNotices()
 
         binding.button.setOnClickListener {
             val intentToStartShit = Intent(this, SwipeActivity::class.java)
@@ -57,11 +58,7 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             showReportConfirmDialog()
         }
-        adapter = StarredNoticesListItemAdapter(this, SDO.starredNotices)
-        recyclerView = binding.recyclerViewStarredNoticesList
-        recyclerView.adapter = adapter
-        recyclerView.setHasFixedSize(true)
-        binding.textViewEmptyStarredList.visibility = if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
+
     }
 
     private fun showReportConfirmDialog(){
@@ -78,6 +75,27 @@ class MainActivity : AppCompatActivity() {
     fun updateStarredNoticesList(){
         Log.i("Main", "update starred notices recyclerview")
         adapter.updateData(SDO.starredNotices)
+        binding.textViewEmptyStarredList.text = getString(R.string.no_notices_starred)
         binding.textViewEmptyStarredList.visibility = if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun syncNotices(){
+        Log.i("Main", "synchronizing notices")
+        binding.button.text = getString(R.string.synchronizing_notices)
+        binding.button.isEnabled = false
+        binding.textViewEmptyStarredList.text = getString(R.string.loading_starred_notices)
+
+        GlobalScope.launch {
+            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
+            SDO.initStarredNotices()
+            withContext(Dispatchers.Main){
+                updateStarredNoticesList()
+                binding.button.text = getString(R.string.start_swipe_button)
+                binding.button.isEnabled = true
+            }
+        }
+
+
     }
 }

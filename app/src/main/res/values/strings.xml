@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Tinderpol</string>
     <string name="start_swipe_button">Start Swiping</string>
+    <string name="synchronizing_notices">Sync notices…</string>
     <string name="start_explain_text_1">Swipe left to see the next notice.</string>
     <string name="start_explain_text_2">Swipe right if you have information about the Wanted Person to contact Interpol.</string>
     <string name="start_explain_text_3">Swipe up to see more information about the Wanted Person.</string>
@@ -19,5 +20,6 @@
     <string name="sync_notices">Sync Notices</string>
     <string name="no_notices_starred">No Notices Starred</string>
     <string name="title_activity_maps">MapsActivity</string>
-    <string name="loading_starred_notices">Loading...</string>
+    <string name="loading_starred_notices">Loading…</string>
+
 </resources>

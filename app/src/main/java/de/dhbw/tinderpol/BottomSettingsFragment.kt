@@ -20,12 +20,9 @@ import kotlinx.coroutines.withContext
 class BottomSettingsFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentBottomSettingsBinding? = null
+    private var syncFlag = false
 
     private val binding get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -39,6 +36,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         binding.switchUnNotices.isChecked = sharedPref?.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true) ?: true
 
         binding.switchRedNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+            syncFlag = true
             val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
             if (sharedPref != null) {
                 with(sharedPref.edit()){
@@ -54,6 +52,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             }
         }
         binding.switchYellowNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+            syncFlag = true
             val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
             if (sharedPref != null) {
                 with(sharedPref.edit()){
@@ -70,6 +69,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             }
         }
         binding.switchUnNotices.setOnCheckedChangeListener{_: CompoundButton, b:Boolean ->
+            syncFlag = true
             val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
             if(sharedPref != null){
                 with(sharedPref.edit()){
@@ -103,17 +103,21 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             Toast.makeText(activity, "Successfully cleared swipe history", Toast.LENGTH_SHORT).show()
         }
         binding.buttonSyncLocalStorages.setOnClickListener{
-            GlobalScope.launch(Dispatchers.IO) {
-                SDO.syncNotices(activity?.getSharedPreferences(
-                    getString(R.string.shared_preferences_file),
-                    Context.MODE_PRIVATE), true
-                )
+            if(activity != null){
+                (activity as MainActivity).syncNotices()
+            }
+            else{
+                Toast.makeText(activity, "Sync failed due to unknown reason", Toast.LENGTH_SHORT).show()
             }
         }
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onDestroy() {
+        if(syncFlag && activity != null){
+            (activity as MainActivity).syncNotices()
+        }
         super.onDestroy()
         _binding = null
     }
