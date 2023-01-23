@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         LocalNoticesDataSource.dao = db.noticeDao()
 
         GlobalScope.launch(Dispatchers.IO) {
+            SDO.loadCountriesData(resources)
             SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
             SDO.initStarredNotices()
             withContext(Dispatchers.Main){
