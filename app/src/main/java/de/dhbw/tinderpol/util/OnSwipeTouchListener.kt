@@ -1,4 +1,5 @@
 package de.dhbw.tinderpol.util
+
 import android.content.Context
 import android.util.Log
 import android.view.GestureDetector
@@ -25,7 +26,7 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
         }
     }
 
-    private fun onMove(event: MotionEvent) {
+    open fun onMove(event: MotionEvent) {
         var xDiff = 0F
         if (initialX == null) {
             initialX = event.rawX
@@ -35,8 +36,8 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
         else onSwipingRight(xDiff)
     }
 
-    private fun onMoveDone(event: MotionEvent) {
-
+    open fun onMoveDone(event: MotionEvent) {
+        initialX = null
     }
 
     private inner class GestureListener : SimpleOnGestureListener(){

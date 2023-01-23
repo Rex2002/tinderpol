@@ -3,6 +3,7 @@ package de.dhbw.tinderpol
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
 import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
@@ -34,9 +35,7 @@ class SwipeActivity : AppCompatActivity() {
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
             override fun onSwipedLeft() {
                 super.onSwipedLeft()
-                val notice = SDO.getNextNotice()
-                val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
-                binding.textViewFullName.text = nameText
+                SDO.getNextNotice()
                 updateShownImg()
             }
 
@@ -57,12 +56,18 @@ class SwipeActivity : AppCompatActivity() {
 
             override fun onSwipingLeft(xDiff: Float) {
                 super.onSwipingLeft(xDiff)
-                // TODO
+                binding.noticeImage.animate().x(xDiff).setDuration(0).start()
             }
 
             override fun onSwipingRight(xDiff: Float) {
                 super.onSwipingRight(xDiff)
-                binding.noticeImage.animate().rotation(xDiff).setDuration(0).start()
+                binding.noticeImage.animate().x(xDiff).setDuration(0).start()
+            }
+
+            override fun onMoveDone(event: MotionEvent) {
+                super.onMoveDone(event)
+                val imageStart = (resources.displayMetrics.widthPixels.toFloat() - binding.noticeImage.width) / 2
+                binding.noticeImage.animate().x(imageStart).setDuration(150).start()
             }
         })
 
@@ -86,6 +91,9 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     fun updateShownImg(){
+        val notice = SDO.getCurrentNotice()
+        val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
+        binding.textViewFullName.text = nameText
         binding.noticeImage.load(SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
