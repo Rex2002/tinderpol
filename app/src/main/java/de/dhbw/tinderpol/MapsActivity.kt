@@ -8,18 +8,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityMapsBinding
-import android.content.Context
-import java.io.IOException
-import com.google.gson.*
-import de.dhbw.tinderpol.data.room.countryRoadTakeMeHome
-import de.dhbw.tinderpol.data.room.place
-import de.dhbw.tinderpol.util.OnSwipeTouchListener
-import de.dhbw.tinderpol.SwipeActivity
-
-
-
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
