@@ -87,10 +87,14 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
         binding.buttonClearStarredNotices.setOnClickListener{
             Log.i("BottomSettingsFragment", "clearing starred notices")
-            SDO.clearStarredNotices()
-            val a : MainActivity? = if (activity == null) null else activity as MainActivity
-            a?.updateStarredNoticesList()
-            Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT).show()
+            GlobalScope.launch(Dispatchers.IO){
+                SDO.clearStarredNotices()
+                withContext(Dispatchers.Main){
+                    val a : MainActivity? = if (activity == null) null else activity as MainActivity
+                    a?.updateStarredNoticesList()
+                    Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         binding.buttonClearSwipeHistory.setOnClickListener{
 

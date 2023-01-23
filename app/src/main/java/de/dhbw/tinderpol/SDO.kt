@@ -122,8 +122,9 @@ class SDO {
             else starredNotices.remove(starredNotices.find{it.id == notice.id})
         }
 
-        fun clearStarredNotices(){
+        suspend fun clearStarredNotices(){
             starredNotices.forEach { it.starred = false }
+            persistStarredNotices()
             initStarredNotices()
             Log.i("SDO", "cleared starred notices")
         }
