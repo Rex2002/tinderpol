@@ -8,10 +8,24 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityMapsBinding
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.gson.*
+import de.dhbw.tinderpol.data.Country
+import de.dhbw.tinderpol.data.MapsData
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    companion object {
+        private const val nationalityColor = BitmapDescriptorFactory.HUE_VIOLET
+        private const val chargedColor = BitmapDescriptorFactory.HUE_RED
+        private const val birthColor = BitmapDescriptorFactory.HUE_CYAN
+    }
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -27,42 +41,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
-
-    /*fun getCountryID(){
-
-    }
-
-    fun getJsonDataFromAsset(context: Context, fileName: String): String? {
-        val jsonString: String
-        try {
-            jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
-        } catch (ioException: IOException) {
-            ioException.printStackTrace()
-            return null
-        }
-        return jsonString
-    }
-
-
-    fun getJsonData(){
-        val jsonFileString = getJsonDataFromAsset(applicationContext, "countries.json")
-
-        //Länderkürzel holen!!
-
-        val country = "DE"
-
-        var gson = Gson().fromJson(jsonFileString, countryRoadTakeMeHome::class.java)
-        val stringAsshole = gson.filter(country)
-        var myPlace = Gson().fromJson(stringAsshole, place::class.java)
-    }
-    */
-
-
-    //var place = gson.get(country)
-    //var place = Gson().fromJson(gson.get(country), countryRoadTakeMeHome::class.java)
-    //var gson=Gson()
-    //var place = gson.fromJson(jsonFileString, countryRoadTakeMeHome::class.java)
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -74,24 +52,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
 
 
-    /*fun getLat(){
-        val natID = getCountryID()
-        val lo=0.0
-         }
+    private fun addMarker(country: Country?, color: Float, title: String) {
+        if (country == null) return
+        val lat = country.lat
+        val lon = country.long
+        val location = LatLng(lat,lon)
+        mMap.addMarker(MarkerOptions()
+            .position(location)
+            .title(title)
+            .icon(BitmapDescriptorFactory.defaultMarker(color)))
+    }
 
 
-    fun getLong(){
-        val natID = getCountryID()
-        val lan = 0.0
-    }*/
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val lat = 0.0 //getLat()
-        val lon = 0.0 // getLong()
-        val location = LatLng(lat,lon)
-        mMap.addMarker(MarkerOptions().position(location).title("Former Location"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-    }}
+        val data = MapsData.deserialize(intent.getStringExtra("data"))
+        Log.i("Countries", data.toString())
+        Log.i("Countries", data.chargeCountries.toString())
 
-//need to be able to leave map after
+        addMarker(SDO.getCountry(data.birthCountry), birthColor, "Birth Country")
+        data.nationalities.forEach { addMarker(SDO.getCountry(it), nationalityColor, "Nationality") }
+        data.chargeCountries.forEach { addMarker(SDO.getCountry(it), chargedColor, "Charged by") }
+
+        val birthCountry = SDO.getCountry(data.birthCountry)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(birthCountry?.lat ?: 0.0, birthCountry?.long ?: 0.0)))
+    }}
 

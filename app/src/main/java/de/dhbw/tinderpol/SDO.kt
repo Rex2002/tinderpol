@@ -1,16 +1,25 @@
 package de.dhbw.tinderpol
 
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.reflect.TypeToken
+import de.dhbw.tinderpol.data.Country
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
+import java.lang.reflect.Type
 import java.util.function.Consumer
 
 
 class SDO {
     companion object {
+        private var countries: HashMap<String, Country>? = null
         private const val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
         private var currentNoticeIndex = 0
         private var notices : List<Notice> = listOf()
@@ -38,7 +47,49 @@ class SDO {
             notices = newNotices
             onUpdate?.accept(getCurrentNotice())
         }
+        private class CountriesDeserializer: JsonDeserializer<Any> {
+            override fun deserialize(
+                json: JsonElement?,
+                typeOfT: Type?,
+                context: JsonDeserializationContext?
+            ): Any? {
+                var res: Any? = null
+                val str = json!!.asJsonPrimitive.asString
+                res = try {
+                    str.toDouble()
+                } catch (e: java.lang.Exception) {
+                    str
+                }
+                return res
+            }
+        }
 
+        fun loadCountriesData(res: Resources) {
+            val text = res.openRawResource(R.raw.countries).bufferedReader().use { it.readText() }
+            val builder = GsonBuilder()
+            builder.registerTypeAdapter(Any::class.java, CountriesDeserializer())
+            val gson = builder.create()
+            val objectListType = object : TypeToken<HashMap<String, Country>?>() {}.type
+            val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
+            countries = obj
+            Log.i("Countries", countries.toString())
+        }
+
+        fun getLatOfCountry(countryID: String): Double? {
+            return countries?.get(countryID)?.lat
+        }
+
+        fun getLongOfCountry(countryID: String): Double? {
+            return countries?.get(countryID)?.long
+        }
+
+        fun getNameOfCountry(countryID: String): String? {
+            return countries?.get(countryID)?.name
+        }
+
+        fun getCountry(countryID: String?): Country? {
+            return countries?.get(countryID)
+        }
         suspend fun persistStarredNotices() {
             Log.i("SDO", "saving current starred notices to Room")
             NoticeRepository.updateStatus(*starredNotices.toTypedArray())
