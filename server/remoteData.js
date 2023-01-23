@@ -65,6 +65,9 @@ async function getJSONReq(url) {
 }
 
 function getCountries() {
+	// Data of countries was taken from the following two sources:
+	// 1. https://gist.github.com/sindresorhus/1341699
+	// 2. https://www.geonames.org/countries/
 	return JSON.parse(readFileSync('countries.json').toString());
 }
 
