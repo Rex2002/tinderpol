@@ -8,10 +8,18 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityMapsBinding
-//import de.dhbw.tinderpol.data.Notice
-//import de.dhbw.tinderpol.util.OnSwipeTouchListener
-//import com.google.android.material.R.drawable.*
+import android.content.Context
+import java.io.IOException
+import com.google.gson.*
+import de.dhbw.tinderpol.data.room.countryRoadTakeMeHome
+import de.dhbw.tinderpol.data.room.place
+import de.dhbw.tinderpol.util.OnSwipeTouchListener
+import de.dhbw.tinderpol.SwipeActivity
+
+
+
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -31,6 +39,41 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    /*fun getCountryID(){
+
+    }
+
+    fun getJsonDataFromAsset(context: Context, fileName: String): String? {
+        val jsonString: String
+        try {
+            jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return null
+        }
+        return jsonString
+    }
+
+
+    fun getJsonData(){
+        val jsonFileString = getJsonDataFromAsset(applicationContext, "countries.json")
+
+        //Länderkürzel holen!!
+
+        val country = "DE"
+
+        var gson = Gson().fromJson(jsonFileString, countryRoadTakeMeHome::class.java)
+        val stringAsshole = gson.filter(country)
+        var myPlace = Gson().fromJson(stringAsshole, place::class.java)
+    }
+    */
+
+
+    //var place = gson.get(country)
+    //var place = Gson().fromJson(gson.get(country), countryRoadTakeMeHome::class.java)
+    //var gson=Gson()
+    //var place = gson.fromJson(jsonFileString, countryRoadTakeMeHome::class.java)
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -41,57 +84,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
 
-    /*
-     * this is probably a lot harder and less efficient than it has to be
-     * but i think the API only lets you use your own location, a pre saved one or you add one
-     * while youre on the map. Therefore a few countries will be hardcoded
-    */
 
-    /*fun getLo(){
-        if(AF){lo = 33.927125}
-        else if(EG){lo = 26.820190}
-        else if(AR){lo = -38.416097}
-        else if(AU){lo = -25.274022}
-        else if(BE){lo = 50.8504500}
-        else if(BG){lo = 42.733883}
-        else if(CN){lo = 19.7699300}
-        else if(DE){lo = 51.165691}
-        else if(EU){lo = 50,02447}
-        else if(RU){lo = 51.8590500}
-        return lo
+    /*fun getLat(){
+        val natID = getCountryID()
+        val lo=0.0
          }
 
 
-    fun getLan(){
-        if(AF){lan = 67.721655}
-        else if(EG){lan = 30.798712}
-        else if(AR){lan = -63.616672}
-        else if(AU){lan = 133.775392}
-        else if(BE){lan = 4.3487800}
-        else if(BG){lan = 25.485830}
-        else if(CN){lan = -90.4959500}
-        else if(DE){lan = 10.451526}
-        else if(EU){lan = 9,9319}
-        else if(RU){lan = 58.2213600}
-        return lan
+    fun getLong(){
+        val natID = getCountryID()
+        val lan = 0.0
     }*/
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val lo = 0.0 //getLo()
-        val lan = 0.0 // getLan()
-        val location = LatLng(lo,lan)
+        val lat = 0.0 //getLat()
+        val lon = 0.0 // getLong()
+        val location = LatLng(lat,lon)
         mMap.addMarker(MarkerOptions().position(location).title("Former Location"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-    }
-/*
-need to be able to leave map after
+    }}
 
-    binding.root.setOnTouchListener(object : OnSwipeTouchListener(this){
-        override fun onSwipeLeft() {
-            super.onSwipeLeft()
-            val notice = SDO.getNextNotice()
-            val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
-            binding.textViewFullName.text = nameText
-            SwipeActivity.updateShownImg()
-        }}*/
-}
+//need to be able to leave map after
+
