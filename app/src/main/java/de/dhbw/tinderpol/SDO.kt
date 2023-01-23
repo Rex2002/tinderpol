@@ -124,6 +124,7 @@ class SDO {
 
         fun clearStarredNotices(){
             starredNotices.forEach { it.starred = false }
+            initStarredNotices()
             Log.i("SDO", "cleared starred notices")
         }
 
