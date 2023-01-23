@@ -50,6 +50,16 @@ class SwipeActivity : AppCompatActivity() {
                 super.onSwipedDown()
                 finish()
             }
+
+            override fun onSwipingLeft(xDiff: Float) {
+                super.onSwipingLeft(xDiff)
+                // TODO
+            }
+
+            override fun onSwipingRight(xDiff: Float) {
+                super.onSwipingRight(xDiff)
+                binding.noticeImage.animate().rotation(xDiff).setDuration(0).start()
+            }
         })
 
         updateShownImg()

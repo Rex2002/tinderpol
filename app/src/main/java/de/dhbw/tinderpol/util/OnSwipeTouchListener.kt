@@ -10,12 +10,35 @@ import kotlin.math.abs
 
 internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private val gestureDetector : GestureDetector
-    override fun onTouch(p0: View?, event: MotionEvent?): Boolean {
+    private var initialX : Float? = null
+
+    override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         return when (event) {
             null -> false
-            else -> gestureDetector.onTouchEvent(event)
+            else -> {
+                when (event.action) {
+                    MotionEvent.ACTION_MOVE -> onMove(event)
+                    MotionEvent.ACTION_UP -> onMoveDone(event)
+                }
+                return gestureDetector.onTouchEvent(event)
+            }
         }
     }
+
+    private fun onMove(event: MotionEvent) {
+        var xDiff = 0F
+        if (initialX == null) {
+            initialX = event.rawX
+        } else xDiff = event.rawX - initialX!!
+
+        if (xDiff < 0) onSwipingLeft(xDiff)
+        else onSwipingRight(xDiff)
+    }
+
+    private fun onMoveDone(event: MotionEvent) {
+
+    }
+
     private inner class GestureListener : SimpleOnGestureListener(){
         private val SWIPE_THRESHOLD : Int = 100
         private val SWIPE_VELOCITY_THRESHOLD: Int = 100
@@ -75,7 +98,9 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
             return false
         }
     }
+    open fun onSwipingRight(xDiff: Float) {}
     open fun onSwipedRight() {}
+    open fun onSwipingLeft(xDiff: Float) {}
     open fun onSwipedLeft() {}
     open fun onSwipedDown() {}
     open fun onSwipedUp() {}
