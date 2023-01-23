@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var recyclerView : RecyclerView
-    private lateinit var adapter: StarredNoticesListItemAdapter
+    lateinit var adapter: StarredNoticesListItemAdapter
 
 
     @RequiresApi(Build.VERSION_CODES.N)
