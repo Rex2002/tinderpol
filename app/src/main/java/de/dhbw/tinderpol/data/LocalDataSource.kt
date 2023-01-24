@@ -8,22 +8,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.function.Predicate
 
-class LocalNoticesDataSource {
+class LocalDataSource {
     companion object {
-        lateinit var dao : NoticeDao
+        lateinit var dao : TinderPolDao
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     suspend fun getAll(filter: Predicate<Notice>): List<Notice> {
         return withContext(Dispatchers.IO) {
-            Log.i("API-Req", "Retrieving all local notices...")
+            Log.i("LocalDataSource", "Retrieving all local notices...")
             val noticesWithLists: List<NoticeWithLists> = dao.getNoticesWithLists()
             val notices: MutableList<Notice> = mutableListOf()
             noticesWithLists.forEach {
                 it.notice.spokenLanguages = it.getLanguages()
                 it.notice.imgs = it.getImages()
                 it.notice.nationalities = it.getNationalities()
-                it.notice.charges = it.charges
+                it.notice.charges = it.getCharges()
                 if (filter.test(it.notice))
                     notices.add(it.notice)
             }
@@ -31,35 +31,39 @@ class LocalNoticesDataSource {
         }
     }
 
+    suspend fun getAllNoticeIds(): List<String> {
+        return withContext(Dispatchers.IO) {
+            Log.i("LocalDataSource", "retrieving all noticeIds")
+            return@withContext dao.getAllNoticeIds()
+        }
+    }
+
     suspend fun insert(vararg notices: Notice){
         withContext(Dispatchers.IO) {
             dao.insertNotices(*notices)
-            val languageMaps: ArrayList<NoticeLanguageMap> = ArrayList()
-            val imageMaps: ArrayList<NoticeImageMap> = ArrayList()
-            val nationalityMaps: ArrayList<NoticeNationalityMap> = ArrayList()
-            val chargeMaps: ArrayList<NoticeChargeMap> = ArrayList()
-            val charges: ArrayList<Charge> = ArrayList()
+            val languageMaps: ArrayList<NoticeLanguage> = ArrayList()
+            val imageMaps: ArrayList<NoticeImage> = ArrayList()
+            val nationalityMaps: ArrayList<NoticeNationality> = ArrayList()
+            val chargeMaps: ArrayList<NoticeCharge> = ArrayList()
             notices.forEach {notice ->
                 notice.spokenLanguages?.forEach {
-                    languageMaps.add(NoticeLanguageMap(notice.id, it))
+                    languageMaps.add(NoticeLanguage(notice.id, it))
                 }
                 notice.imgs?.forEach{
-                    imageMaps.add(NoticeImageMap(notice.id, it))
+                    imageMaps.add(NoticeImage(notice.id, it))
                 }
                 notice.nationalities?.forEach {
-                    nationalityMaps.add(NoticeNationalityMap(notice.id, it))
+                    nationalityMaps.add(NoticeNationality(notice.id, it))
                 }
                 notice.charges?.forEach {
                     val chargeId: String = it.country + it.charge
-                    chargeMaps.add(NoticeChargeMap(notice.id, chargeId))
-                    charges.add(it)
+                    chargeMaps.add(NoticeCharge(notice.id, chargeId))
                 }
             }
             dao.insertLanguages(*languageMaps.toTypedArray())
             dao.insertImages(*imageMaps.toTypedArray())
             dao.insertNationalities(*nationalityMaps.toTypedArray())
             dao.insertChargeMaps(*chargeMaps.toTypedArray())
-            dao.insertCharges(*charges.toTypedArray())
         }
     }
 
@@ -68,14 +72,8 @@ class LocalNoticesDataSource {
             dao.update(*notices)
         }
     }
-    suspend fun deleteAll(){
-        withContext(Dispatchers.IO){
-            dao.deleteAllCharges()
-            dao.deleteAllImages()
-            dao.deleteAllLanguages()
-            dao.deleteAllChargeMaps()
-            dao.deleteAllNotices()
-            dao.deleteAllNationalities()
-        }
+
+    fun deleteById(vararg ids: String) {
+        dao.deleteById(*ids)
     }
 }

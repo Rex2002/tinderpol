@@ -13,8 +13,8 @@ import kotlin.coroutines.coroutineContext
 
 class NoticeRepository {
     companion object {
-        private val localDataSource = LocalNoticesDataSource()
-        private val remoteDataSource = RemoteNoticesDataSource()
+        private val localDataSource = LocalDataSource()
+        private val remoteDataSource = RemoteDataSource()
         private const val dataLifetimeInMillis: Long = 86400000
         private var onUpdate: Consumer<List<Notice>>? = null
 
@@ -36,31 +36,42 @@ class NoticeRepository {
             }
 
             if (forceRemoteSync || System.currentTimeMillis() - lastUpdated > dataLifetimeInMillis) {
-                Log.i("noticeRepository", "syncing notices with remote data sources")
-                Log.i("noticeRepository", "forceRemoteSync: $forceRemoteSync")
-                Log.i("noticeRepository", "lastUpdated: $lastUpdated")
-                Log.i("noticeRepository", "time diff: " + (System.currentTimeMillis() - lastUpdated)/3600 + "h")
+                Log.i("NoticeRepository", "syncing notices with remote data source")
+                Log.i("NoticeRepository", "forceRemoteSync: $forceRemoteSync")
+                Log.i("NoticeRepository", "lastUpdated: $lastUpdated")
+                Log.i("NoticeRepository", "time diff: " + (System.currentTimeMillis() - lastUpdated)/3600 + "h")
                 CoroutineScope(coroutineContext).launch {
                     val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
                     if (remoteNotices.isNotEmpty()) {
-                        updateFromRemoteNotices(remoteNotices)
+                        Log.i("NoticeRepository", "received remote notices...")
+                        updateFromRemoteNotices(remoteNotices.toMutableList())
                         sharedPref?.edit()?.putLong("lastUpdated", System.currentTimeMillis())?.apply()
                     }
                 }
-                Log.i("noticeRepository", "sync successful")
+                Log.i("NoticeRepository", "sync successful")
             }
-            updateNotices(localDataSource.getAll(filter))
+            updateSDO(localDataSource.getAll(filter))
         }
 
+        /*
+            Updates Room db by adding new notices and deleting ones that are not included in remote data.
+            Does not currently update data within a notice but skips the ids that already exist locally.
+         */
         @RequiresApi(Build.VERSION_CODES.N)
-        private suspend fun updateFromRemoteNotices(notices: List<Notice>) {
-            updateNotices(notices)
-            //TODO implement more efficient updating
-            Log.i("API-Req", "Received new Remote Notices...")
-            localDataSource.deleteAll()
-            Log.i("API-Req", "Cleared Local DB...")
-            localDataSource.insert(*notices.toTypedArray())
-            Log.i("API-Req", "Added new notices to local DB...")
+        private suspend fun updateFromRemoteNotices(notices: MutableList<Notice>) {
+            val localIds: MutableList<String> = localDataSource.getAllNoticeIds().toMutableList()
+            val newNotices: MutableList<Notice> = mutableListOf()
+            notices.forEach {
+                if (localIds.contains(it.id))
+                    localIds.remove(it.id)
+                else
+                    newNotices.add(it)
+            }
+            localDataSource.deleteById(*localIds.toTypedArray())
+            Log.i("NoticeRepository", "removed obsolete notices")
+
+            localDataSource.insert(*newNotices.toTypedArray())
+            Log.i("NoticeRepository", "added new notices to local DB")
         }
 
         suspend fun updateStatus(vararg notices: Notice) {
@@ -68,8 +79,8 @@ class NoticeRepository {
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
-        private fun updateNotices(notices: List<Notice>) {
-            Log.i("API-Req", "Updating Notices...")
+        private fun updateSDO(notices: List<Notice>) {
+            Log.i("NoticeRepository", "Updating SDO")
             onUpdate?.accept(notices)
         }
     }

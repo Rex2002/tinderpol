@@ -8,8 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.room.Room
-import de.dhbw.tinderpol.data.LocalNoticesDataSource
-import de.dhbw.tinderpol.data.room.NoticeDatabase
+import de.dhbw.tinderpol.data.LocalDataSource
+import de.dhbw.tinderpol.data.room.TinderPolDatabase
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
@@ -34,9 +34,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val db = Room.databaseBuilder(
-            applicationContext, NoticeDatabase::class.java, "db-tinderPol"
+            applicationContext, TinderPolDatabase::class.java, "db-tinderPol"
         ).fallbackToDestructiveMigration().build()
-        LocalNoticesDataSource.dao = db.noticeDao()
+        LocalDataSource.dao = db.getDao()
 
         adapter = StarredNoticesListItemAdapter(this, SDO.starredNotices)
         recyclerView = binding.recyclerViewStarredNoticesList

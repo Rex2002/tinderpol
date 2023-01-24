@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class Notice(
     @PrimaryKey
-    var id: String,
+    var id: String = "",
     var type: String? = "",
     var lastName: String? = "",
     var firstName: String? = "",
@@ -23,11 +23,6 @@ data class Notice(
     var height: Double? = 0.0,
     var starred: Boolean = false,
 ) {
-    constructor(): this(
-        "", "", "", "", "", listOf(""), listOf(""), SexID.U,
-        "", "", listOf(Charge()), listOf(), 0.0, 0.0, false
-    )
-
     override fun toString(): String {
         return "Notice(id='$id', type='$type', lastName=$lastName, firstName=$firstName, birthDate=$birthDate, nationalities=$nationalities, imgs=$imgs, sex=$sex, birthCountry=$birthCountry, birthPlace=$birthPlace, charges=$charges, weight=$weight, height=$height)"
     }

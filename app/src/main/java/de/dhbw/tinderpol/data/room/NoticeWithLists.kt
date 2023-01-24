@@ -1,7 +1,6 @@
 package de.dhbw.tinderpol.data.room
 
 import androidx.room.Embedded
-import androidx.room.Junction
 import androidx.room.Relation
 import de.dhbw.tinderpol.data.Charge
 import de.dhbw.tinderpol.data.Notice
@@ -11,17 +10,16 @@ data class NoticeWithLists(
     var notice: Notice,
 
     @Relation(parentColumn = "id", entityColumn = "noticeId")
-    var noticeNationalityMaps: List<NoticeNationalityMap>,
+    var noticeNationalities: List<NoticeNationality>,
 
     @Relation(parentColumn = "id", entityColumn = "noticeId")
-    var noticeImageMaps: List<NoticeImageMap>,
+    var noticeImages: List<NoticeImage>,
 
     @Relation(parentColumn = "id", entityColumn = "noticeId")
-    var spokenLanguages: List<NoticeLanguageMap>,
+    var spokenLanguages: List<NoticeLanguage>,
 
-    @Relation(parentColumn = "id", entity = Charge::class, entityColumn = "id",
-        associateBy = Junction(NoticeChargeMap::class, parentColumn = "noticeId", entityColumn = "chargeId"))
-    var charges: List<Charge>
+    @Relation(parentColumn = "id", entityColumn = "noticeId")
+    var noticeCharges: List<NoticeCharge>
 ) {
 
     fun getLanguages(): List<String>{
@@ -31,12 +29,18 @@ data class NoticeWithLists(
     }
     fun getImages(): List<String>{
         val images: MutableList<String> = mutableListOf()
-        noticeImageMaps.forEach { images.add(it.image) }
+        noticeImages.forEach { images.add(it.image) }
         return images.toList()
     }
     fun getNationalities(): List<String>{
         val nationalities: MutableList<String> = mutableListOf()
-        noticeNationalityMaps.forEach { nationalities.add(it.nationality) }
+        noticeNationalities.forEach { nationalities.add(it.nationality) }
         return nationalities.toList()
+    }
+
+    fun getCharges(): List<Charge> {
+        val charges: MutableList<Charge> = mutableListOf()
+        noticeCharges.forEach { charges.add( Charge(it.country, it.charge)) }
+        return charges.toList()
     }
 }

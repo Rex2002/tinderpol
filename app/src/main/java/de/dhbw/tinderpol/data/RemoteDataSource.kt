@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.SocketTimeoutException
 
-class RemoteNoticesDataSource {
+class RemoteDataSource {
     companion object {
         const val baseURL = "https://tinderpol.onrender.com/"
     }
