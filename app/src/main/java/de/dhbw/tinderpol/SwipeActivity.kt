@@ -1,12 +1,16 @@
 package de.dhbw.tinderpol
 
 import android.annotation.SuppressLint
+import android.graphics.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import coil.load
 import com.google.android.material.R.drawable.*
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.lang.Math.abs
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -51,14 +55,23 @@ class SwipeActivity : AppCompatActivity() {
                 finish()
             }
 
-            override fun onSwipingLeft(xDiff: Float) {
-                super.onSwipingLeft(xDiff)
-                // TODO
+            private fun clamp(x: Float, min: Float = -1F, max: Float = 1F): Float {
+                return if (x > max) max
+                else if (x < min) min
+                else x
             }
 
-            override fun onSwipingRight(xDiff: Float) {
-                super.onSwipingRight(xDiff)
-                binding.noticeImage.animate().rotation(xDiff).setDuration(0).start()
+            override fun onMove(xDiff: Float) {
+                super.onMove(xDiff)
+                val deg = clamp(2 * xDiff / resources.displayMetrics.widthPixels) * 30
+                val prevX = binding.noticeImage.x
+                binding.noticeImage.animate().rotation(deg).setDuration(0).start()
+                binding.noticeImage.animate().rotation(deg).x(prevX).start()
+            }
+
+            override fun onMoveDone(event: MotionEvent) {
+                super.onMoveDone(event)
+                binding.noticeImage.animate().rotation(0F).setDuration(150).start()
             }
         })
 
