@@ -7,7 +7,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
+        android:paddingLeft="12dp"
         >
 
 
@@ -25,17 +25,18 @@
 
             <TextView
                 android:id="@+id/nameText"
-                android:layout_width="344dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:padding="8dp"
+                android:layout_weight="1"
+                android:paddingRight="8dp"
                 tools:text="@tools:sample/full_names" />
 
             <ImageButton
                 android:id="@+id/starNoticeImageButton"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0"
                 app:srcCompat="@android:drawable/btn_star"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
