@@ -23,7 +23,7 @@ class NoticeRepository {
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
-        suspend fun syncNotices(sharedPref: SharedPreferences?, forceSync: Boolean = false) {
+        suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
             val lastUpdated: Long = sharedPref?.getLong("lastUpdated", 0) ?: 0
 
             val redFilter: Boolean = sharedPref?.getBoolean(R.string.show_red_notices_shared_prefs.toString(), true) == true
@@ -35,11 +35,11 @@ class NoticeRepository {
                         (it.type.equals("un") && unFilter)
             }
 
-            if (forceSync || System.currentTimeMillis() - lastUpdated > dataLifetimeInMillis) {
+            if (forceRemoteSync || System.currentTimeMillis() - lastUpdated > dataLifetimeInMillis) {
                 Log.i("noticeRepository", "syncing notices with remote data sources")
-                Log.i("noticeRepository", "force Sync: $forceSync")
+                Log.i("noticeRepository", "forceRemoteSync: $forceRemoteSync")
                 Log.i("noticeRepository", "lastUpdated: $lastUpdated")
-                Log.i("noticeRepository", "diff: " + (System.currentTimeMillis() - lastUpdated)/3600 + "h")
+                Log.i("noticeRepository", "time diff: " + (System.currentTimeMillis() - lastUpdated)/3600 + "h")
                 CoroutineScope(coroutineContext).launch {
                     val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
                     if (remoteNotices.isNotEmpty()) {

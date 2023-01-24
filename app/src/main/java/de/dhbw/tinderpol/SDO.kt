@@ -32,13 +32,13 @@ class SDO {
          * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
         @RequiresApi(Build.VERSION_CODES.N)
-        suspend fun syncNotices(sharedPref: SharedPreferences?, forceSync: Boolean = false) {
+        suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
             if (!isListeningToUpdates) {
                 NoticeRepository.listenToUpdates { update(it) }
                 isListeningToUpdates = true
             }
-            NoticeRepository.syncNotices(sharedPref, forceSync)
+            NoticeRepository.syncNotices(sharedPref, forceRemoteSync)
         }
 
         @RequiresApi(Build.VERSION_CODES.N)

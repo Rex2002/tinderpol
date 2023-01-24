@@ -104,7 +104,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.buttonSyncLocalStorages.setOnClickListener{
             if(activity != null){
-                (activity as MainActivity).syncNotices()
+                (activity as MainActivity).syncNotices(true)
             }
             else{
                 Toast.makeText(activity, "Sync failed due to unknown reason", Toast.LENGTH_SHORT).show()

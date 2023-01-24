@@ -80,14 +80,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun syncNotices(){
+    fun syncNotices(forceRemoteSync: Boolean = false){
         Log.i("Main", "synchronizing notices")
         binding.button.text = getString(R.string.synchronizing_notices)
         binding.button.isEnabled = false
         binding.textViewEmptyStarredList.text = getString(R.string.loading_starred_notices)
 
         GlobalScope.launch {
-            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE))
+            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE), forceRemoteSync)
             SDO.initStarredNotices()
             withContext(Dispatchers.Main){
                 updateStarredNoticesList()
