@@ -11,6 +11,7 @@ import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalNoticesDataSource
 import de.dhbw.tinderpol.data.room.NoticeDatabase
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
@@ -50,6 +51,10 @@ class MainActivity : AppCompatActivity() {
 
         syncNotices()
 
+        binding.textViewExplainText1.setOnClickListener{
+            errorView("this is an example error view")
+        }
+
         binding.button.setOnClickListener {
             val intentToStartShit = Intent(this, SwipeActivity::class.java)
             startActivity(intentToStartShit)
@@ -87,15 +92,25 @@ class MainActivity : AppCompatActivity() {
         binding.textViewEmptyStarredList.text = getString(R.string.loading_starred_notices)
 
         GlobalScope.launch {
-            SDO.syncNotices(getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE), forceRemoteSync)
+            SDO.syncNotices(
+                getSharedPreferences(
+                    getString(R.string.shared_preferences_file),
+                    Context.MODE_PRIVATE
+                ), forceRemoteSync
+            )
             SDO.initStarredNotices()
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 updateStarredNoticesList()
                 binding.button.text = getString(R.string.start_swipe_button)
                 binding.button.isEnabled = true
             }
         }
-
-
+    }
+    fun errorView(message: String){
+        val alertDialog : AlertDialog.Builder = AlertDialog.Builder(this)
+        alertDialog.setTitle("An error occured").setIcon(com.google.android.material.R.drawable.mtrl_ic_error).setMessage(message).setPositiveButton("Ok"
+        ) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }.show()
     }
 }
