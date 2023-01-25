@@ -19,21 +19,20 @@ import java.util.function.Consumer
 
 class SDO {
     companion object {
-        private var countries: HashMap<String, Country>? = null
         private const val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
-        private var currentNoticeIndex = 0
-        private var notices : List<Notice> = listOf()
         private val emptyNotice = Notice("empty", imgs = listOf(noImg))
+
         var onUpdate: Consumer<Notice>? = null
         private var isListeningToUpdates = false
-        var starredNotices: MutableList<Notice> = mutableListOf()
 
-        @RequiresApi(Build.VERSION_CODES.N)
-        suspend fun initialize(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
-            syncNotices(sharedPref, forceRemoteSync)
-            initStarredNotices()
-            initCurrentNoticeIndex(sharedPref)
-        }
+        private var notices : List<Notice> = listOf()
+        var starredNotices: MutableList<Notice> = mutableListOf()
+        private var currentNoticeIndex = 0
+
+        private var countries: HashMap<String, Country>? = null
+
+        // NOTICE-RELATED METHODS
+
         /**
          * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
@@ -41,63 +40,24 @@ class SDO {
         suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
             if (!isListeningToUpdates) {
-                NoticeRepository.listenToUpdates { update(it) }
+                NoticeRepository.listenToUpdates { updateNoticesInSDO(it) }
                 isListeningToUpdates = true
             }
             NoticeRepository.syncNotices(sharedPref, forceRemoteSync)
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
-        private fun update(newNotices: List<Notice>) {
+        private fun updateNoticesInSDO(newNotices: List<Notice>) {
             Log.i("SDO", "Notices updated...")
             notices = newNotices
             onUpdate?.accept(getCurrentNotice())
         }
-        private class CountriesDeserializer: JsonDeserializer<Any> {
-            override fun deserialize(
-                json: JsonElement?,
-                typeOfT: Type?,
-                context: JsonDeserializationContext?
-            ): Any? {
-                var res: Any? = null
-                val str = json!!.asJsonPrimitive.asString
-                res = try {
-                    str.toDouble()
-                } catch (e: java.lang.Exception) {
-                    str
-                }
-                return res
-            }
+
+        fun listenToUpdates(callback: Consumer<Notice>?) {
+            onUpdate = callback
         }
 
-        fun loadCountriesData(res: Resources) {
-            val text = res.openRawResource(R.raw.countries).bufferedReader().use { it.readText() }
-            val builder = GsonBuilder()
-            builder.registerTypeAdapter(Any::class.java, CountriesDeserializer())
-            val gson = builder.create()
-            val objectListType = object : TypeToken<HashMap<String, Country>?>() {}.type
-            val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
-            countries = obj
-            Log.i("Countries", countries.toString())
-            //TODO review whether log adds value in this form: it's very long and it's showing static information
-        }
-
-        fun getLatOfCountry(countryID: String): Double? {
-            return countries?.get(countryID)?.lat
-        }
-
-        fun getLongOfCountry(countryID: String): Double? {
-            return countries?.get(countryID)?.long
-        }
-
-        fun getNameOfCountry(countryID: String): String? {
-            return countries?.get(countryID)?.name
-        }
-
-        fun getCountry(countryID: String?): Country? {
-            return countries?.get(countryID)
-        }
-
+        //methods that write to Room
         suspend fun persistStatus(sharedPref: SharedPreferences?) {
             persistStarredNotices()
             persistViewedNotices()
@@ -124,8 +84,12 @@ class SDO {
             Log.i("SDO", "saved viewed notices' status to Room")
         }
 
-        fun listenToUpdates(callback: Consumer<Notice>?) {
-            onUpdate = callback
+        // methods that edit SDO
+        @RequiresApi(Build.VERSION_CODES.N)
+        suspend fun initialize(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
+            syncNotices(sharedPref, forceRemoteSync)
+            initStarredNotices()
+            initCurrentNoticeIndex(sharedPref)
         }
 
         private fun initStarredNotices() {
@@ -150,6 +114,41 @@ class SDO {
             Log.i("SDO", "initialized currentNoticeIndex with $currentNoticeIndex")
         }
 
+        fun toggleStarredNotice(n: Notice? = null) {
+            val notice = n ?: getCurrentNotice()
+            notice.starred = !notice.starred
+            if (notice.starred) starredNotices.add(notice)
+            else starredNotices.remove(starredNotices.find{it.id == notice.id})
+        }
+
+        // methods that correspond to button in settings
+        suspend fun clearStarredNotices(){
+            starredNotices.forEach { it.starred = false }
+            persistStarredNotices()
+            initStarredNotices()
+            Log.i("SDO", "cleared starred notices")
+        }
+
+        suspend fun clearSwipeHistory(sharedPref: SharedPreferences?){
+            Log.i("SDO", "clearing swipe history")
+            val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
+            val noticesToClear: List<Notice> =
+                if (firstUnviewedIndex != -1) notices.subList(0, firstUnviewedIndex)
+                else notices
+
+            noticesToClear.forEach { it.viewedAt = Long.MAX_VALUE }
+            NoticeRepository.updateStatus(*noticesToClear.toTypedArray())
+            notices = notices.sortedBy { it.id }
+            if (sharedPref != null) {
+                with(sharedPref.edit()) {
+                    putString(R.string.current_noticeId_shared_prefs.toString(), "")
+                    apply()
+                }
+            }
+            Log.i("SDO", "successfully cleared swipe history")
+        }
+
+        //methods that get data from SDO
         fun getCurrentNotice() : Notice {
             if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeIndex].toString())
             if (notices.size <= currentNoticeIndex) {
@@ -214,38 +213,52 @@ class SDO {
             return (notice ?: getCurrentNotice()).starred
         }
 
-        fun toggleStarredNotice(n: Notice? = null) {
-            val notice = n ?: getCurrentNotice()
-            notice.starred = !notice.starred
-            if (notice.starred) starredNotices.add(notice)
-            else starredNotices.remove(starredNotices.find{it.id == notice.id})
-        }
+        // COUNTRY-RELATED METHODS
+        //TODO SDO seems cluttered. does it maybe make sense to split this into one CountrySDO and one NoticeSDO?
 
-        suspend fun clearStarredNotices(){
-            starredNotices.forEach { it.starred = false }
-            persistStarredNotices()
-            initStarredNotices()
-            Log.i("SDO", "cleared starred notices")
-        }
-
-        suspend fun clearSwipeHistory(sharedPref: SharedPreferences?){
-            Log.i("SDO", "clearing swipe history")
-            val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
-            val noticesToClear: List<Notice> =
-                if (firstUnviewedIndex != -1) notices.subList(0, firstUnviewedIndex)
-                else notices
-
-            noticesToClear.forEach { it.viewedAt = Long.MAX_VALUE }
-            NoticeRepository.updateStatus(*noticesToClear.toTypedArray())
-            notices = notices.sortedBy { it.id }
-            if (sharedPref != null) {
-                with(sharedPref.edit()) {
-                    putString(R.string.current_noticeId_shared_prefs.toString(), "")
-                    apply()
+        private class CountriesDeserializer: JsonDeserializer<Any> {
+            override fun deserialize(
+                json: JsonElement?,
+                typeOfT: Type?,
+                context: JsonDeserializationContext?
+            ): Any? {
+                var res: Any? = null
+                val str = json!!.asJsonPrimitive.asString
+                res = try {
+                    str.toDouble()
+                } catch (e: java.lang.Exception) {
+                    str
                 }
+                return res
             }
-            Log.i("SDO", "successfully cleared swipe history")
         }
 
+        fun loadCountriesData(res: Resources) {
+            val text = res.openRawResource(R.raw.countries).bufferedReader().use { it.readText() }
+            val builder = GsonBuilder()
+            builder.registerTypeAdapter(Any::class.java, CountriesDeserializer())
+            val gson = builder.create()
+            val objectListType = object : TypeToken<HashMap<String, Country>?>() {}.type
+            val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
+            countries = obj
+            Log.i("Countries", countries.toString())
+            //TODO @Jay review whether log adds value in this form: it's very long and it's showing static information
+        }
+
+        fun getLatOfCountry(countryID: String): Double? {
+            return countries?.get(countryID)?.lat
+        }
+
+        fun getLongOfCountry(countryID: String): Double? {
+            return countries?.get(countryID)?.long
+        }
+
+        fun getNameOfCountry(countryID: String): String? {
+            return countries?.get(countryID)?.name
+        }
+
+        fun getCountry(countryID: String?): Country? {
+            return countries?.get(countryID)
+        }
     }
 }
