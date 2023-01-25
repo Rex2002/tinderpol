@@ -12,7 +12,7 @@ import de.dhbw.tinderpol.data.Notice
     NoticeImage::class,
     NoticeLanguage::class,
     NoticeNationality::class
-                     ], version = 7)
+                     ], version = 8)
 abstract class TinderPolDatabase : RoomDatabase() {
     abstract fun getDao(): TinderPolDao
 }

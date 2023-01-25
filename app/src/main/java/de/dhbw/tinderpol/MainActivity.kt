@@ -92,13 +92,11 @@ class MainActivity : AppCompatActivity() {
         binding.textViewEmptyStarredList.text = getString(R.string.loading_starred_notices)
 
         GlobalScope.launch {
-            SDO.syncNotices(
-                getSharedPreferences(
-                    getString(R.string.shared_preferences_file),
-                    Context.MODE_PRIVATE
-                ), forceRemoteSync
-            )
-            SDO.initStarredNotices()
+            SDO.initialize(getSharedPreferences(
+                getString(R.string.shared_preferences_file),
+                Context.MODE_PRIVATE
+            ), forceRemoteSync)
+
             withContext(Dispatchers.Main) {
                 updateStarredNoticesList()
                 binding.button.text = getString(R.string.start_swipe_button)

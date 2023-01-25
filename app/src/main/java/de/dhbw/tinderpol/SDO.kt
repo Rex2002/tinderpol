@@ -28,6 +28,12 @@ class SDO {
         private var isListeningToUpdates = false
         var starredNotices: MutableList<Notice> = mutableListOf()
 
+        @RequiresApi(Build.VERSION_CODES.N)
+        suspend fun initialize(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
+            syncNotices(sharedPref, forceRemoteSync)
+            initStarredNotices()
+            initCurrentNoticeIndex(sharedPref)
+        }
         /**
          * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
@@ -90,18 +96,57 @@ class SDO {
         fun getCountry(countryID: String?): Country? {
             return countries?.get(countryID)
         }
-        suspend fun persistStarredNotices() {
-            Log.i("SDO", "saving current starred notices to Room")
+
+        suspend fun persistStatus(sharedPref: SharedPreferences?) {
+            persistStarredNotices()
+            persistViewedNotices()
+            if (sharedPref != null && notices.isNotEmpty()) {
+                with(sharedPref.edit()) {
+                    putString(R.string.current_noticeId_shared_prefs.toString(), notices[currentNoticeIndex].id)
+                    this.apply()
+                }
+                Log.i("SDO", "saved current noticeId to shared preferences")
+            }
+        }
+
+        private suspend fun persistStarredNotices() {
             NoticeRepository.updateStatus(*starredNotices.toTypedArray())
+            Log.i("SDO", "saved current starred notices to Room")
+        }
+
+        private suspend fun persistViewedNotices() {
+            val viewedNotices: List<Notice> =
+                if (currentNoticeIndex+1<notices.size) notices.subList(0, currentNoticeIndex+1)
+                else notices
+
+            NoticeRepository.updateStatus(*viewedNotices.toTypedArray())
+            Log.i("SDO", "saved viewed notices' status to Room")
         }
 
         fun listenToUpdates(callback: Consumer<Notice>?) {
             onUpdate = callback
         }
 
-        fun initStarredNotices() {
+        private fun initStarredNotices() {
             starredNotices = notices.filter { it.starred }.toMutableList()
             Log.i("SDO", "initialized starredNotices list")
+        }
+
+        private fun initCurrentNoticeIndex(sharedPref: SharedPreferences?) {
+            if (sharedPref != null) {
+                val id = sharedPref.getString(R.string.current_noticeId_shared_prefs.toString(), "")
+                currentNoticeIndex = notices.indexOfFirst { it.id == id}
+            }
+            if (sharedPref == null || currentNoticeIndex == -1) {
+                currentNoticeIndex = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE } -1
+                //notices.indexOfLast {it.viewedAt < Long.MaxValue} would make more sense here but
+                // that would check the entire list. This only checks as many notices as necessary.
+            }
+            if (currentNoticeIndex < 0) {
+                currentNoticeIndex = 0
+            }
+            notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
+            Log.i("SDO", "initialized currentNoticeIndex with $currentNoticeIndex")
         }
 
         fun getCurrentNotice() : Notice {
@@ -124,8 +169,10 @@ class SDO {
         }
 
         fun getNextNotice() : Notice {
-            if (notices.isNotEmpty())
+            if (notices.isNotEmpty()){
                 currentNoticeIndex++
+                notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
+            }
 
             if (currentNoticeIndex >= notices.size) {
                 currentNoticeIndex = notices.size -1

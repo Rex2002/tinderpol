@@ -1,6 +1,7 @@
 package de.dhbw.tinderpol
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
@@ -103,7 +104,10 @@ class SwipeActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         GlobalScope.launch {
-            SDO.persistStarredNotices()
+            SDO.persistStatus(getSharedPreferences(
+                getString(R.string.shared_preferences_file),
+                Context.MODE_PRIVATE
+            ))
         }
     }
 }

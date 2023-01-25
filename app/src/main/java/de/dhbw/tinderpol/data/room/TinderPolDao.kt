@@ -27,23 +27,11 @@ interface TinderPolDao {
     fun insertCharges(vararg charges: Charge)
 
     //Get methods
-    @Query("SELECT * FROM notice")
-    fun getAllNotices(): List<Notice>
-
     @Query("SELECT id FROM notice")
     fun getAllNoticeIds(): List<String>
 
-    @Query("SELECT nationality FROM noticeNationality WHERE noticeId IS :id")
-    fun getNationalitiesByNoticeId(id: String): List<String>
-
-    @Query("SELECT image FROM noticeImage WHERE noticeId IS :id")
-    fun getImagesByNoticeId(id: String): List<String>
-
-    @Query("SELECT language FROM noticeLanguage WHERE noticeId IS :id")
-    fun getLanguagesByNoticeId(id: String): List<String>
-
     @Transaction
-    @Query("SELECT * FROM notice")
+    @Query("SELECT * FROM notice ORDER BY viewedAt ASC")
     fun getNoticesWithLists(): List<NoticeWithLists>
 
     //Update methods

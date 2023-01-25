@@ -22,8 +22,9 @@ data class Notice(
     var weight: Double? = 0.0,
     var height: Double? = 0.0,
     var starred: Boolean = false,
+    var viewedAt: Long = Long.MAX_VALUE
 ) {
     override fun toString(): String {
-        return "Notice(id='$id', type='$type', lastName=$lastName, firstName=$firstName, birthDate=$birthDate, nationalities=$nationalities, imgs=$imgs, sex=$sex, birthCountry=$birthCountry, birthPlace=$birthPlace, charges=$charges, weight=$weight, height=$height)"
+        return "Notice(id='$id', type='$type', lastName=$lastName, firstName=$firstName, viewedAt = $viewedAt, birthDate=$birthDate, nationalities=$nationalities, imgs=$imgs, sex=$sex, birthCountry=$birthCountry, birthPlace=$birthPlace, charges=$charges, weight=$weight, height=$height)"
     }
 }
