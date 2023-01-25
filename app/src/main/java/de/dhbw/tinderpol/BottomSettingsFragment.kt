@@ -98,7 +98,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.buttonClearSwipeHistory.setOnClickListener{
 
-            SDO.clearSwipeHistory()
+            //SDO.clearSwipeHistory()
 
             Toast.makeText(activity, "Successfully cleared swipe history", Toast.LENGTH_SHORT).show()
         }

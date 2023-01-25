@@ -79,6 +79,7 @@ class SDO {
             val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
             countries = obj
             Log.i("Countries", countries.toString())
+            //TODO review whether log adds value in this form: it's very long and it's showing static information
         }
 
         fun getLatOfCountry(countryID: String): Double? {
@@ -227,9 +228,23 @@ class SDO {
             Log.i("SDO", "cleared starred notices")
         }
 
-        fun clearSwipeHistory(){
-            Log.i("SDO", "cleared swipe history")
-            // TODO implement
+        suspend fun clearSwipeHistory(sharedPref: SharedPreferences?){
+            Log.i("SDO", "clearing swipe history")
+            val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
+            val noticesToClear: List<Notice> =
+                if (firstUnviewedIndex != -1) notices.subList(0, firstUnviewedIndex)
+                else notices
+
+            noticesToClear.forEach { it.viewedAt = Long.MAX_VALUE }
+            NoticeRepository.updateStatus(*noticesToClear.toTypedArray())
+            notices = notices.sortedBy { it.id }
+            if (sharedPref != null) {
+                with(sharedPref.edit()) {
+                    putString(R.string.current_noticeId_shared_prefs.toString(), "")
+                    apply()
+                }
+            }
+            Log.i("SDO", "successfully cleared swipe history")
         }
 
     }
