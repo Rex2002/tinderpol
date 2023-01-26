@@ -40,13 +40,12 @@ class NoticeRepository {
                 Log.i("NoticeRepository", "forceRemoteSync: $forceRemoteSync")
                 Log.i("NoticeRepository", "lastUpdated: $lastUpdated")
                 Log.i("NoticeRepository", "time diff: " + (System.currentTimeMillis() - lastUpdated)/3600 + "h")
-                CoroutineScope(coroutineContext).launch {
-                    val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
-                    if (remoteNotices.isNotEmpty()) {
-                        Log.i("NoticeRepository", "received remote notices...")
-                        updateFromRemoteNotices(remoteNotices.toMutableList())
-                        sharedPref?.edit()?.putLong("lastUpdated", System.currentTimeMillis())?.apply()
-                    }
+                val remoteNotices = remoteDataSource.fetchNotices().getOrDefault(listOf())
+                if (remoteNotices.isNotEmpty()) {
+                    Log.i("NoticeRepository", "received remote notices...")
+                    Log.i("NoticeRepository", "First remote notice: ${remoteNotices[0]}")
+                    updateFromRemoteNotices(remoteNotices.toMutableList())
+                    sharedPref?.edit()?.putLong("lastUpdated", System.currentTimeMillis())?.apply()
                 }
                 Log.i("NoticeRepository", "sync successful")
             }

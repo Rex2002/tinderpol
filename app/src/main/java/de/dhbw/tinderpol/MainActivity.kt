@@ -15,10 +15,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,10 +44,9 @@ class MainActivity : AppCompatActivity() {
 
 
         GlobalScope.launch(Dispatchers.IO) {
+            syncNotices()
             SDO.loadCountriesData(resources)
         }
-
-        syncNotices()
 
         binding.textViewExplainText1.setOnClickListener{
             errorView("this is an example error view")
@@ -85,13 +82,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun syncNotices(forceRemoteSync: Boolean = false){
+    suspend fun syncNotices(forceRemoteSync: Boolean = false){
         Log.i("Main", "synchronizing notices")
-        binding.button.text = getString(R.string.synchronizing_notices)
-        binding.button.isEnabled = false
-        binding.textViewEmptyStarredList.text = getString(R.string.loading_starred_notices)
+        runOnUiThread {
+            binding.button.text = getString(R.string.synchronizing_notices)
+            binding.button.isEnabled = false
+            binding.textViewEmptyStarredList.text = getString(R.string.loading_starred_notices)
+        }
 
-        GlobalScope.launch {
+        CoroutineScope(coroutineContext).launch {
             SDO.initialize(getSharedPreferences(
                 getString(R.string.shared_preferences_file),
                 Context.MODE_PRIVATE

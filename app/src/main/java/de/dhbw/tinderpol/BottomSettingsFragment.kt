@@ -104,9 +104,11 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.buttonSyncLocalStorages.setOnClickListener{
             if(activity != null){
-                (activity as MainActivity).syncNotices(true)
+                GlobalScope.launch {
+                    (activity as MainActivity).syncNotices(true)
+                }
             }
-            else{
+            else {
                 Toast.makeText(activity, "Sync failed due to unknown reason", Toast.LENGTH_SHORT).show()
             }
         }
@@ -116,7 +118,9 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onDestroy() {
         if(syncFlag && activity != null){
-            (activity as MainActivity).syncNotices()
+            GlobalScope.launch {
+                (activity as MainActivity).syncNotices()
+            }
         }
         super.onDestroy()
         _binding = null
@@ -124,7 +128,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
     private fun checkMinNoticesSelected() : Boolean{
         val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
-        return if(sharedPref != null){
+        return if(sharedPref != null) {
             sharedPref.getBoolean(getString(R.string.show_red_notices_shared_prefs), true) || sharedPref.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true) || sharedPref.getBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
         } else false
 
