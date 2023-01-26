@@ -13,7 +13,6 @@ import de.dhbw.tinderpol.data.Notice
 )],primaryKeys = ["noticeId", "country", "charge"])
 data class NoticeCharge(
     var noticeId: String,
-    val country: String = "",
-    val charge: String = ""
     var country: String,
+    var charge: String
 )
