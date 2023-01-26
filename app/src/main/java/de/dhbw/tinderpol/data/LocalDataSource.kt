@@ -56,8 +56,7 @@ class LocalDataSource {
                     nationalityMaps.add(NoticeNationality(notice.id, it))
                 }
                 notice.charges?.forEach {
-                    val chargeId: String = it.country + it.charge
-                    chargeMaps.add(NoticeCharge(notice.id, chargeId))
+                    chargeMaps.add(NoticeCharge(notice.id, it.country, it.charge))
                 }
             }
             dao.insertLanguages(*languageMaps.toTypedArray())
