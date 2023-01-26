@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        Log.i("Main", "resume main activity")
+        Log.i("Main", "resumed main activity")
         updateStarredNoticesList()
         super.onResume()
     }
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun errorView(message: String){
         val alertDialog : AlertDialog.Builder = AlertDialog.Builder(this)
-        alertDialog.setTitle("An error occured").setIcon(com.google.android.material.R.drawable.mtrl_ic_error).setMessage(message).setPositiveButton("Ok"
+        alertDialog.setTitle("An error occurred").setIcon(com.google.android.material.R.drawable.mtrl_ic_error).setMessage(message).setPositiveButton("Ok"
         ) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }.show()

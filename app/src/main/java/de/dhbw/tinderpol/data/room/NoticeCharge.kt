@@ -15,4 +15,5 @@ data class NoticeCharge(
     var noticeId: String,
     val country: String = "",
     val charge: String = ""
+    var country: String,
 )

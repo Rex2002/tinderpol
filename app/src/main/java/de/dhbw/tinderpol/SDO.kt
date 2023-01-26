@@ -48,9 +48,9 @@ class SDO {
 
         @RequiresApi(Build.VERSION_CODES.N)
         private fun updateNoticesInSDO(newNotices: List<Notice>) {
-            Log.i("SDO", "Notices updated...")
             notices = newNotices
             onUpdate?.accept(getCurrentNotice())
+            Log.i("SDO", "Notices updated")
         }
 
         fun listenToUpdates(callback: Consumer<Notice>?) {
@@ -98,6 +98,7 @@ class SDO {
         }
 
         private fun initCurrentNoticeIndex(sharedPref: SharedPreferences?) {
+            Log.i("SDO", "initializing currentNoticeIndex")
             if (sharedPref != null) {
                 val id = sharedPref.getString(R.string.current_noticeId_shared_prefs.toString(), "")
                 currentNoticeIndex = notices.indexOfFirst { it.id == id}
@@ -241,20 +242,8 @@ class SDO {
             val objectListType = object : TypeToken<HashMap<String, Country>?>() {}.type
             val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
             countries = obj
-            Log.i("Countries", countries.toString())
+            Log.i("Countries", "Loaded countries data: $countries")
             //TODO @Jay review whether log adds value in this form: it's very long and it's showing static information
-        }
-
-        fun getLatOfCountry(countryID: String): Double? {
-            return countries?.get(countryID)?.lat
-        }
-
-        fun getLongOfCountry(countryID: String): Double? {
-            return countries?.get(countryID)?.long
-        }
-
-        fun getNameOfCountry(countryID: String): String? {
-            return countries?.get(countryID)?.name
         }
 
         fun getCountry(countryID: String?): Country? {

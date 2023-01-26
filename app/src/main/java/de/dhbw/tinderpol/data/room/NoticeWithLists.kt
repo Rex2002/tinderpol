@@ -40,7 +40,7 @@ data class NoticeWithLists(
 
     fun getCharges(): List<Charge> {
         val charges: MutableList<Charge> = mutableListOf()
-        noticeCharges.forEach { charges.add( Charge(it.country, it.charge)) }
+        noticeCharges.forEach { charges.add(Charge(it.country, it.charge)) }
         return charges.toList()
     }
 }

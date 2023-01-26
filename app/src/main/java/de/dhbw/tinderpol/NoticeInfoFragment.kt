@@ -105,7 +105,6 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
 
         binding.btnMap.setOnClickListener {
             val intentionalStuffHappening = Intent(context, MapsActivity::class.java)
-            val notice = SDO.getCurrentNotice()
             val data = MapsData(notice.nationalities ?: listOf(), notice.charges?.map { it.country } ?: listOf(), notice.birthCountry, notice.birthPlace)
             intentionalStuffHappening.putExtra("data", MapsData.serialize(data))
             startActivity(intentionalStuffHappening)
