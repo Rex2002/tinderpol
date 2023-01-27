@@ -96,11 +96,21 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
                 }
             }
         }
-        binding.buttonClearSwipeHistory.setOnClickListener{
-
-            //SDO.clearSwipeHistory()
-
-            Toast.makeText(activity, "Successfully cleared swipe history", Toast.LENGTH_SHORT).show()
+        binding.buttonClearSwipeHistory.setOnClickListener {
+            GlobalScope.launch(Dispatchers.IO) {
+                val sharedPref = activity?.getSharedPreferences(
+                    getString(R.string.shared_preferences_file),
+                    Context.MODE_PRIVATE
+                )
+                if (sharedPref != null) {
+                    SDO.clearSwipeHistory(sharedPref)
+                    Toast.makeText(
+                        activity,
+                        "Successfully cleared swipe history",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
         binding.buttonSyncLocalStorages.setOnClickListener{
             if(activity != null){
