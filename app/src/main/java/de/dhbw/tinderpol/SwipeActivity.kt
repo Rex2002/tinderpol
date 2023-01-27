@@ -108,11 +108,17 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     private fun updateDots(imgAmount: Int, currentImgIndex: Int) {
-        binding.tabDots.removeAllTabs()
-        for (i in 0 until imgAmount) {
-            val t = binding.tabDots.newTab()
-            binding.tabDots.addTab(t, currentImgIndex == i)
+        val tabCount = binding.tabDots.tabCount
+        // Remove unnecessary tabs:
+        for (i in 0 until tabCount - imgAmount) {
+            binding.tabDots.removeTabAt(tabCount - i - 1)
         }
+        // Add necessary tabs:
+        for (i in tabCount until imgAmount) {
+            binding.tabDots.addTab(binding.tabDots.newTab())
+        }
+        // Select current tab:
+        binding.tabDots.selectTab(binding.tabDots.getTabAt(currentImgIndex))
     }
 
     fun updateShownImg(imgURL: String? = null, toUpdateDots: Boolean = true) {
