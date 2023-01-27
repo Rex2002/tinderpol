@@ -11,12 +11,13 @@ import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 
 class SwipeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNoticeBinding
-
+    
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,14 +56,10 @@ class SwipeActivity : AppCompatActivity() {
                 finish()
             }
 
-            override fun onSwipingLeft(xDiff: Float) {
-                super.onSwipingLeft(xDiff)
-                binding.noticeImage.animate().x(xDiff).setDuration(0).start()
-            }
-
-            override fun onSwipingRight(xDiff: Float) {
-                super.onSwipingRight(xDiff)
-                binding.noticeImage.animate().x(xDiff).setDuration(0).start()
+            override fun onSwipingSideways(xDiff: Float, posDiffToLast: Pair<Float, Float>) {
+                super.onSwipingSideways(xDiff, posDiffToLast)
+                val duration = (abs(posDiffToLast.first) / 100).toLong()
+                binding.noticeImage.animate().x(xDiff).setDuration(duration).start()
             }
 
             override fun onMoveDone(event: MotionEvent) {
