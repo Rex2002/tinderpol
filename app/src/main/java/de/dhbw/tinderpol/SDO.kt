@@ -204,6 +204,10 @@ class SDO {
             return getCurrentNotice()
         }
 
+        fun noticesIsEmpty() : Boolean{
+            return notices.isEmpty()
+        }
+
         fun getImageURL(n: Notice? = null): String {
             val notice = n ?: getCurrentNotice()
             return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg

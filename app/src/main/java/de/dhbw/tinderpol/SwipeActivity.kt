@@ -92,8 +92,7 @@ class SwipeActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        if(1==0){
-            // TODO add sensible check, if notices are empty
+        if(SDO.noticesIsEmpty()){
             Util.errorView(this, "The local notices database is empty. Go online to sync", "Empty database", this::finish)
 
         }
