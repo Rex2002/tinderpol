@@ -215,7 +215,7 @@ class SDO {
 
         fun getNextImageURL(n: Notice? = null): String {
             val notice = n ?: getCurrentNotice()
-            if (notice.imgs != null && notice.imgs!!.size > currentImgIndex) currentImgIndex++
+            if (notice.imgs != null && notice.imgs!!.size - 1 > currentImgIndex) currentImgIndex++
             return getImageURL(notice)
         }
 
