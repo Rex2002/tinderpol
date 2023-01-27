@@ -28,7 +28,7 @@ class SDO {
         private var notices : List<Notice> = listOf()
         var starredNotices: MutableList<Notice> = mutableListOf()
         private var currentNoticeIndex = 0
-        private var currentImgIndex = 0
+        var currentImgIndex = 0
 
         private var countries: HashMap<String, Country>? = null
 

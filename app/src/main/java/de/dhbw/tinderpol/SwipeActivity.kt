@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.MotionEvent
 import coil.load
 import com.google.android.material.R.drawable.*
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
 import kotlinx.coroutines.GlobalScope
@@ -77,6 +79,15 @@ class SwipeActivity : AppCompatActivity() {
             }
         })
 
+        binding.tabDots.addOnTabSelectedListener(object: OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                SDO.currentImgIndex = tab?.position ?: 0
+                updateShownImg(null, false)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+
         updateShownImg()
 
         SDO.listenToUpdates {
@@ -96,9 +107,18 @@ class SwipeActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(confirmReportDialog,"").commit()
     }
 
-    fun updateShownImg(imgURL: String? = null){
+    private fun updateDots(imgAmount: Int, currentImgIndex: Int) {
+        binding.tabDots.removeAllTabs()
+        for (i in 0 until imgAmount) {
+            val t = binding.tabDots.newTab()
+            binding.tabDots.addTab(t, currentImgIndex == i)
+        }
+    }
+
+    fun updateShownImg(imgURL: String? = null, toUpdateDots: Boolean = true) {
         val notice = SDO.getCurrentNotice()
         val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
+        if (toUpdateDots) updateDots(notice.imgs?.size ?: 0, SDO.currentImgIndex)
         binding.textViewFullName.text = nameText
         binding.noticeImage.load(imgURL ?: SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
