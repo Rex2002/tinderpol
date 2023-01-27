@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import coil.load
 import com.google.android.material.R.drawable.*
@@ -17,10 +18,11 @@ import kotlin.math.abs
 class SwipeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNoticeBinding
-    
+
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val middle = resources.displayMetrics.widthPixels.toFloat() / 2
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -64,8 +66,14 @@ class SwipeActivity : AppCompatActivity() {
 
             override fun onMoveDone(event: MotionEvent) {
                 super.onMoveDone(event)
-                val imageStart = (resources.displayMetrics.widthPixels.toFloat() - binding.noticeImage.width) / 2
+                val imageStart = middle - (binding.noticeImage.width / 2)
                 binding.noticeImage.animate().x(imageStart).setDuration(150).start()
+            }
+
+            override fun onClick(pos: Pair<Float, Float>) {
+                super.onClick(pos)
+                if (pos.first <= middle) updateShownImg(SDO.getPrevImageURL())
+                else updateShownImg(SDO.getNextImageURL())
             }
         })
 
@@ -88,11 +96,11 @@ class SwipeActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(confirmReportDialog,"").commit()
     }
 
-    fun updateShownImg(){
+    fun updateShownImg(imgURL: String? = null){
         val notice = SDO.getCurrentNotice()
         val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
         binding.textViewFullName.text = nameText
-        binding.noticeImage.load(SDO.getImageURL()){
+        binding.noticeImage.load(imgURL ?: SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
         }
