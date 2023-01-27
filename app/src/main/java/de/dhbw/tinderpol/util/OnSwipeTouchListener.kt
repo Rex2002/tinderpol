@@ -11,7 +11,8 @@ import kotlin.math.abs
 
 internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private val gestureDetector : GestureDetector
-    private var initialX : Float? = null
+    private var initialPos : Pair<Float, Float>? = null
+    private var lastPos : Pair<Float, Float>? = null
 
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         return when (event) {
@@ -27,17 +28,21 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     }
 
     open fun onMove(event: MotionEvent) {
-        var xDiff = 0F
-        if (initialX == null) {
-            initialX = event.rawX
-        } else xDiff = event.rawX - initialX!!
+        var posDiffToInitial = Pair(0F, 0F)
+        if (initialPos == null) initialPos = Pair(event.rawX, event.rawY)
+        else posDiffToInitial = Pair(event.rawX - initialPos!!.first, event.rawY - initialPos!!.second)
 
-        if (xDiff < 0) onSwipingLeft(xDiff)
-        else onSwipingRight(xDiff)
+        val posDiffToLast = if (lastPos == null) Pair(0F, 0F)
+        else Pair(event.rawX - lastPos!!.first, event.rawY - lastPos!!.second)
+        lastPos = Pair(event.rawX, event.rawY)
+
+        if (abs(posDiffToLast.first) > abs(posDiffToLast.second)) {
+            onSwipingSideways(posDiffToInitial.first, posDiffToLast)
+        } // Swiping vertically can be ignored, because we don't use that anyways
     }
 
     open fun onMoveDone(event: MotionEvent) {
-        initialX = null
+        initialPos = null
     }
 
     private inner class GestureListener : SimpleOnGestureListener(){
@@ -48,7 +53,7 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
             return true
         }
         override fun onSingleTapUp(e: MotionEvent): Boolean {
-            onClick()
+            onClick(Pair(e.rawX, e.rawY))
             return super.onSingleTapUp(e)
         }
 
@@ -99,13 +104,12 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
             return false
         }
     }
-    open fun onSwipingRight(xDiff: Float) {}
+    open fun onSwipingSideways(xDiff: Float, posDiffToLast: Pair<Float, Float>) {}
     open fun onSwipedRight() {}
-    open fun onSwipingLeft(xDiff: Float) {}
     open fun onSwipedLeft() {}
     open fun onSwipedDown() {}
     open fun onSwipedUp() {}
-    private fun onClick() {}
+    open fun onClick(pos: Pair<Float, Float>) {}
     private fun onDoubleClick() {}
     private fun onLongClick() {}
 

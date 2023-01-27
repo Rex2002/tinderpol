@@ -28,6 +28,7 @@ class SDO {
         private var notices : List<Notice> = listOf()
         var starredNotices: MutableList<Notice> = mutableListOf()
         private var currentNoticeIndex = 0
+        var currentImgIndex = 0
 
         private var countries: HashMap<String, Country>? = null
 
@@ -170,6 +171,7 @@ class SDO {
         }
 
         fun getNextNotice() : Notice {
+            currentImgIndex = 0
             if (notices.isNotEmpty()){
                 currentNoticeIndex++
                 notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
@@ -188,9 +190,9 @@ class SDO {
             return getCurrentNotice()
         }
 
-        fun getPrevNotice() : Notice{
-            if (notices.isNotEmpty())
-                currentNoticeIndex--
+        fun getPrevNotice() : Notice {
+            currentImgIndex = 0
+            if (notices.isNotEmpty()) currentNoticeIndex--
             if (currentNoticeIndex < 0) {
                 currentNoticeIndex = 0
                 throw Exception("Already on first notice in local cache")
@@ -204,10 +206,23 @@ class SDO {
             return getCurrentNotice()
         }
 
-        fun getImageURL(n: Notice?  = null): String {
+        fun getImageURL(n: Notice? = null): String {
             val notice = n ?: getCurrentNotice()
             return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
-            else notice.imgs!![0]
+            else if (currentImgIndex >= notice.imgs!!.size) notice.imgs!!.last()
+            else notice.imgs!![currentImgIndex]
+        }
+
+        fun getNextImageURL(n: Notice? = null): String {
+            val notice = n ?: getCurrentNotice()
+            if (notice.imgs != null && notice.imgs!!.size - 1 > currentImgIndex) currentImgIndex++
+            return getImageURL(notice)
+        }
+
+        fun getPrevImageURL(n: Notice? = null): String {
+            val notice = n ?: getCurrentNotice()
+            if (notice.imgs != null && currentImgIndex > 0) currentImgIndex--
+            return getImageURL(notice)
         }
 
         fun isNoticeStarred(notice: Notice? = null): Boolean {

@@ -4,13 +4,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import coil.load
 import com.google.android.material.R.drawable.*
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 
 class SwipeActivity : AppCompatActivity() {
@@ -20,6 +24,7 @@ class SwipeActivity : AppCompatActivity() {
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val middle = resources.displayMetrics.widthPixels.toFloat() / 2
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -55,21 +60,32 @@ class SwipeActivity : AppCompatActivity() {
                 finish()
             }
 
-            override fun onSwipingLeft(xDiff: Float) {
-                super.onSwipingLeft(xDiff)
-                binding.noticeImage.animate().x(xDiff).setDuration(0).start()
-            }
-
-            override fun onSwipingRight(xDiff: Float) {
-                super.onSwipingRight(xDiff)
-                binding.noticeImage.animate().x(xDiff).setDuration(0).start()
+            override fun onSwipingSideways(xDiff: Float, posDiffToLast: Pair<Float, Float>) {
+                super.onSwipingSideways(xDiff, posDiffToLast)
+                val duration = (abs(posDiffToLast.first) / 100).toLong()
+                binding.noticeImage.animate().x(xDiff).setDuration(duration).start()
             }
 
             override fun onMoveDone(event: MotionEvent) {
                 super.onMoveDone(event)
-                val imageStart = (resources.displayMetrics.widthPixels.toFloat() - binding.noticeImage.width) / 2
+                val imageStart = middle - (binding.noticeImage.width / 2)
                 binding.noticeImage.animate().x(imageStart).setDuration(150).start()
             }
+
+            override fun onClick(pos: Pair<Float, Float>) {
+                super.onClick(pos)
+                if (pos.first <= middle) updateShownImg(SDO.getPrevImageURL())
+                else updateShownImg(SDO.getNextImageURL())
+            }
+        })
+
+        binding.tabDots.addOnTabSelectedListener(object: OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                SDO.currentImgIndex = tab?.position ?: 0
+                updateShownImg(null, false)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
         updateShownImg()
@@ -91,11 +107,20 @@ class SwipeActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(confirmReportDialog,"").commit()
     }
 
-    fun updateShownImg(){
+    private fun updateDots(imgAmount: Int, currentImgIndex: Int) {
+        binding.tabDots.removeAllTabs()
+        for (i in 0 until imgAmount) {
+            val t = binding.tabDots.newTab()
+            binding.tabDots.addTab(t, currentImgIndex == i)
+        }
+    }
+
+    fun updateShownImg(imgURL: String? = null, toUpdateDots: Boolean = true) {
         val notice = SDO.getCurrentNotice()
         val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
+        if (toUpdateDots) updateDots(notice.imgs?.size ?: 0, SDO.currentImgIndex)
         binding.textViewFullName.text = nameText
-        binding.noticeImage.load(SDO.getImageURL()){
+        binding.noticeImage.load(imgURL ?: SDO.getImageURL()){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
         }
