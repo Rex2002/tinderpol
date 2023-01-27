@@ -11,10 +11,10 @@ import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalDataSource
 import de.dhbw.tinderpol.data.room.TinderPolDatabase
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
+import de.dhbw.tinderpol.util.Util
 import kotlinx.coroutines.*
 import kotlin.coroutines.coroutineContext
 
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.textViewExplainText1.setOnClickListener{
-            errorView("this is an example error view")
+            Util.errorView(this, "this is an example error view")
         }
 
         binding.button.setOnClickListener {
@@ -103,11 +103,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    fun errorView(message: String){
-        val alertDialog : AlertDialog.Builder = AlertDialog.Builder(this)
-        alertDialog.setTitle("An error occurred").setIcon(com.google.android.material.R.drawable.mtrl_ic_error).setMessage(message).setPositiveButton("Ok"
-        ) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }.show()
-    }
+
 }

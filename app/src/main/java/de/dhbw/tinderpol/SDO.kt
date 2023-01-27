@@ -180,7 +180,6 @@ class SDO {
             if (currentNoticeIndex >= notices.size) {
                 currentNoticeIndex = notices.size -1
                 throw Exception("Reached last notice in local cache")
-                //TODO create meaningful UI event for after last notice
             }
 
             Log.i("Notice-Call", currentNoticeIndex.toString())
@@ -196,7 +195,6 @@ class SDO {
             if (currentNoticeIndex < 0) {
                 currentNoticeIndex = 0
                 throw Exception("Already on first notice in local cache")
-                //TODO create meaningful UI event for before first notice
             }
 
             Log.i("Notice-Call", currentNoticeIndex.toString())
