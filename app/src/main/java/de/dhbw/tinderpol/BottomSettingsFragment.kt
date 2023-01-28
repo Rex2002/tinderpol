@@ -125,12 +125,13 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
     }
 
     override fun onDestroy() {
-        if(syncFlag && activity != null){
-            GlobalScope.launch {
-                (activity as MainActivity).syncNotices()
+        super.onDestroy()
+        val a: MainActivity? = activity as MainActivity?
+        GlobalScope.launch {
+            if(syncFlag && a != null){
+                a.syncNotices()
             }
         }
-        super.onDestroy()
         _binding = null
     }
 
