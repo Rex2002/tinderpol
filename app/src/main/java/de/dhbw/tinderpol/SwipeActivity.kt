@@ -3,6 +3,7 @@ package de.dhbw.tinderpol
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import coil.load
 import com.google.android.material.R.drawable.*
@@ -22,21 +23,23 @@ class SwipeActivity : AppCompatActivity() {
 
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("swipeActivity", "creating instance")
         super.onCreate(savedInstanceState)
         val middle = resources.displayMetrics.widthPixels.toFloat() / 2
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.imageButtonPrev.setOnClickListener {
+            Log.i("swipeActivity", "button prev clicked")
             try {
                 SDO.getPrevNotice()
                 updateShownImg()
             } catch (e: Exception) {
-                e.message?.let { Util.errorView(this@SwipeActivity, it, "First notice reached") }
-            }
+                Util.errorView(this@SwipeActivity, e.message ?: "unknown error", "First notice reached") }
         }
 
         binding.imageButtonNext.setOnClickListener {
+            Log.i("swipeActivity", "button next clicked")
             nextNotice()
             updateShownImg()
         }
@@ -44,21 +47,25 @@ class SwipeActivity : AppCompatActivity() {
         binding.root.setOnTouchListener(object : OnSwipeTouchListener(this) {
             override fun onSwipedLeft() {
                 super.onSwipedLeft()
+                Log.i("swipeActivity", "swipe left registered")
                 nextNotice()
             }
 
             override fun onSwipedRight() {
                 super.onSwipedRight()
+                Log.i("swipeActivity", "swipe right registered")
                 showReportConfirmDialog()
             }
 
             override fun onSwipedUp() {
                 super.onSwipedUp()
+                Log.i("swipeActivity", "swipe up registered")
                 showBottomSheetDialog()
             }
 
             override fun onSwipedDown() {
                 super.onSwipedDown()
+                Log.i("swipeActivity", "swipe down registered")
                 finish()
             }
 
@@ -92,8 +99,7 @@ class SwipeActivity : AppCompatActivity() {
         })
 
         if(SDO.noticesIsEmpty()){
-            Util.errorView(this, "The local notices database is empty. Go online to sync", "Empty database", this::finish)
-
+            Util.errorView(this, "The local notices database is empty. Go online to sync", this::finish, "Empty database")
         }
         else {
             updateShownImg()
@@ -135,7 +141,7 @@ class SwipeActivity : AppCompatActivity() {
             SDO.getNextNotice()
             updateShownImg()
         }catch (e: Exception){
-            e.message?.let { Util.errorView(this@SwipeActivity, it, "Last notice reached" ) }
+            Util.errorView(this@SwipeActivity, e.message ?: "unknown error", "Last notice reached")
         }
     }
 
@@ -151,6 +157,7 @@ class SwipeActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
+        Log.i("swipeActivity", "killing swipeActivity")
         super.onStop()
         GlobalScope.launch {
             SDO.persistStatus(applicationContext)
