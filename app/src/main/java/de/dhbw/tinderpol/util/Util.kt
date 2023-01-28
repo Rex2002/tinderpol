@@ -67,7 +67,6 @@ class Util {
             get() = false
         override val isSuspend: Boolean
             get() = false
-
         override fun invoke() {
             return
         }}){

@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:text="@string/synchronizing_notices"
             android:textSize="20sp"
+            android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -31,7 +32,7 @@
             app:layout_constraintBottom_toTopOf="@+id/button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.86">
+            app:layout_constraintVertical_bias="0.93">
 
             <TextView
                 android:id="@+id/textViewExplainText1"
@@ -68,16 +69,19 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
+
+        <ImageView
             android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tinderpol"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
             android:textSize="48sp"
             app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.156"
+            app:srcCompat="@mipmap/icon_logo" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,73 +90,20 @@
             app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
             app:layout_constraintTop_toBottomOf="@+id/textView"
             app:layout_constraintVertical_bias="0.0"
-            tools:layout_editor_absoluteX="16dp">
+            tools:layout_editor_absoluteX="16dp"
+            android:orientation="horizontal">
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <ImageView
-                android:id="@+id/star0"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_on"
-                tools:layout_editor_absoluteX="26dp"
-                tools:layout_editor_absoluteY="123dp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/star1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_on"
-                tools:layout_editor_absoluteX="26dp"
-                tools:layout_editor_absoluteY="123dp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/star2"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@android:drawable/btn_star_big_on"
-                tools:layout_editor_absoluteX="26dp"
-                tools:layout_editor_absoluteY="123dp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/star3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_on"
-                tools:layout_editor_absoluteX="26dp"
-                tools:layout_editor_absoluteY="123dp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/star4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star_big_on"
-                tools:layout_editor_absoluteX="26dp"
-                tools:layout_editor_absoluteY="123dp" />
-
+                app:srcCompat="@raw/icon_tinderpol"
+                android:layout_weight="1"
+                />
             <Space
                 android:layout_width="0dp"
                 android:layout_height="1dp"
@@ -186,9 +137,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/teal_700"
                 android:ellipsize="none"
                 android:gravity="center"
+                android:background="@color/blue"
                 android:text="@string/starred_notices"
                 android:textSize="24sp" />
             <TextView
