@@ -31,7 +31,7 @@ interface TinderPolDao {
     fun getAllNoticeIds(): List<String>
 
     @Transaction
-    @Query("SELECT * FROM notice ORDER BY viewedAt ASC")
+    @Query("SELECT * FROM notice ORDER BY viewedAt ASC, id DESC")
     fun getNoticesWithLists(): List<NoticeWithLists>
 
     //Update methods

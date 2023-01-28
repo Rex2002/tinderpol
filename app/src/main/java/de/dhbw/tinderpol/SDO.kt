@@ -217,6 +217,7 @@ class SDO {
             Log.i("SDO", "cleared starred notices")
         }
 
+        @RequiresApi(Build.VERSION_CODES.N)
         suspend fun clearSwipeHistory(sharedPref: SharedPreferences?){
             Log.i("SDO", "clearing swipe history")
             val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
@@ -226,7 +227,7 @@ class SDO {
 
             noticesToClear.forEach { it.viewedAt = Long.MAX_VALUE }
             NoticeRepository.updateStatus(*noticesToClear.toTypedArray())
-            notices = notices.sortedBy { it.id }
+            notices = notices.sortedWith(compareByDescending { it.id })
             if (sharedPref != null) {
                 with(sharedPref.edit()) {
                     putString(R.string.current_noticeId_shared_prefs.toString(), "")
