@@ -2,6 +2,7 @@ package de.dhbw.tinderpol
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +16,14 @@ import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
 import de.dhbw.tinderpol.util.Util.Companion.isBlankStr
 import de.dhbw.tinderpol.util.Util.Companion.isBlankNum
 import de.dhbw.tinderpol.util.Util.Companion.sexToStr
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class NoticeInfoFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentNoticeInfoBinding? = null
-
     private val binding get() = _binding!!
+    private lateinit var notice:Notice
 
 
     private fun changeTextViewVisibility(view: TextView, parent: LinearLayout, text: String? = null, show: Boolean = text == null) {
@@ -54,15 +57,16 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.i("noticeInfo", "create view called")
         _binding = FragmentNoticeInfoBinding.inflate(inflater)
-        val notice : Notice = SDO.getNotice(arguments?.getString("notice", ""))
+        notice = SDO.getNotice(arguments?.getString("notice", ""))
 
         val firstName = if (isBlankStr(notice.firstName)) "" else notice.firstName
         val lastName = if (isBlankStr(notice.lastName)) "" else notice.lastName
         val nameSeparator = if (isBlankStr(firstName) || isBlankStr(lastName)) "" else " "
         val sexStr = sexToStr(notice.sex)
         val isNameVisible = !isBlankStr(firstName) || !isBlankStr(lastName)
-        val nameText = if (isNameVisible) "Name: ${firstName + nameSeparator + lastName} ($sexStr)" else "Sex: $sexStr"
+        val nameText = if (isNameVisible) "${firstName + nameSeparator + lastName} ($sexStr)" else "Sex: $sexStr"
         binding.nameText.text = nameText
 
         changeTextViewVisibility(binding.noticeTypeText, binding.noticeTypeLinearLayout, "Type of Notice: ${notice.type}", !isBlankStr(notice.type))
@@ -92,14 +96,14 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         bindList(binding.spokenLanguagesText, binding.spokenLanguagesLinearLayout, notice.spokenLanguages, "Spoken Languages: ")
 
         binding.starNoticeImageButton.setImageResource(
-            if (SDO.isNoticeStarred()) android.R.drawable.btn_star_big_on
+            if (SDO.isNoticeStarred(notice)) android.R.drawable.btn_star_big_on
             else android.R.drawable.btn_star_big_off )
         binding.starNoticeImageButton.setBackgroundResource(0)
 
         binding.starNoticeImageButton.setOnClickListener{
-            SDO.toggleStarredNotice()
+            SDO.toggleStarredNotice(notice)
             binding.starNoticeImageButton.setImageResource(
-                if (SDO.isNoticeStarred()) android.R.drawable.btn_star_big_on
+                if (SDO.isNoticeStarred(notice)) android.R.drawable.btn_star_big_on
                 else android.R.drawable.btn_star_big_off )
         }
 
@@ -115,6 +119,14 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.i("noticeInfo", "notice info fragment killed")
+        // if argument is set it is implied that the calling activity is the main activity
+        if(arguments?.getString("notice", null) != null && activity != null) {
+            (activity as MainActivity).updateStarredNoticesList()
+            GlobalScope.launch{
+                SDO.persistStatus(notice)
+            }
+        }
         _binding = null
     }
 }

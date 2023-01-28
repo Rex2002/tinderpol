@@ -79,11 +79,6 @@ class SDO {
                 persistImages(context)
         }
 
-        private suspend fun persistStarredNotices() {
-            NoticeRepository.updateStatus(*starredNotices.toTypedArray())
-            Log.i("SDO", "saved current starred notices to Room")
-        }
-
         private suspend fun persistViewedNotices() {
             val viewedNotices: List<Notice> =
                 if (currentNoticeIndex+1<notices.size) notices.subList(0, currentNoticeIndex+1)
@@ -93,7 +88,7 @@ class SDO {
             Log.i("SDO", "saved viewed notices' status to Room")
         }
 
-        private suspend fun persistStatus(notice: Notice) {
+        suspend fun persistStatus(notice: Notice) {
             NoticeRepository.updateStatus(notice)
             Log.i("SDO", "saved status of notice ${notice.id} to Room")
         }
@@ -158,7 +153,10 @@ class SDO {
                 Log.i("SDO", "images deleted: $numberOldFiles")
             }
         }
-
+        private suspend fun persistStarredNotices() {
+            NoticeRepository.updateStatus(*starredNotices.toTypedArray())
+            Log.i("SDO", "saved current starred notices to Room")
+        }
         // methods that edit SDO
         suspend fun initialize(sharedPref: SharedPreferences?, context: Context, forceRemoteSync: Boolean = false) {
             syncNotices(sharedPref, forceRemoteSync)
