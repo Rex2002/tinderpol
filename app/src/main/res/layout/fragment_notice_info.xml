@@ -30,6 +30,7 @@
                 android:paddingRight="8dp"
                 android:paddingStart="12dp"
                 android:textStyle="bold"
+                android:textColor="@color/white"
                 tools:text="@tools:sample/full_names" />
 
             <ImageButton
