@@ -45,7 +45,7 @@ class SDO {
         /**
          * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
-        suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
+        private suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
             if (!isListeningToUpdates) {
                 NoticeRepository.listenToUpdates { updateNoticesInSDO(it) }
@@ -115,7 +115,15 @@ class SDO {
 
                         notice.imgs!!.forEachIndexed {index, img ->
                             val imgURL = URL(img)
-                            val inputStream = BufferedInputStream(imgURL.openStream())
+                            val inputStream: BufferedInputStream
+                            inputStream = try {
+                                BufferedInputStream(imgURL.openStream())
+                            } catch (e: FileNotFoundException) {
+                                Log.e("SDO",
+                                    "encountered FileNotFoundException while getting image for notice ${notice.id}"
+                                )
+                                BufferedInputStream(URL(noImg).openStream())
+                            }
                             val outputStream = ByteArrayOutputStream()
                             val buffer = ByteArray(90000)
                             var len: Int
