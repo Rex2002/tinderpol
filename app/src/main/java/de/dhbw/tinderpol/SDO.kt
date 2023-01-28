@@ -5,28 +5,20 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import android.util.Log
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
-import de.dhbw.tinderpol.data.Country
-import de.dhbw.tinderpol.data.Notice
-import de.dhbw.tinderpol.data.NoticeRepository
+import de.dhbw.tinderpol.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.*
-import java.lang.reflect.Type
-import java.net.URL
 import java.util.function.Consumer
 import java.util.function.Predicate
 
 
 class SDO {
     companion object {
-        private const val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
-        private val emptyNotice = Notice("0000/00000", imgs = listOf(noImg))
+        private const val NO_IMG_URL: String = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
+        const val EMPTY_NOTICE_ID = "0000/00000"
+        private val emptyNotice = Notice(EMPTY_NOTICE_ID, imgs = listOf(NO_IMG_URL))
 
         var onUpdate: Consumer<Notice>? = null
         private var isListeningToUpdates = false
@@ -41,10 +33,71 @@ class SDO {
 
         private var countries: HashMap<String, Country>? = null
 
-        // NOTICE-RELATED METHODS
+// NOTICE-RELATED METHODS
+        private fun updateNoticesInSDO(newNotices: List<Notice>) {
+            notices = newNotices
+            onUpdate?.accept(getCurrentNotice())
+            Log.i("SDO", "Notices updated")
+        }
+
+        fun listenToUpdates(callback: Consumer<Notice>?) {
+            onUpdate = callback
+        }
+
+    //methods that write to Room
+        suspend fun persistStatus(context: Context) {
+            persistStarredNotices()
+            persistViewedNotices()
+            val sharedPref = context.getSharedPreferences(
+                context.resources.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE
+            )
+
+            if (sharedPref != null && notices.isNotEmpty()) {
+                with(sharedPref.edit()) {
+                    putString(context.resources.getString(R.string.current_noticeId_shared_prefs), notices[currentNoticeIndex].id)
+                    apply()
+                }
+                Log.i("SDO", "saved current noticeId to shared preferences")
+            }
+            if (!offlineFlag)
+                persistCurrentImages(context)
+        }
+
+        suspend fun persistStatus(notice: Notice) {
+            NoticeRepository.updateStatus(notice)
+            Log.i("SDO", "saved status of notice ${notice.id} to Room")
+        }
+
+        private suspend fun persistViewedNotices() {
+            val viewedNotices: List<Notice> =
+                if (currentNoticeIndex+1<notices.size) notices.subList(0, currentNoticeIndex+1)
+                else notices
+
+            NoticeRepository.updateStatus(*viewedNotices.toTypedArray())
+            Log.i("SDO", "saved viewed notices' status to Room")
+        }
+
+        private suspend fun persistStarredNotices() {
+            NoticeRepository.updateStatus(*starredNotices.toTypedArray())
+            Log.i("SDO", "saved current starred notices to Room")
+        }
+
+        private suspend fun persistCurrentImages(context: Context){
+            Log.i("SDO", "persisting notice images to disk")
+            val lowerBound = if (currentNoticeIndex-10 >= 0) currentNoticeIndex-10 else 0
+            val upperBound = if (currentNoticeIndex+50 < notices.size) currentNoticeIndex+50 else notices.size
+            val toPersist: MutableSet<Notice> = notices.subList(lowerBound, upperBound).toMutableSet()
+            toPersist.addAll(starredNotices)
+            toPersist.add(emptyNotice)
+
+            val dir = context.getDir("images", Context.MODE_PRIVATE)
+            LocalImageSource.persistImages(toPersist, dir)
+        }
+
+    // methods that edit SDO
 
         /**
-         * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
+         * Gets notices stored in database and updates database from backend if last update is at least 24h ago
          */
         private suspend fun syncNotices(context: Context, forceRemoteSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
@@ -66,125 +119,6 @@ class SDO {
                         (it.type.equals("yellow") && includeYellow) ||
                         (it.type.equals("un") && includeUN)
             }
-        }
-
-        private fun updateNoticesInSDO(newNotices: List<Notice>) {
-            notices = newNotices
-            onUpdate?.accept(getCurrentNotice())
-            Log.i("SDO", "Notices updated")
-        }
-
-        fun listenToUpdates(callback: Consumer<Notice>?) {
-            onUpdate = callback
-        }
-
-        //methods that write to Room
-        suspend fun persistStatus(context: Context) {
-            persistStarredNotices()
-            persistViewedNotices()
-            val sharedPref = context.getSharedPreferences(
-                context.resources.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE
-            )
-
-            if (sharedPref != null && notices.isNotEmpty()) {
-                with(sharedPref.edit()) {
-                    putString(context.resources.getString(R.string.current_noticeId_shared_prefs), notices[currentNoticeIndex].id)
-                    apply()
-                }
-                Log.i("SDO", "saved current noticeId to shared preferences")
-            }
-            if (!offlineFlag)
-                persistImages(context)
-        }
-
-        private suspend fun persistViewedNotices() {
-            val viewedNotices: List<Notice> =
-                if (currentNoticeIndex+1<notices.size) notices.subList(0, currentNoticeIndex+1)
-                else notices
-
-            NoticeRepository.updateStatus(*viewedNotices.toTypedArray())
-            Log.i("SDO", "saved viewed notices' status to Room")
-        }
-
-        suspend fun persistStatus(notice: Notice) {
-            NoticeRepository.updateStatus(notice)
-            Log.i("SDO", "saved status of notice ${notice.id} to Room")
-        }
-
-        private suspend fun persistImages(context: Context){
-            Log.i("SDO", "persisting notice images to disk")
-            val lowerBound = if (currentNoticeIndex-10 >= 0) currentNoticeIndex-10 else 0
-            val upperBound = if (currentNoticeIndex+50 < notices.size) currentNoticeIndex+50 else notices.size
-            val toPersist: MutableSet<Notice> = notices.subList(lowerBound, upperBound).toMutableSet()
-            toPersist.addAll(starredNotices)
-            toPersist.add(emptyNotice)
-
-            withContext(Dispatchers.IO){
-                val noticeIds: MutableList<String> = mutableListOf()
-                val dir = context.getDir("images", Context.MODE_PRIVATE)
-                toPersist.forEach {notice ->
-                    //notice.id[4] is always '/' which is not allowed in file names. Replaced by '_'.
-                    val id: String = notice.id.substring(0,4) + "_" + notice.id.substring(5)
-
-                    if (!notice.imgs.isNullOrEmpty()) {
-                        notice.imgs!!.forEachIndexed {index, img ->
-                            val file = File(dir,id + "_$index")
-
-                            //skipping existing files because notices are never updated
-                            if (!file.exists()) {
-                                try {
-                                    val imgURL = URL(img)
-                                    val inputStream = BufferedInputStream(imgURL.openStream())
-                                    val outputStream = ByteArrayOutputStream()
-                                    val buffer = ByteArray(90000)
-                                    var len: Int
-                                    while (-1 != inputStream.read(buffer).also { len = it }) {
-                                        outputStream.write(buffer, 0, len)
-                                    }
-                                    outputStream.close()
-                                    inputStream.close()
-                                    val response = outputStream.toByteArray()
-
-                                    val fos = FileOutputStream(File(dir, id + "_$index"))
-                                    fos.write(response)
-                                    fos.close()
-                                } catch (e: FileNotFoundException) {
-                                    Log.e("SDO",
-                                        "encountered FileNotFoundException while getting image $index for notice ${notice.id}"
-                                    )
-                                    //no exception handling because intended behaviour is that a file is simply not created when an exception occurs
-                                }
-                            }
-                        }
-                    }
-                    noticeIds.add(id)
-                }
-                var fileNames: Array<String> = dir.list() ?: arrayOf()
-                val numberFiles: Int = fileNames.size
-                fileNames = fileNames.filter { !noticeIds.contains(it.substring(0,10)) }.toTypedArray()
-                val numberOldFiles: Int = fileNames.size
-                fileNames.forEach {
-                    File(dir,it).delete()
-                }
-                Log.i("SDO", "images persisted successfully")
-                Log.i("SDO", "images stored: " +  numberFiles.minus(numberOldFiles).toString())
-                Log.i("SDO", "images deleted: $numberOldFiles")
-            }
-        }
-        private suspend fun persistStarredNotices() {
-            NoticeRepository.updateStatus(*starredNotices.toTypedArray())
-            Log.i("SDO", "saved current starred notices to Room")
-        }
-        // methods that edit SDO
-        suspend fun initialize(context: Context, forceRemoteSync: Boolean = false) {
-            val res = context.resources
-            val sharedPref = context.getSharedPreferences(res.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
-
-            syncNotices(context, forceRemoteSync)
-            initStarredNotices()
-            initCurrentNoticeIndex(sharedPref, res)
-            if (offlineFlag)
-                loadLocalImages(context)
         }
 
         private fun initStarredNotices() {
@@ -210,23 +144,8 @@ class SDO {
         }
 
         private suspend fun loadLocalImages(context: Context) {
-            withContext(Dispatchers.IO) {
-                val dir = context.getDir("images", Context.MODE_PRIVATE)
-                val fileNames: Array<String> = dir.list() ?: arrayOf()
-
-                fileNames.forEach {
-                    val image = ByteArray(90000)
-                    val noticeId: String = it.substring(0,4) + "/" + it.substring(5,10)
-                    val imgIndex: Int = it.substring(11).toInt()
-                    val inputStream = FileInputStream(File(dir, it))
-                    inputStream.read(image)
-                    inputStream.close()
-                    if (localImages[noticeId] == null)
-                        localImages[noticeId] = mutableListOf()
-
-                    localImages[noticeId]!!.add(imgIndex, image)
-                }
-            }
+            val dir = context.getDir("images", Context.MODE_PRIVATE)
+            LocalImageSource.loadImages(dir)
         }
 
         fun toggleStarredNotice(n: Notice? = null) {
@@ -234,11 +153,22 @@ class SDO {
             notice.starred = !notice.starred
             if (notice.starred) starredNotices.add(notice)
             else starredNotices.remove(starredNotices.find{it.id == notice.id})
-            Log.i("SDO", "toggled starred notice: $n")
+            Log.i("SDO", "toggled property starred of notice: $n")
 
         }
 
-        // methods that correspond to button in settings
+    // methods that correspond to button in settings
+        suspend fun initialize(context: Context, forceRemoteSync: Boolean = false) {
+            val res = context.resources
+            val sharedPref = context.getSharedPreferences(res.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
+
+            syncNotices(context, forceRemoteSync)
+            initStarredNotices()
+            initCurrentNoticeIndex(sharedPref, res)
+            if (offlineFlag)
+                loadLocalImages(context)
+        }
+
         suspend fun clearStarredNotices(){
             starredNotices.forEach { it.starred = false }
             persistStarredNotices()
@@ -247,6 +177,7 @@ class SDO {
         }
 
         suspend fun clearSwipeHistory(sharedPref: SharedPreferences?, res: Resources){
+            Log.i("SDO", "clearing swipe history")
             val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
             val noticesToClear: List<Notice> =
                 if (firstUnviewedIndex != -1) notices.subList(0, firstUnviewedIndex)
@@ -264,7 +195,7 @@ class SDO {
             Log.i("SDO", "successfully cleared swipe history")
         }
 
-        //methods that get data from SDO
+    //methods that get data from SDO
         fun getCurrentNotice() : Notice {
             if (notices.isNotEmpty() && currentNoticeIndex < notices.size) {
                 notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
@@ -325,20 +256,20 @@ class SDO {
         fun getImage(context: Context, n: Notice? = null): Any {
             val notice = n ?: getCurrentNotice()
             if (offlineFlag) {
-                Log.i("SDO-imageCall", "using local image for notice ${notice.id}")
+                Log.i("SDO-imageCall", "using local image for notice ${notice.id} and index $currentImgIndex")
                 if (localImages.isEmpty()) {
                     CoroutineScope(Dispatchers.IO).launch {
                         loadLocalImages(context)
                     }
                 }
-                return if (localImages[notice.id]?.isNotEmpty() == true)
-                    localImages[notice.id]?.get(currentImgIndex) ?: localImages["0000/00000"]!![0]
-                else if (!localImages["0000/00000"].isNullOrEmpty())
-                    localImages["0000/00000"]!![0]
+                return if ((localImages[notice.id]?.isNotEmpty() == true) && localImages[notice.id]?.get(currentImgIndex) != null)
+                    localImages[notice.id]!![currentImgIndex]
+                else if (!localImages[EMPTY_NOTICE_ID].isNullOrEmpty())
+                    localImages[EMPTY_NOTICE_ID]!![0]
                 else ByteArray(1)
             }
             else {
-                return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
+                return if (notice.imgs == null || notice.imgs!!.isEmpty()) NO_IMG_URL
                 else if (currentImgIndex >= notice.imgs!!.size) notice.imgs!!.last()
                 else notice.imgs!![currentImgIndex]
             }
@@ -359,25 +290,7 @@ class SDO {
             return (notice ?: getCurrentNotice()).starred
         }
 
-        // COUNTRY-RELATED METHODS
-
-        private class CountriesDeserializer: JsonDeserializer<Any> {
-            override fun deserialize(
-                json: JsonElement?,
-                typeOfT: Type?,
-                context: JsonDeserializationContext?
-            ): Any? {
-                val res: Any?
-                val str = json!!.asJsonPrimitive.asString
-                res = try {
-                    str.toDouble()
-                } catch (e: java.lang.Exception) {
-                    str
-                }
-                return res
-            }
-        }
-
+// COUNTRY-RELATED METHODS
         fun loadCountriesData(res: Resources) {
             val text = res.openRawResource(R.raw.countries).bufferedReader().use { it.readText() }
             val builder = GsonBuilder()
@@ -386,7 +299,7 @@ class SDO {
             val objectListType = object : TypeToken<HashMap<String, Country>?>() {}.type
             val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
             countries = obj
-            Log.i("Countries", "Loaded countries data: $countries")
+            Log.i("SDO", "Loaded country data: $countries")
         }
 
         fun getCountry(countryID: String?): Country? {
