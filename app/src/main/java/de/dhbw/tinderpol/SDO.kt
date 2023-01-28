@@ -121,8 +121,8 @@ class SDO {
             }
         }
 
-        private fun initStarredNotices() {
-            starredNotices = notices.filter { it.starred }.toMutableList()
+        private suspend fun initStarredNotices() {
+            starredNotices = NoticeRepository.getStarredNotices().toMutableList()
             Log.i("SDO", "initialized starredNotices list")
         }
 
@@ -213,7 +213,7 @@ class SDO {
             if(id == "" || id == null){
                 return getCurrentNotice()
             }
-            val notice = notices.find{it.id == id} ?: emptyNotice
+            val notice = notices.find{it.id == id} ?: starredNotices.find { it.id == id } ?: emptyNotice
             Log.i("SDO-noticeCall", "get notice from id called with: $notice")
             return notice
         }

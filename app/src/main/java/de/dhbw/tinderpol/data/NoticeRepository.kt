@@ -38,14 +38,13 @@ class NoticeRepository {
                 }
                 Log.i("NoticeRepository", "sync successful")
             }
-            updateSDO(localDataSource.getAll(filter))
+            updateSDO(localDataSource.getAllInFilter(filter))
         }
 
         /*
             Updates Room db by adding new notices and deleting ones that are not included in remote data.
             Does not currently update data within a notice but skips the ids that already exist locally.
          */
-
         private suspend fun updateFromRemoteNotices(notices: MutableList<Notice>) {
             val localIds: MutableList<String> = localDataSource.getAllNoticeIds().toMutableList()
             val newNotices: MutableList<Notice> = mutableListOf()
@@ -69,6 +68,10 @@ class NoticeRepository {
         private fun updateSDO(notices: List<Notice>) {
             Log.i("NoticeRepository", "Updating SDO")
             onUpdate?.accept(notices)
+        }
+
+        suspend fun getStarredNotices(): List<Notice> {
+            return localDataSource.getAllInFilter { it.starred }
         }
     }
 }

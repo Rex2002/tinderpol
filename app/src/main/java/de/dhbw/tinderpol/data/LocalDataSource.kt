@@ -11,7 +11,7 @@ class LocalDataSource {
         lateinit var dao : TinderPolDao
     }
 
-    suspend fun getAll(filter: Predicate<Notice>): List<Notice> {
+    suspend fun getAllInFilter(filter: Predicate<Notice>): List<Notice> {
         return withContext(Dispatchers.IO) {
             Log.i("LocalDataSource", "Retrieving all local notices...")
             val noticesWithLists: List<NoticeWithLists> = dao.getNoticesWithLists()
