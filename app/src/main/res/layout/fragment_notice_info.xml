@@ -7,7 +7,6 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="12dp"
         >
 
 
@@ -17,10 +16,9 @@
             app:layout_constraintBottom_toTopOf="@+id/noticeTypeLinearLayout"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            android:background="@color/blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
 
             <TextView
@@ -30,7 +28,19 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:paddingRight="8dp"
+                android:paddingStart="12dp"
+                android:textStyle="bold"
                 tools:text="@tools:sample/full_names" />
+
+            <ImageButton
+                android:id="@+id/btnMap"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:background="@android:color/transparent"
+                android:layout_weight="0"
+                app:srcCompat="@android:drawable/ic_dialog_map"
+                tools:ignore="ContentDescription"/>
 
             <ImageButton
                 android:id="@+id/starNoticeImageButton"
@@ -51,7 +61,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            >
 
 
             <TextView
@@ -73,8 +86,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp"
-            >
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"            >
 
             <TextView
                 android:id="@+id/crimeDescrText"
@@ -96,7 +110,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            >
 
 
             <TextView
@@ -119,7 +136,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            >
 
             <TextView
                 android:id="@+id/physicalsText"
@@ -140,7 +160,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
 
             <TextView
@@ -150,13 +172,6 @@
                 android:layout_gravity="center_vertical"
                 android:padding="8dp"
                 tools:text="@tools:sample/lorem" />
-
-            <Button
-                android:id="@+id/btnMap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Map" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -168,7 +183,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp">
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
 
             <TextView
