@@ -41,28 +41,28 @@ class LocalDataSource {
     suspend fun insert(vararg notices: Notice){
         withContext(Dispatchers.IO) {
             dao.insertNotices(*notices)
-            val languageMaps: ArrayList<NoticeLanguage> = ArrayList()
-            val imageMaps: ArrayList<NoticeImage> = ArrayList()
-            val nationalityMaps: ArrayList<NoticeNationality> = ArrayList()
-            val chargeMaps: ArrayList<NoticeCharge> = ArrayList()
+            val languages: ArrayList<NoticeLanguage> = ArrayList()
+            val images: ArrayList<NoticeImage> = ArrayList()
+            val nationalities: ArrayList<NoticeNationality> = ArrayList()
+            val charges: ArrayList<NoticeCharge> = ArrayList()
             notices.forEach {notice ->
                 notice.spokenLanguages?.forEach {
-                    languageMaps.add(NoticeLanguage(notice.id, it))
+                    languages.add(NoticeLanguage(notice.id, it))
                 }
                 notice.imgs?.forEach{
-                    imageMaps.add(NoticeImage(notice.id, it))
+                    images.add(NoticeImage(notice.id, it))
                 }
                 notice.nationalities?.forEach {
-                    nationalityMaps.add(NoticeNationality(notice.id, it))
+                    nationalities.add(NoticeNationality(notice.id, it))
                 }
                 notice.charges?.forEach {
-                    chargeMaps.add(NoticeCharge(notice.id, it.country, it.charge))
+                    charges.add(NoticeCharge(notice.id, it.country, it.charge))
                 }
             }
-            dao.insertLanguages(*languageMaps.toTypedArray())
-            dao.insertImages(*imageMaps.toTypedArray())
-            dao.insertNationalities(*nationalityMaps.toTypedArray())
-            dao.insertChargeMaps(*chargeMaps.toTypedArray())
+            dao.insertLanguages(*languages.toTypedArray())
+            dao.insertImages(*images.toTypedArray())
+            dao.insertNationalities(*nationalities.toTypedArray())
+            dao.insertChargeMaps(*charges.toTypedArray())
         }
     }
 
