@@ -17,12 +17,13 @@ class LocalDataSource {
             val noticesWithLists: List<NoticeWithLists> = dao.getNoticesWithLists()
             val notices: MutableList<Notice> = mutableListOf()
             noticesWithLists.forEach {
-                it.notice.spokenLanguages = it.getLanguages()
-                it.notice.imgs = it.getImages()
-                it.notice.nationalities = it.getNationalities()
-                it.notice.charges = it.getCharges()
-                if (filter.test(it.notice))
+                if (filter.test(it.notice)) {
+                    it.notice.spokenLanguages = it.getLanguages()
+                    it.notice.imgs = it.getImages()
+                    it.notice.nationalities = it.getNationalities()
+                    it.notice.charges = it.getCharges()
                     notices.add(it.notice)
+                }
             }
             return@withContext notices
         }

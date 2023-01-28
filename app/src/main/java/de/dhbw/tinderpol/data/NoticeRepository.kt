@@ -1,6 +1,6 @@
 package de.dhbw.tinderpol.data
 
-import android.content.SharedPreferences
+import android.content.Context
 import android.util.Log
 import de.dhbw.tinderpol.R
 import java.util.function.Consumer
@@ -17,17 +17,12 @@ class NoticeRepository {
             onUpdate = callback
         }
 
-        suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
-            val lastUpdated: Long = sharedPref?.getLong("lastUpdated", 0) ?: 0
-
-            val redFilter: Boolean = sharedPref?.getBoolean(R.string.show_red_notices_shared_prefs.toString(), true) == true
-            val yellowFilter: Boolean = sharedPref?.getBoolean("ShowYellowNoticesSharedPref", true) == true
-            val unFilter: Boolean = sharedPref?.getBoolean("ShowUnNoticesSharedPref", true) == true
-            val filter: Predicate<Notice> = Predicate {
-                (it.type.equals("red") && redFilter) ||
-                        (it.type.equals("yellow") && yellowFilter) ||
-                        (it.type.equals("un") && unFilter)
-            }
+        suspend fun syncNotices(context: Context, filter: Predicate<Notice>, forceRemoteSync: Boolean = false) {
+            val res = context.resources
+            val sharedPref = context.getSharedPreferences(
+                res.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE
+            )
+            val lastUpdated: Long = sharedPref?.getLong(res.getString(R.string.last_updated_shared_prefs), 0) ?: 0
 
             if (forceRemoteSync || System.currentTimeMillis() - lastUpdated > dataLifetimeInMillis) {
                 Log.i("NoticeRepository", "syncing notices with remote data source")
@@ -39,7 +34,7 @@ class NoticeRepository {
                     Log.i("NoticeRepository", "received remote notices...")
                     Log.i("NoticeRepository", "First remote notice: ${remoteNotices[0]}")
                     updateFromRemoteNotices(remoteNotices.toMutableList())
-                    sharedPref?.edit()?.putLong("lastUpdated", System.currentTimeMillis())?.apply()
+                    sharedPref?.edit()?.putLong(res.getString(R.string.last_updated_shared_prefs), System.currentTimeMillis())?.apply()
                 }
                 Log.i("NoticeRepository", "sync successful")
             }

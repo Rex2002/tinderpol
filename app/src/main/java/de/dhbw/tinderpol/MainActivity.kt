@@ -1,6 +1,5 @@
 package de.dhbw.tinderpol
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -39,10 +38,14 @@ class MainActivity : AppCompatActivity() {
 
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         connectivityObserver.observe().onEach {
-            if (it == NetworkConnectivityObserver.Status.Unavailable)
+            if (it == NetworkConnectivityObserver.Status.Unavailable) {
+                Log.i("ConnectivityObserver", "network state changed to unavailable")
                 SDO.offlineFlag = true
-            else if (it == NetworkConnectivityObserver.Status.Available)
+            }
+            else if (it == NetworkConnectivityObserver.Status.Available) {
                 SDO.offlineFlag = false
+                Log.i("ConnectivityObserver", "network state changed to available")
+            }
         }.launchIn(lifecycleScope)
 
         adapter = StarredNoticesListItemAdapter(this, SDO.starredNotices)
@@ -98,10 +101,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         CoroutineScope(coroutineContext).launch {
-            SDO.initialize(getSharedPreferences(
-                getString(R.string.shared_preferences_file),
-                Context.MODE_PRIVATE
-            ), applicationContext, forceRemoteSync)
+            SDO.initialize(applicationContext, forceRemoteSync)
 
             withContext(Dispatchers.Main) {
                 updateStarredNoticesList()

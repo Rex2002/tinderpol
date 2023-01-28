@@ -34,50 +34,43 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
         binding.switchRedNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
             syncFlag = true
-            val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
             if (sharedPref != null) {
                 with(sharedPref.edit()){
                     putBoolean(getString(R.string.show_red_notices_shared_prefs), b)
-                    this.apply()
                     if(!checkMinNoticesSelected()){
-                        this.putBoolean(getString(R.string.show_red_notices_shared_prefs), true)
-                        this.apply()
+                        putBoolean(getString(R.string.show_red_notices_shared_prefs), true)
                         binding.switchRedNotices.isChecked = true
                         Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                     }
+                    apply()
                 }
             }
         }
         binding.switchYellowNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
             syncFlag = true
-            val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
             if (sharedPref != null) {
                 with(sharedPref.edit()){
-                    this.putBoolean(getString(R.string.show_yellow_notices_shared_prefs), b)
-                    this.apply()
+                    putBoolean(getString(R.string.show_yellow_notices_shared_prefs), b)
                     if(!checkMinNoticesSelected()){
-                        this.putBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
-                        this.apply()
+                        putBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
                         binding.switchYellowNotices.isChecked = true
                         Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                     }
-
+                    apply()
                 }
             }
         }
         binding.switchUnNotices.setOnCheckedChangeListener{_: CompoundButton, b:Boolean ->
             syncFlag = true
-            val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
             if(sharedPref != null){
                 with(sharedPref.edit()){
-                    this.putBoolean(getString(R.string.show_UN_notices_shared_prefs), b)
-                    this.apply()
+                    putBoolean(getString(R.string.show_UN_notices_shared_prefs), b)
                     if(!checkMinNoticesSelected()){
-                        this.putBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
-                        this.apply()
+                        putBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
                         binding.switchUnNotices.isChecked = true
                         Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                     }
+                    apply()
                 }
             }
         }
@@ -95,12 +88,8 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.buttonClearSwipeHistory.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
-                val sharedPref = activity?.getSharedPreferences(
-                    getString(R.string.shared_preferences_file),
-                    Context.MODE_PRIVATE
-                )
                 if (sharedPref != null) {
-                    SDO.clearSwipeHistory(sharedPref)
+                    SDO.clearSwipeHistory(sharedPref, resources)
                     activity?.runOnUiThread {
                         Toast.makeText(
                             activity,
@@ -138,7 +127,9 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
     private fun checkMinNoticesSelected() : Boolean{
         val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
         return if(sharedPref != null) {
-            sharedPref.getBoolean(getString(R.string.show_red_notices_shared_prefs), true) || sharedPref.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true) || sharedPref.getBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
+            sharedPref.getBoolean(getString(R.string.show_red_notices_shared_prefs), true)
+                    || sharedPref.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
+                    || sharedPref.getBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
         } else false
 
     }

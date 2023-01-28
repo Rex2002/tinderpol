@@ -20,6 +20,7 @@ import java.io.*
 import java.lang.reflect.Type
 import java.net.URL
 import java.util.function.Consumer
+import java.util.function.Predicate
 
 
 class SDO {
@@ -45,13 +46,26 @@ class SDO {
         /**
          * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
-        private suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
+        private suspend fun syncNotices(context: Context, forceRemoteSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
             if (!isListeningToUpdates) {
                 NoticeRepository.listenToUpdates { updateNoticesInSDO(it) }
                 isListeningToUpdates = true
             }
-            NoticeRepository.syncNotices(sharedPref, forceRemoteSync)
+            val res = context.resources
+            val sharedPref = context.getSharedPreferences(res.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
+            val filter: Predicate<Notice> = getCurrentFilter(sharedPref, res)
+            NoticeRepository.syncNotices(context, filter, forceRemoteSync)
+        }
+        private fun getCurrentFilter(sharedPref: SharedPreferences?, res: Resources): Predicate<Notice> {
+            val includeRed: Boolean = sharedPref?.getBoolean(res.getString(R.string.show_red_notices_shared_prefs), true) ?: true
+            val includeYellow: Boolean = sharedPref?.getBoolean(res.getString(R.string.show_yellow_notices_shared_prefs), true) ?: true
+            val includeUN: Boolean = sharedPref?.getBoolean(res.getString(R.string.show_UN_notices_shared_prefs), true) ?: true
+            return Predicate {
+                (it.type.equals("red") && includeRed) ||
+                        (it.type.equals("yellow") && includeYellow) ||
+                        (it.type.equals("un") && includeUN)
+            }
         }
 
         private fun updateNoticesInSDO(newNotices: List<Notice>) {
@@ -65,13 +79,17 @@ class SDO {
         }
 
         //methods that write to Room
-        suspend fun persistStatus(sharedPref: SharedPreferences?, context: Context) {
+        suspend fun persistStatus(context: Context) {
             persistStarredNotices()
             persistViewedNotices()
+            val sharedPref = context.getSharedPreferences(
+                context.resources.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE
+            )
+
             if (sharedPref != null && notices.isNotEmpty()) {
                 with(sharedPref.edit()) {
-                    putString(R.string.current_noticeId_shared_prefs.toString(), notices[currentNoticeIndex].id)
-                    this.apply()
+                    putString(context.resources.getString(R.string.current_noticeId_shared_prefs), notices[currentNoticeIndex].id)
+                    apply()
                 }
                 Log.i("SDO", "saved current noticeId to shared preferences")
             }
@@ -108,35 +126,35 @@ class SDO {
                     //notice.id[4] is always '/' which is not allowed in file names. Replaced by '_'.
                     val id: String = notice.id.substring(0,4) + "_" + notice.id.substring(5)
 
-                    //checking only for index 0 because notices aren't updated,
-                    // so if any file exists at a matching noticeId, the correct images must be present.
-                    val file = File(dir,id + "_0")
-                    if (!file.exists() && !notice.imgs.isNullOrEmpty()) {
-
+                    if (!notice.imgs.isNullOrEmpty()) {
                         notice.imgs!!.forEachIndexed {index, img ->
-                            val imgURL = URL(img)
-                            val inputStream: BufferedInputStream
-                            inputStream = try {
-                                BufferedInputStream(imgURL.openStream())
-                            } catch (e: FileNotFoundException) {
-                                Log.e("SDO",
-                                    "encountered FileNotFoundException while getting image for notice ${notice.id}"
-                                )
-                                BufferedInputStream(URL(noImg).openStream())
-                            }
-                            val outputStream = ByteArrayOutputStream()
-                            val buffer = ByteArray(90000)
-                            var len: Int
-                            while (-1 != inputStream.read(buffer).also { len = it }) {
-                                outputStream.write(buffer, 0, len)
-                            }
-                            outputStream.close()
-                            inputStream.close()
-                            val response = outputStream.toByteArray()
+                            val file = File(dir,id + "_$index")
 
-                            val fos = FileOutputStream(File(dir, id + "_$index"))
-                            fos.write(response)
-                            fos.close()
+                            //skipping existing files because notices are never updated
+                            if (!file.exists()) {
+                                try {
+                                    val imgURL = URL(img)
+                                    val inputStream = BufferedInputStream(imgURL.openStream())
+                                    val outputStream = ByteArrayOutputStream()
+                                    val buffer = ByteArray(90000)
+                                    var len: Int
+                                    while (-1 != inputStream.read(buffer).also { len = it }) {
+                                        outputStream.write(buffer, 0, len)
+                                    }
+                                    outputStream.close()
+                                    inputStream.close()
+                                    val response = outputStream.toByteArray()
+
+                                    val fos = FileOutputStream(File(dir, id + "_$index"))
+                                    fos.write(response)
+                                    fos.close()
+                                } catch (e: FileNotFoundException) {
+                                    Log.e("SDO",
+                                        "encountered FileNotFoundException while getting image $index for notice ${notice.id}"
+                                    )
+                                    //no exception handling because intended behaviour is that a file is simply not created when an exception occurs
+                                }
+                            }
                         }
                     }
                     noticeIds.add(id)
@@ -158,10 +176,13 @@ class SDO {
             Log.i("SDO", "saved current starred notices to Room")
         }
         // methods that edit SDO
-        suspend fun initialize(sharedPref: SharedPreferences?, context: Context, forceRemoteSync: Boolean = false) {
-            syncNotices(sharedPref, forceRemoteSync)
+        suspend fun initialize(context: Context, forceRemoteSync: Boolean = false) {
+            val res = context.resources
+            val sharedPref = context.getSharedPreferences(res.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
+
+            syncNotices(context, forceRemoteSync)
             initStarredNotices()
-            initCurrentNoticeIndex(sharedPref)
+            initCurrentNoticeIndex(sharedPref, res)
             if (offlineFlag)
                 loadLocalImages(context)
         }
@@ -171,10 +192,10 @@ class SDO {
             Log.i("SDO", "initialized starredNotices list")
         }
 
-        private fun initCurrentNoticeIndex(sharedPref: SharedPreferences?) {
+        private fun initCurrentNoticeIndex(sharedPref: SharedPreferences?, res: Resources) {
             Log.i("SDO", "initializing currentNoticeIndex")
             if (sharedPref != null) {
-                val id = sharedPref.getString(R.string.current_noticeId_shared_prefs.toString(), "")
+                val id = sharedPref.getString(res.getString(R.string.current_noticeId_shared_prefs), "")
                 currentNoticeIndex = notices.indexOfFirst { it.id == id}
             }
             if (sharedPref == null || currentNoticeIndex == -1) {
@@ -223,7 +244,7 @@ class SDO {
             Log.i("SDO", "cleared starred notices")
         }
 
-        suspend fun clearSwipeHistory(sharedPref: SharedPreferences?){
+        suspend fun clearSwipeHistory(sharedPref: SharedPreferences?, res: Resources){
             Log.i("SDO", "clearing swipe history")
             val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
             val noticesToClear: List<Notice> =
@@ -235,7 +256,7 @@ class SDO {
             notices = notices.sortedWith(compareByDescending { it.id })
             if (sharedPref != null) {
                 with(sharedPref.edit()) {
-                    putString(R.string.current_noticeId_shared_prefs.toString(), "")
+                    putString(res.getString(R.string.current_noticeId_shared_prefs), "none")
                     apply()
                 }
             }
@@ -244,12 +265,12 @@ class SDO {
 
         //methods that get data from SDO
         fun getCurrentNotice() : Notice {
-            if (notices.isNotEmpty()) {
+            if (notices.isNotEmpty() && currentNoticeIndex < notices.size) {
                 notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
                 Log.i("SDO", notices[currentNoticeIndex].toString())
             }
             if (notices.size <= currentNoticeIndex) {
-                // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
+                // Realistically only the else branch will ever be used here, but it's checked anyways to prevent any bugs
                 if (notices.isNotEmpty()) currentNoticeIndex = notices.size - 1
                 else return emptyNotice
             }
@@ -309,9 +330,11 @@ class SDO {
                         loadLocalImages(context)
                     }
                 }
-                return if (localImages[notice.id]?.isNotEmpty() == true) localImages[notice.id]!![currentImgIndex]
-                    else if (!localImages["0000/00000"].isNullOrEmpty()) localImages["0000/00000"]!![0]
-                        else ByteArray(1)
+                return if (localImages[notice.id]?.isNotEmpty() == true)
+                    localImages[notice.id]?.get(currentImgIndex) ?: localImages["0000/00000"]!![0]
+                else if (!localImages["0000/00000"].isNullOrEmpty())
+                    localImages["0000/00000"]!![0]
+                else ByteArray(1)
             }
             else {
                 return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
