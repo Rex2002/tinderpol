@@ -234,6 +234,8 @@ class SDO {
             notice.starred = !notice.starred
             if (notice.starred) starredNotices.add(notice)
             else starredNotices.remove(starredNotices.find{it.id == notice.id})
+            Log.i("SDO", "toggled starred notice: $n")
+
         }
 
         // methods that correspond to button in settings
@@ -245,7 +247,6 @@ class SDO {
         }
 
         suspend fun clearSwipeHistory(sharedPref: SharedPreferences?, res: Resources){
-            Log.i("SDO", "clearing swipe history")
             val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }
             val noticesToClear: List<Notice> =
                 if (firstUnviewedIndex != -1) notices.subList(0, firstUnviewedIndex)
@@ -267,7 +268,7 @@ class SDO {
         fun getCurrentNotice() : Notice {
             if (notices.isNotEmpty() && currentNoticeIndex < notices.size) {
                 notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
-                Log.i("SDO", notices[currentNoticeIndex].toString())
+                Log.i("SDO-noticeCall", notices[currentNoticeIndex].toString())
             }
             if (notices.size <= currentNoticeIndex) {
                 // Realistically only the else branch will ever be used here, but it's checked anyways to prevent any bugs
@@ -282,7 +283,7 @@ class SDO {
                 return getCurrentNotice()
             }
             val notice = notices.find{it.id == id} ?: emptyNotice
-            Log.i("SDO", notice.toString())
+            Log.i("SDO-noticeCall", "get notice from id called with: $notice")
             return notice
         }
 
@@ -295,9 +296,9 @@ class SDO {
                 throw Exception("Reached last notice in local cache")
             }
 
-            Log.i("Notice-Call", currentNoticeIndex.toString())
+            Log.i("SDO-noticeCall", currentNoticeIndex.toString())
             if (notices.isNotEmpty())
-                Log.i("Notice-Call", notices[currentNoticeIndex].toString())
+                Log.i("SDO-noticeCall", notices[currentNoticeIndex].toString())
 
             return getCurrentNotice()
         }
@@ -310,9 +311,9 @@ class SDO {
                 throw Exception("Already on first notice in local cache")
             }
 
-            Log.i("Notice-Call", currentNoticeIndex.toString())
+            Log.i("SDO-noticeCall", currentNoticeIndex.toString())
             if (notices.isNotEmpty())
-                Log.i("Notice-Call", notices[currentNoticeIndex].toString())
+                Log.i("SDO-noticeCall", notices[currentNoticeIndex].toString())
 
             return getCurrentNotice()
         }
@@ -324,7 +325,7 @@ class SDO {
         fun getImage(context: Context, n: Notice? = null): Any {
             val notice = n ?: getCurrentNotice()
             if (offlineFlag) {
-                Log.i("SDO", "using local image for notice ${notice.id}")
+                Log.i("SDO-imageCall", "using local image for notice ${notice.id}")
                 if (localImages.isEmpty()) {
                     CoroutineScope(Dispatchers.IO).launch {
                         loadLocalImages(context)

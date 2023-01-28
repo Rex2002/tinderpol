@@ -101,6 +101,7 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         binding.starNoticeImageButton.setBackgroundResource(0)
 
         binding.starNoticeImageButton.setOnClickListener{
+            Log.i("noticeInfo", "starNotice button clicked")
             SDO.toggleStarredNotice(notice)
             binding.starNoticeImageButton.setImageResource(
                 if (SDO.isNoticeStarred(notice)) android.R.drawable.btn_star_big_on
@@ -108,6 +109,7 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
         }
 
         binding.btnMap.setOnClickListener {
+            Log.i("noticeInfo", "viewMap button clicked")
             val intentionalStuffHappening = Intent(context, MapsActivity::class.java)
             val data = MapsData(notice.nationalities ?: listOf(), notice.charges?.map { it.country } ?: listOf(), notice.birthCountry, notice.birthPlace)
             intentionalStuffHappening.putExtra("data", MapsData.serialize(data))
@@ -119,7 +121,7 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("noticeInfo", "notice info fragment killed")
+        Log.i("noticeInfo", "killing notice info fragment")
         // if argument is set it is implied that the calling activity is the main activity
         if(arguments?.getString("notice", null) != null && activity != null) {
             (activity as MainActivity).updateStarredNoticesList()

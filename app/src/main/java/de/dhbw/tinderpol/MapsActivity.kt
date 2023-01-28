@@ -27,6 +27,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("mapsActivity", "creating instance")
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
@@ -57,6 +58,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .position(location)
             .title(title)
             .icon(BitmapDescriptorFactory.defaultMarker(color)))
+        Log.i("mapsActivity", "added marker $title at \n lat: $lat \n long: $lon")
     }
 
 

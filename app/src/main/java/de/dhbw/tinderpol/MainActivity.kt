@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.NetworkConnectivityObserver
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
-import de.dhbw.tinderpol.util.Util
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -56,12 +55,9 @@ class MainActivity : AppCompatActivity() {
 
 
         GlobalScope.launch(Dispatchers.IO) {
+            Log.i("main","starting initial notices sync")
             syncNotices()
             SDO.loadCountriesData(resources)
-        }
-
-        binding.textViewExplainText1.setOnClickListener{
-            Util.errorView(this, "this is an example error view")
         }
 
         binding.button.setOnClickListener {
@@ -70,30 +66,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.imageButtonSettings.setOnClickListener{
-            showReportConfirmDialog()
+            showBottomSettingsDialog()
         }
     }
 
-    private fun showReportConfirmDialog(){
+    private fun showBottomSettingsDialog(){
         val settingsFragment = BottomSettingsFragment()
         supportFragmentManager.beginTransaction().add(settingsFragment, "").commit()
     }
 
     override fun onResume() {
-        Log.i("Main", "resumed main activity")
+        Log.i("main", "resumed main activity")
         updateStarredNoticesList()
         super.onResume()
     }
 
     fun updateStarredNoticesList(){
-        Log.i("Main", "update starred notices recyclerview")
+        Log.i("main", "update starred notices recyclerview")
         adapter.updateData(SDO.starredNotices)
         binding.textViewEmptyStarredList.text = getString(R.string.no_notices_starred)
         binding.textViewEmptyStarredList.visibility = if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
     }
 
     suspend fun syncNotices(forceRemoteSync: Boolean = false){
-        Log.i("Main", "synchronizing notices")
+        Log.i("main", "synchronizing notices")
         runOnUiThread {
             binding.button.text = getString(R.string.synchronizing_notices)
             binding.button.isEnabled = false

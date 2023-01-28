@@ -26,6 +26,8 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.i("settingsFragment","starting settings fragment")
+
         _binding = FragmentBottomSettingsBinding.inflate(inflater)
         val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
         binding.switchRedNotices.isChecked = sharedPref?.getBoolean(getString(R.string.show_red_notices_shared_prefs), true) ?: true
@@ -87,6 +89,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             }
         }
         binding.buttonClearSwipeHistory.setOnClickListener {
+            Log.i("settingsFragment","clearing swipe history")
             GlobalScope.launch(Dispatchers.IO) {
                 if (sharedPref != null) {
                     SDO.clearSwipeHistory(sharedPref, resources)
@@ -101,19 +104,21 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             }
         }
         binding.buttonSyncLocalStorages.setOnClickListener{
+            Log.i("settingsFragment", "initiating force sync of local storage")
             if(activity != null){
                 GlobalScope.launch {
                     (activity as MainActivity).syncNotices(true)
                 }
             }
             else {
-                Toast.makeText(activity, "Sync failed due to unknown reason", Toast.LENGTH_SHORT).show()
+                Log.e("settingsFragment", "sync failed due to activity being null")
             }
         }
         return binding.root
     }
 
     override fun onDestroy() {
+        Log.i("settingsFragment", "onDestroy called")
         super.onDestroy()
         val a: MainActivity? = activity as MainActivity?
         GlobalScope.launch {

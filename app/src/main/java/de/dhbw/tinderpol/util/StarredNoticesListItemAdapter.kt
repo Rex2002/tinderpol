@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,13 +27,14 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+        Log.i("starredNoticesList", "creating view holder")
         val adapterLayout = LayoutInflater.from(parent.context).inflate(R.layout.layout_starred_notices_list, parent, false)
         return ItemViewHolder(adapterLayout)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item: Notice = dataset[position]
-        Log.i("StarredNoticesList", "loadingStarredNotice: $item")
+        Log.i("starredNoticesList", "loadingStarredNotice: $item")
         holder.textViewName.text = "${item.firstName} ${item.lastName}"
         holder.textViewBirthdate.text =  if (Util.isBlankStr(item.birthDate)) "" else item.birthDate
         holder.iconImage.load(SDO.getImage(context, item)){
@@ -63,6 +63,7 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
     }
 
     fun updateData(newData : List<Notice>){
+        Log.i("starredNoticesList", "updating dataset")
         dataset = newData
         notifyDataSetChanged()
     }

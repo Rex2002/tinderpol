@@ -19,32 +19,22 @@ class ContactInterpolConfirmFragment : DialogFragment() {
         )
 
         val notice = SDO.getCurrentNotice()
+        Log.i("contactFragment", "creating AlertDialog for ${notice.id}")
         alertDialogBuilder.setTitle("Report Criminal Sighting")
-
         alertDialogBuilder.setMessage("You are about to report a sighting for \n ${notice.firstName} ${notice.lastName} \n You will be redirected to a website")
-
         alertDialogBuilder.setPositiveButton(
             "Continue"
         ) { _, _ ->
-            Log.i("contactIntPolConf", "contacting interpol with url: https://www.interpol.int/Contacts/Fugitives-wanted-persons?notice=${
-                notice.id.replace(
-                    "/",
-                    "-"
-                )
-            }")
+            Log.i("contactIntPolConf", "contacting interpol with url: https://www.interpol.int/Contacts/Fugitives-wanted-persons?notice=${notice.id.replace("/","-")}")
             val openUrl = Intent(Intent.ACTION_VIEW)
             openUrl.data = Uri.parse("https://www.interpol.int/Contacts/Fugitives-wanted-persons?notice=${notice.id.replace("/","-")}")
             startActivity(openUrl)
         }
-
         alertDialogBuilder.setNegativeButton(
             "Cancel"
         ) { dialog, _ ->
             dialog?.dismiss()
         }
-
-
-
         return alertDialogBuilder.create()
     }
 
