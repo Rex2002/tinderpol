@@ -10,10 +10,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.dhbw.tinderpol.databinding.FragmentBottomSettingsBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class BottomSettingsFragment : BottomSheetDialogFragment() {
 
@@ -22,6 +19,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
     private val binding get() = _binding!!
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -84,7 +82,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
                 withContext(Dispatchers.Main){
                     val a : MainActivity? = if (activity == null) null else activity as MainActivity
                     a?.updateStarredNoticesList()
-                    Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(a, "Successfully cleared starred notices", Toast.LENGTH_SHORT)?.show()
                 }
             }
         }
@@ -117,6 +115,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onDestroy() {
         Log.i("settingsFragment", "onDestroy called")
         super.onDestroy()

@@ -1,6 +1,8 @@
 package de.dhbw.tinderpol
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,8 +14,10 @@ import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
 import de.dhbw.tinderpol.util.OnSwipeTouchListener
 import de.dhbw.tinderpol.util.Util
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.math.abs
 
 
@@ -151,11 +155,19 @@ class SwipeActivity : AppCompatActivity() {
         if (toUpdateDots) updateDots(notice.imgs?.size ?: 0, SDO.currentImgIndex)
         binding.textViewFullName.text = nameText
         binding.noticeImage.load(imgURL ?: SDO.getImage(applicationContext)){
-            placeholder(android.R.drawable.stat_sys_download)
+            placeholder(
+                Drawable.createFromPath(
+                    File(getDir(
+                        "images", Context.MODE_PRIVATE),
+                        SDO.EMPTY_NOTICE_ID + "_0"
+                    ).absolutePath
+                )
+            )
             error(mtrl_ic_error)
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onStop() {
         Log.i("swipeActivity", "killing swipeActivity")
         super.onStop()

@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -62,6 +63,7 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateData(newData : List<Notice>){
         Log.i("starredNoticesList", "updating dataset")
         dataset = newData
