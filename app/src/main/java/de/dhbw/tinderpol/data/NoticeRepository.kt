@@ -1,15 +1,10 @@
 package de.dhbw.tinderpol.data
 
 import android.content.SharedPreferences
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.function.Consumer
 import java.util.function.Predicate
-import kotlin.coroutines.coroutineContext
 
 class NoticeRepository {
     companion object {
@@ -22,7 +17,6 @@ class NoticeRepository {
             onUpdate = callback
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
             val lastUpdated: Long = sharedPref?.getLong("lastUpdated", 0) ?: 0
 
@@ -56,7 +50,7 @@ class NoticeRepository {
             Updates Room db by adding new notices and deleting ones that are not included in remote data.
             Does not currently update data within a notice but skips the ids that already exist locally.
          */
-        @RequiresApi(Build.VERSION_CODES.N)
+
         private suspend fun updateFromRemoteNotices(notices: MutableList<Notice>) {
             val localIds: MutableList<String> = localDataSource.getAllNoticeIds().toMutableList()
             val newNotices: MutableList<Notice> = mutableListOf()
@@ -77,7 +71,6 @@ class NoticeRepository {
             localDataSource.updateAll(*notices)
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         private fun updateSDO(notices: List<Notice>) {
             Log.i("NoticeRepository", "Updating SDO")
             onUpdate?.accept(notices)

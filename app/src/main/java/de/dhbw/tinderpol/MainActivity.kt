@@ -2,7 +2,6 @@ package de.dhbw.tinderpol
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +9,6 @@ import android.view.View
 import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalDataSource
 import de.dhbw.tinderpol.data.room.TinderPolDatabase
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
@@ -29,7 +27,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var adapter: StarredNoticesListItemAdapter
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -92,7 +89,6 @@ class MainActivity : AppCompatActivity() {
         binding.textViewEmptyStarredList.visibility = if (SDO.starredNotices.size != 0) View.GONE else View.VISIBLE
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     suspend fun syncNotices(forceRemoteSync: Boolean = false){
         Log.i("Main", "synchronizing notices")
         runOnUiThread {

@@ -3,9 +3,7 @@ package de.dhbw.tinderpol
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -47,7 +45,6 @@ class SDO {
         /**
          * Gets notices stored in Room and updates Room from backend on the first call of the day (in the background)
          */
-        @RequiresApi(Build.VERSION_CODES.N)
         suspend fun syncNotices(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
             Log.i("SDO", "Syncing Notices...")
             if (!isListeningToUpdates) {
@@ -57,7 +54,6 @@ class SDO {
             NoticeRepository.syncNotices(sharedPref, forceRemoteSync)
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         private fun updateNoticesInSDO(newNotices: List<Notice>) {
             notices = newNotices
             onUpdate?.accept(getCurrentNotice())
@@ -151,7 +147,6 @@ class SDO {
         }
 
         // methods that edit SDO
-        @RequiresApi(Build.VERSION_CODES.N)
         suspend fun initialize(sharedPref: SharedPreferences?, context: Context, forceRemoteSync: Boolean = false) {
             syncNotices(sharedPref, forceRemoteSync)
             initStarredNotices()
@@ -217,7 +212,6 @@ class SDO {
             Log.i("SDO", "cleared starred notices")
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         suspend fun clearSwipeHistory(sharedPref: SharedPreferences?){
             Log.i("SDO", "clearing swipe history")
             val firstUnviewedIndex: Int = notices.indexOfFirst { it.viewedAt == Long.MAX_VALUE }

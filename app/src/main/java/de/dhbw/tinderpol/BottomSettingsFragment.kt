@@ -1,7 +1,6 @@
 package de.dhbw.tinderpol
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.dhbw.tinderpol.databinding.FragmentBottomSettingsBinding
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +22,6 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
     private val binding get() = _binding!!
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -127,7 +124,6 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onDestroy() {
         if(syncFlag && activity != null){
             GlobalScope.launch {

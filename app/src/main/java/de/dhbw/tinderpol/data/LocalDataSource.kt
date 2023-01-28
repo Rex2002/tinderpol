@@ -1,8 +1,6 @@
 package de.dhbw.tinderpol.data
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import de.dhbw.tinderpol.data.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,7 +11,6 @@ class LocalDataSource {
         lateinit var dao : TinderPolDao
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     suspend fun getAll(filter: Predicate<Notice>): List<Notice> {
         return withContext(Dispatchers.IO) {
             Log.i("LocalDataSource", "Retrieving all local notices...")

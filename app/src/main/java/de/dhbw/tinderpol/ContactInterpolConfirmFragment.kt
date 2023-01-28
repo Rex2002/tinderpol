@@ -33,14 +33,13 @@ class ContactInterpolConfirmFragment : DialogFragment() {
                 )
             }")
             val openUrl = Intent(Intent.ACTION_VIEW)
-            // TODO change URL to current notice url!!!!
             openUrl.data = Uri.parse("https://www.interpol.int/Contacts/Fugitives-wanted-persons?notice=${notice.id.replace("/","-")}")
             startActivity(openUrl)
         }
 
         alertDialogBuilder.setNegativeButton(
             "Cancel"
-        ) { dialog, which ->
+        ) { dialog, _ ->
             dialog?.dismiss()
         }
 
