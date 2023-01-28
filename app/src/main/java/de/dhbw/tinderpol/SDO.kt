@@ -93,6 +93,11 @@ class SDO {
             Log.i("SDO", "saved viewed notices' status to Room")
         }
 
+        private suspend fun persistStatus(notice: Notice) {
+            NoticeRepository.updateStatus(notice)
+            Log.i("SDO", "saved status of notice ${notice.id} to Room")
+        }
+
         private suspend fun persistImages(context: Context){
             Log.i("SDO", "persisting notice images to disk")
             val lowerBound = if (currentNoticeIndex-10 >= 0) currentNoticeIndex-10 else 0
