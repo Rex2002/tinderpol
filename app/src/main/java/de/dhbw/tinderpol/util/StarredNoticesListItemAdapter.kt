@@ -30,10 +30,10 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val item = dataset[position]
+        val item: Notice = dataset[position]
         holder.textViewName.text = "${item.firstName} ${item.lastName}"
         holder.textViewBirthdate.text =  if (Util.isBlankStr(item.birthDate)) "" else item.birthDate
-        holder.iconImage.load(SDO.getImageURL(item)){
+        holder.iconImage.load(SDO.getImage(context, item)){
             placeholder(android.R.drawable.stat_sys_download)
            error(com.google.android.material.R.drawable.mtrl_ic_error)
         }

@@ -77,8 +77,8 @@ class SwipeActivity : AppCompatActivity() {
 
             override fun onClick(pos: Pair<Float, Float>) {
                 super.onClick(pos)
-                if (pos.first <= middle) updateShownImg(SDO.getPrevImageURL())
-                else updateShownImg(SDO.getNextImageURL())
+                if (pos.first <= middle) updateShownImg(SDO.getPrevImage(applicationContext))
+                else updateShownImg(SDO.getNextImage(applicationContext))
             }
         })
 
@@ -140,12 +140,12 @@ class SwipeActivity : AppCompatActivity() {
         }
     }
 
-    fun updateShownImg(imgURL: String? = null, toUpdateDots: Boolean = true) {
+    fun updateShownImg(imgURL: Any? = null, toUpdateDots: Boolean = true) {
         val notice = SDO.getCurrentNotice()
         val nameText = "${notice.firstName} ${notice.lastName} (${notice.sex})"
         if (toUpdateDots) updateDots(notice.imgs?.size ?: 0, SDO.currentImgIndex)
         binding.textViewFullName.text = nameText
-        binding.noticeImage.load(imgURL ?: SDO.getImageURL()){
+        binding.noticeImage.load(imgURL ?: SDO.getImage(applicationContext)){
             placeholder(android.R.drawable.stat_sys_download)
             error(mtrl_ic_error)
         }
@@ -157,7 +157,7 @@ class SwipeActivity : AppCompatActivity() {
             SDO.persistStatus(getSharedPreferences(
                 getString(R.string.shared_preferences_file),
                 Context.MODE_PRIVATE
-            ))
+            ), applicationContext)
         }
     }
 }

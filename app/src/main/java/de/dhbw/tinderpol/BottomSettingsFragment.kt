@@ -104,11 +104,13 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
                 )
                 if (sharedPref != null) {
                     SDO.clearSwipeHistory(sharedPref)
-                    Toast.makeText(
-                        activity,
-                        "Successfully cleared swipe history",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    activity?.runOnUiThread {
+                        Toast.makeText(
+                            activity,
+                            "Successfully cleared swipe history",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }

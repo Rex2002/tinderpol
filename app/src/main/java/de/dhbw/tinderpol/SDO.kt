@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Build
@@ -13,20 +14,29 @@ import com.google.gson.reflect.TypeToken
 import de.dhbw.tinderpol.data.Country
 import de.dhbw.tinderpol.data.Notice
 import de.dhbw.tinderpol.data.NoticeRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.*
 import java.lang.reflect.Type
+import java.net.URL
 import java.util.function.Consumer
 
 
 class SDO {
     companion object {
         private const val noImg = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
-        private val emptyNotice = Notice("empty", imgs = listOf(noImg))
+        private val emptyNotice = Notice("0000/00000", imgs = listOf(noImg))
 
         var onUpdate: Consumer<Notice>? = null
         private var isListeningToUpdates = false
 
+        var offlineFlag: Boolean = true
+
         private var notices : List<Notice> = listOf()
         var starredNotices: MutableList<Notice> = mutableListOf()
+        var localImages: HashMap<String, MutableList<ByteArray>> = hashMapOf()
         private var currentNoticeIndex = 0
         var currentImgIndex = 0
 
@@ -59,7 +69,7 @@ class SDO {
         }
 
         //methods that write to Room
-        suspend fun persistStatus(sharedPref: SharedPreferences?) {
+        suspend fun persistStatus(sharedPref: SharedPreferences?, context: Context) {
             persistStarredNotices()
             persistViewedNotices()
             if (sharedPref != null && notices.isNotEmpty()) {
@@ -69,6 +79,8 @@ class SDO {
                 }
                 Log.i("SDO", "saved current noticeId to shared preferences")
             }
+            if (!offlineFlag)
+                persistImages(context)
         }
 
         private suspend fun persistStarredNotices() {
@@ -85,12 +97,67 @@ class SDO {
             Log.i("SDO", "saved viewed notices' status to Room")
         }
 
+        private suspend fun persistImages(context: Context){
+            Log.i("SDO", "persisting notice images to disk")
+            val lowerBound = if (currentNoticeIndex-10 >= 0) currentNoticeIndex-10 else 0
+            val upperBound = if (currentNoticeIndex+50 < notices.size) currentNoticeIndex+50 else notices.size
+            val toPersist: MutableSet<Notice> = notices.subList(lowerBound, upperBound).toMutableSet()
+            toPersist.addAll(starredNotices)
+            toPersist.add(emptyNotice)
+
+            withContext(Dispatchers.IO){
+                val noticeIds: MutableList<String> = mutableListOf()
+                val dir = context.getDir("images", Context.MODE_PRIVATE)
+                toPersist.forEach {notice ->
+                    //notice.id[4] is always '/' which is not allowed in file names. Replaced by '_'.
+                    val id: String = notice.id.substring(0,4) + "_" + notice.id.substring(5)
+
+                    //checking only for index 0 because notices aren't updated,
+                    // so if any file exists at a matching noticeId, the correct images must be present.
+                    val file = File(dir,id + "_0")
+                    if (!file.exists() && !notice.imgs.isNullOrEmpty()) {
+
+                        notice.imgs!!.forEachIndexed {index, img ->
+                            val imgURL = URL(img)
+                            val inputStream = BufferedInputStream(imgURL.openStream())
+                            val outputStream = ByteArrayOutputStream()
+                            val buffer = ByteArray(90000)
+                            var len: Int
+                            while (-1 != inputStream.read(buffer).also { len = it }) {
+                                outputStream.write(buffer, 0, len)
+                            }
+                            outputStream.close()
+                            inputStream.close()
+                            val response = outputStream.toByteArray()
+
+                            val fos = FileOutputStream(File(dir, id + "_$index"))
+                            fos.write(response)
+                            fos.close()
+                        }
+                    }
+                    noticeIds.add(id)
+                }
+                var fileNames: Array<String> = dir.list() ?: arrayOf()
+                val numberFiles: Int = fileNames.size
+                fileNames = fileNames.filter { !noticeIds.contains(it.substring(0,10)) }.toTypedArray()
+                val numberOldFiles: Int = fileNames.size
+                fileNames.forEach {
+                    File(dir,it).delete()
+                }
+                Log.i("SDO", "images persisted successfully")
+                Log.i("SDO", "images stored: " +  numberFiles.minus(numberOldFiles).toString())
+                Log.i("SDO", "images deleted: $numberOldFiles")
+            }
+        }
+
         // methods that edit SDO
         @RequiresApi(Build.VERSION_CODES.N)
-        suspend fun initialize(sharedPref: SharedPreferences?, forceRemoteSync: Boolean = false) {
+        suspend fun initialize(sharedPref: SharedPreferences?, context: Context, forceRemoteSync: Boolean = false) {
             syncNotices(sharedPref, forceRemoteSync)
             initStarredNotices()
             initCurrentNoticeIndex(sharedPref)
+            if (offlineFlag)
+                loadLocalImages(context)
         }
 
         private fun initStarredNotices() {
@@ -112,8 +179,27 @@ class SDO {
             if (currentNoticeIndex < 0) {
                 currentNoticeIndex = 0
             }
-            notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
             Log.i("SDO", "initialized currentNoticeIndex with $currentNoticeIndex")
+        }
+
+        private suspend fun loadLocalImages(context: Context) {
+            withContext(Dispatchers.IO) {
+                val dir = context.getDir("images", Context.MODE_PRIVATE)
+                val fileNames: Array<String> = dir.list() ?: arrayOf()
+
+                fileNames.forEach {
+                    val image = ByteArray(90000)
+                    val noticeId: String = it.substring(0,4) + "/" + it.substring(5,10)
+                    val imgIndex: Int = it.substring(11).toInt()
+                    val inputStream = FileInputStream(File(dir, it))
+                    inputStream.read(image)
+                    inputStream.close()
+                    if (localImages[noticeId] == null)
+                        localImages[noticeId] = mutableListOf()
+
+                    localImages[noticeId]!!.add(imgIndex, image)
+                }
+            }
         }
 
         fun toggleStarredNotice(n: Notice? = null) {
@@ -152,7 +238,10 @@ class SDO {
 
         //methods that get data from SDO
         fun getCurrentNotice() : Notice {
-            if (notices.isNotEmpty()) Log.i("SDO", notices[currentNoticeIndex].toString())
+            if (notices.isNotEmpty()) {
+                notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
+                Log.i("SDO", notices[currentNoticeIndex].toString())
+            }
             if (notices.size <= currentNoticeIndex) {
                 // Realistically only the else branch will ever be used here, but we check just in case to prevent any bugs
                 if (notices.isNotEmpty()) currentNoticeIndex = notices.size - 1
@@ -172,10 +261,7 @@ class SDO {
 
         fun getNextNotice() : Notice {
             currentImgIndex = 0
-            if (notices.isNotEmpty()){
-                currentNoticeIndex++
-                notices[currentNoticeIndex].viewedAt = System.currentTimeMillis()
-            }
+            if (notices.isNotEmpty()) currentNoticeIndex++
 
             if (currentNoticeIndex >= notices.size) {
                 currentNoticeIndex = notices.size -1
@@ -208,31 +294,42 @@ class SDO {
             return notices.isEmpty()
         }
 
-        fun getImageURL(n: Notice? = null): String {
+        fun getImage(context: Context, n: Notice? = null): Any {
             val notice = n ?: getCurrentNotice()
-            return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
-            else if (currentImgIndex >= notice.imgs!!.size) notice.imgs!!.last()
-            else notice.imgs!![currentImgIndex]
+            if (offlineFlag) {
+                Log.i("SDO", "using local image for notice ${notice.id}")
+                if (localImages.isEmpty()) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        loadLocalImages(context)
+                    }
+                }
+                return if (localImages[notice.id]?.isNotEmpty() == true) localImages[notice.id]!![currentImgIndex]
+                    else if (!localImages["0000/00000"].isNullOrEmpty()) localImages["0000/00000"]!![0]
+                        else ByteArray(1)
+            }
+            else {
+                return if (notice.imgs == null || notice.imgs!!.isEmpty()) noImg
+                else if (currentImgIndex >= notice.imgs!!.size) notice.imgs!!.last()
+                else notice.imgs!![currentImgIndex]
+            }
         }
 
-        fun getNextImageURL(n: Notice? = null): String {
+        fun getNextImage(context: Context, n: Notice? = null): Any {
             val notice = n ?: getCurrentNotice()
             if (notice.imgs != null && notice.imgs!!.size - 1 > currentImgIndex) currentImgIndex++
-            return getImageURL(notice)
+            return getImage(context, notice)
         }
 
-        fun getPrevImageURL(n: Notice? = null): String {
+        fun getPrevImage(context: Context, n: Notice? = null): Any {
             val notice = n ?: getCurrentNotice()
             if (notice.imgs != null && currentImgIndex > 0) currentImgIndex--
-            return getImageURL(notice)
+            return getImage(context, notice)
         }
-
         fun isNoticeStarred(notice: Notice? = null): Boolean {
             return (notice ?: getCurrentNotice()).starred
         }
 
         // COUNTRY-RELATED METHODS
-        //TODO SDO seems cluttered. does it maybe make sense to split this into one CountrySDO and one NoticeSDO?
 
         private class CountriesDeserializer: JsonDeserializer<Any> {
             override fun deserialize(
@@ -240,7 +337,7 @@ class SDO {
                 typeOfT: Type?,
                 context: JsonDeserializationContext?
             ): Any? {
-                var res: Any? = null
+                val res: Any?
                 val str = json!!.asJsonPrimitive.asString
                 res = try {
                     str.toDouble()
@@ -260,7 +357,6 @@ class SDO {
             val obj: HashMap<String, Country> = gson.fromJson(text, objectListType)
             countries = obj
             Log.i("Countries", "Loaded countries data: $countries")
-            //TODO @Jay review whether log adds value in this form: it's very long and it's showing static information
         }
 
         fun getCountry(countryID: String?): Country? {

@@ -11,11 +11,15 @@ import androidx.room.Room
 import de.dhbw.tinderpol.data.LocalDataSource
 import de.dhbw.tinderpol.data.room.TinderPolDatabase
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
+import de.dhbw.tinderpol.util.NetworkConnectivityObserver
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
 import de.dhbw.tinderpol.util.Util
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +39,14 @@ class MainActivity : AppCompatActivity() {
             applicationContext, TinderPolDatabase::class.java, "db-tinderPol"
         ).fallbackToDestructiveMigration().build()
         LocalDataSource.dao = db.getDao()
+
+        val connectivityObserver = NetworkConnectivityObserver(applicationContext)
+        connectivityObserver.observe().onEach {
+            if (it == NetworkConnectivityObserver.Status.Unavailable)
+                SDO.offlineFlag = true
+            else if (it == NetworkConnectivityObserver.Status.Available)
+                SDO.offlineFlag = false
+        }.launchIn(lifecycleScope)
 
         adapter = StarredNoticesListItemAdapter(this, SDO.starredNotices)
         recyclerView = binding.recyclerViewStarredNoticesList
@@ -60,7 +72,6 @@ class MainActivity : AppCompatActivity() {
         binding.imageButtonSettings.setOnClickListener{
             showReportConfirmDialog()
         }
-
     }
 
     private fun showReportConfirmDialog(){
@@ -94,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             SDO.initialize(getSharedPreferences(
                 getString(R.string.shared_preferences_file),
                 Context.MODE_PRIVATE
-            ), forceRemoteSync)
+            ), applicationContext, forceRemoteSync)
 
             withContext(Dispatchers.Main) {
                 updateStarredNoticesList()
