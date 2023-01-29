@@ -95,7 +95,7 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
                 withContext(Dispatchers.Main){
                     val a : MainActivity? = if (activity == null) null else activity as MainActivity
                     a?.updateStarredNoticesList()
-                    Toast.makeText(a, "Successfully cleared starred notices", Toast.LENGTH_SHORT)?.show()
+                    Toast.makeText(activity, "Successfully cleared starred notices", Toast.LENGTH_SHORT)?.show()
                 }
             }
         }
