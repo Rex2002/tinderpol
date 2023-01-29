@@ -2,12 +2,14 @@ package de.dhbw.tinderpol.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface.OnShowListener
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -19,6 +21,7 @@ import de.dhbw.tinderpol.R
 import de.dhbw.tinderpol.SDO
 import de.dhbw.tinderpol.data.Notice
 import java.io.File
+
 
 class StarredNoticesListItemAdapter (private val context : Context, private var dataset: List<Notice>) :
     RecyclerView.Adapter<StarredNoticesListItemAdapter.ItemViewHolder>(){
@@ -69,21 +72,35 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
 
             val alert = AlertDialog.Builder(it.context).setPositiveButton("ok"){
                     dialogInter, _ -> dialogInter.dismiss()}.setView(imgView)
+
             if(imgLength > 1){
-                alert.setNeutralButton("Next picture"){
-                    _, _ ->
-                    imgNo = (imgNo+1)%imgLength
-                    imgView.load(SDO.getImage(context, item, imgNo)){
-                        placeholder(android.R.drawable.stat_sys_download)
-                        error(Drawable.createFromPath(File(context.getDir(
-                            "images", Context.MODE_PRIVATE),
-                            SDO.EMPTY_NOTICE_ID + "_0"
-                        ).absolutePath
-                        ))
+                alert.setNeutralButton("Next Image", null)
+                val alertDialog: AlertDialog = alert.create()
+                alertDialog.setOnShowListener { dialog ->
+                    val button: Button =
+                        (dialog as AlertDialog).getButton(AlertDialog.BUTTON_NEUTRAL)
+                    button.setOnClickListener {
+                        imgNo = (imgNo + 1) % imgLength
+                        imgView.load(SDO.getImage(context, item, imgNo)) {
+                            placeholder(android.R.drawable.stat_sys_download)
+                            error(
+                                Drawable.createFromPath(
+                                    File(
+                                        context.getDir(
+                                            "images", Context.MODE_PRIVATE
+                                        ),
+                                        SDO.EMPTY_NOTICE_ID + "_0"
+                                    ).absolutePath
+                                )
+                            )
+                        }
                     }
                 }
+                alertDialog.show()
             }
-            alert.show()
+            else{
+                alert.show()
+            }
         }
     }
 
