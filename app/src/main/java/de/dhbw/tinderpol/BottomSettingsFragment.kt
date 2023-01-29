@@ -37,27 +37,36 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             if (sharedPref != null) {
                 with(sharedPref.edit()){
                     putBoolean(getString(R.string.show_red_notices_shared_prefs), b)
+                    apply()
                     if(!checkMinNoticesSelected()){
                         putBoolean(getString(R.string.show_red_notices_shared_prefs), true)
+                        apply()
                         binding.switchRedNotices.isChecked = true
                         Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                     }
-                    apply()
                 }
+            }
+            if(SDO.offlineFlag){
+                Toast.makeText(activity, "Please note that modifying the filter while offline might lead to unexpected behaviour. It is therefore discouraged", Toast.LENGTH_LONG).show()
             }
         }
         binding.switchYellowNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
             syncFlag = true
+
             if (sharedPref != null) {
                 with(sharedPref.edit()){
                     putBoolean(getString(R.string.show_yellow_notices_shared_prefs), b)
+                    apply()
                     if(!checkMinNoticesSelected()){
                         putBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
+                        apply()
                         binding.switchYellowNotices.isChecked = true
                         Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                     }
-                    apply()
                 }
+            }
+            if(SDO.offlineFlag){
+                Toast.makeText(activity, "Please note that modifying the filter while offline might lead to unexpected behaviour. It is therefore discouraged", Toast.LENGTH_LONG).show()
             }
         }
         binding.switchUnNotices.setOnCheckedChangeListener{_: CompoundButton, b:Boolean ->
@@ -65,13 +74,17 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
             if(sharedPref != null){
                 with(sharedPref.edit()){
                     putBoolean(getString(R.string.show_UN_notices_shared_prefs), b)
+                    apply()
                     if(!checkMinNoticesSelected()){
                         putBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
+                        apply()
                         binding.switchUnNotices.isChecked = true
                         Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                     }
-                    apply()
                 }
+            }
+            if(SDO.offlineFlag){
+                Toast.makeText(activity, "Please note that modifying the filter while offline might lead to unexpected behaviour. It is therefore discouraged", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -130,6 +143,10 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
     private fun checkMinNoticesSelected() : Boolean{
         val sharedPref = activity?.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
+        Log.i("settingsFragment", "showRed: " + sharedPref?.getBoolean(getString(R.string.show_red_notices_shared_prefs), true))
+        Log.i("settingsFragment", "showYel: " + sharedPref?.getBoolean(getString(R.string.show_yellow_notices_shared_prefs), true))
+        Log.i("settingsFragment", "showUN : " + sharedPref?.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true))
+
         return if(sharedPref != null) {
             sharedPref.getBoolean(getString(R.string.show_red_notices_shared_prefs), true)
                     || sharedPref.getBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
