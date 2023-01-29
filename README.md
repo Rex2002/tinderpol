@@ -42,4 +42,4 @@ Due to capacity reasons, TinderPol's backend service is currently hosted on a se
 
 # Legal Disclaimer
 To avoid any, though unlikely but possible, problems concerning the violation of the Terms of Use (https://www.interpol.int/Who-we-are/Terms-of-use) of the Interpol Notices, please be aware that this project is not intended to be used in a commerical way and was exclusively made for educational purposes.
-By using (especially the offline-functionality) you acknowledge that this happens because of your own doing and that the developers can not be held liable for any resulting violation of the Terms of Use of Interpol
+By using (especially the offline-functionality) you acknowledge that this happens because of your own doing and that the developers can not be held liable for any resulting violation of the Terms of Use of Interpol.
