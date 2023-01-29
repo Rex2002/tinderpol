@@ -44,4 +44,4 @@ To avoid any, though unlikely but possible, problems concerning the violation of
 By using (especially the offline-functionality) you acknowledge that this happens because of your own doing and that the developers can not be held liable for any resulting violation of the Terms of Use of Interpol
 
 ## Important Disclaimer
-For financial reasons, TinderPol's backend service is currently hosted on a server that only comes online for a while when it receives a first request. Therefore, remote syncing of notices might take a while, as the app might need to send multiple requests in the background. Please be patient and feel free to contact us if you'd like to contribute to project funding.
+Due to capacity reasons, TinderPol's backend service is currently hosted on a server that only comes online for a while when it receives a first request. Therefore, remote syncing of notices might take a while, as the app might need to send multiple requests in the background.
