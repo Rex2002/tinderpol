@@ -12,6 +12,13 @@ To get started, check out this repository in Android Studio and add a Google Map
 With that set, you should be able to run on any emulator or physical device running Android with API-level 24 or higher.
 You will need a stable internet connection on first startup and offline functionality is limited to around 70 pre-loaded notices at a time to keep storage use low.
 
+### Google Maps API-Key:
+The App can show a map with the general position of a criminal's birth country. In order to use the app properly, a Google Maps API-Key has to be saved to your local properties.
+In order to do this, you open the file local.properties in the package Gradle Scripts. There you add the property
+MAPS_API_KEY= _YOUR_API_KEY_
+
+You can get your own API-Key from Google developers Maps API for free.
+
 ## Features
 - Click the "Start Swiping" Button to start swiping through Interpol Red, Yellow and UN notices in a tinder-like manners
   - Swipe left to report the sighting of a criminal
@@ -31,17 +38,8 @@ You will need a stable internet connection on first startup and offline function
   - Synchronize all local datastorages with the online notice database
 - Offline-Functionality: When leaving the swipeActivity (while being connected to the internet) 50 notices ahead, 20 previous notices and all your starred notices will be downloaded, so that you can continue swiping when returning without a network connection.
 
-
-### Google Maps API-Key:
-The App can show a map with the general position of a criminal's birth country. In order to use the app properly, a Google Maps API-Key has to be saved to your local properties.
-In order to do this, you open the file local.properties in the package Gradle Scripts. There you add the property
-MAPS_API_KEY= _YOUR_API_KEY_
-
-You can get your own API-Key from Google developers Maps API for free.
+Due to capacity reasons, TinderPol's backend service is currently hosted on a server that only comes online for a while when it receives a first request. Therefore, remote syncing of notices might take a while, as the app might need to send multiple requests in the background. Please be patient.
 
 # Legal Disclaimer
 To avoid any, though unlikely but possible, problems concerning the violation of the Terms of Use (https://www.interpol.int/Who-we-are/Terms-of-use) of the Interpol Notices, please be aware that this project is not intended to be used in a commerical way and was exclusively made for educational purposes.
 By using (especially the offline-functionality) you acknowledge that this happens because of your own doing and that the developers can not be held liable for any resulting violation of the Terms of Use of Interpol
-
-## Important Disclaimer
-Due to capacity reasons, TinderPol's backend service is currently hosted on a server that only comes online for a while when it receives a first request. Therefore, remote syncing of notices might take a while, as the app might need to send multiple requests in the background.
