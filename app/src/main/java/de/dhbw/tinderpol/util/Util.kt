@@ -1,5 +1,6 @@
 package de.dhbw.tinderpol.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +25,7 @@ class Util {
             }
         }
 
+        @SuppressLint("PrivateResource")
         fun errorView(context: Context, message: String, title: String="An error occured"){
             Log.i("util", "showing errorView for $title with content $message")
             AlertDialog.Builder(context).setTitle(title).setIcon(com.google.android.material.R.drawable.mtrl_ic_error).setMessage(message).setPositiveButton("Ok"
@@ -32,6 +34,7 @@ class Util {
                 }.show()
         }
 
+        @SuppressLint("PrivateResource")
         fun errorView(context: Context, message: String, onClose: KFunction0<Unit>, title: String="An error occurred"){
             Log.i("util", "showing errorView with callback for $title with content $message")
             AlertDialog.Builder(context).setTitle(title).setIcon(com.google.android.material.R.drawable.mtrl_ic_error).setMessage(message).setPositiveButton("Ok"

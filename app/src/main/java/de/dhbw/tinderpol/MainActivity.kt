@@ -22,9 +22,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var recyclerView : RecyclerView
-    lateinit var adapter: StarredNoticesListItemAdapter
+    private lateinit var adapter: StarredNoticesListItemAdapter
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)

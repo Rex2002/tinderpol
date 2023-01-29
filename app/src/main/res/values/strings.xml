@@ -24,5 +24,8 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="loading_starred_notices">Loading…</string>
     <string name="offlineAnchor">offlineAnchor</string>
+    <string name="report_criminal_sighting">Report criminal sighting</string>
+    <string name="you_are_about_to_report_a_sighting_of_n_criminal_name_n_you_will_be_redirected_to_an_external_website">You are about to report a sighting of \n[criminal name] \n You will be redirected to an external website</string>
+    <string name="continue_button_text">Continue</string>
 
 </resources>

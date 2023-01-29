@@ -2,7 +2,6 @@ package de.dhbw.tinderpol.util
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface.OnShowListener
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +37,7 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
         return ItemViewHolder(adapterLayout)
     }
 
+    @SuppressLint("PrivateResource")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item: Notice = dataset[position]
         Log.i("starredNoticesList", "loadingStarredNotice: $item")

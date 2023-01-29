@@ -15,6 +15,7 @@ internal open class OnSwipeTouchListener (c: Context?) : OnTouchListener {
     private var lastPos : Pair<Float, Float>? = null
 
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+        view?.performClick()
         return when (event) {
             null -> false
             else -> {

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.core.content.edit
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.dhbw.tinderpol.databinding.FragmentBottomSettingsBinding
 import kotlinx.coroutines.*
@@ -34,16 +35,14 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
 
         binding.switchRedNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
             syncFlag = true
-            if (sharedPref != null) {
-                with(sharedPref.edit()){
-                    putBoolean(getString(R.string.show_red_notices_shared_prefs), b)
+            sharedPref?.edit {
+                putBoolean(getString(R.string.show_red_notices_shared_prefs), b)
+                apply()
+                if(!checkMinNoticesSelected()){
+                    putBoolean(getString(R.string.show_red_notices_shared_prefs), true)
                     apply()
-                    if(!checkMinNoticesSelected()){
-                        putBoolean(getString(R.string.show_red_notices_shared_prefs), true)
-                        apply()
-                        binding.switchRedNotices.isChecked = true
-                        Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
-                    }
+                    binding.switchRedNotices.isChecked = true
+                    Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                 }
             }
             if(SDO.offlineFlag){
@@ -53,16 +52,14 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         binding.switchYellowNotices.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
             syncFlag = true
 
-            if (sharedPref != null) {
-                with(sharedPref.edit()){
-                    putBoolean(getString(R.string.show_yellow_notices_shared_prefs), b)
+            sharedPref?.edit {
+                putBoolean(getString(R.string.show_yellow_notices_shared_prefs), b)
+                apply()
+                if(!checkMinNoticesSelected()){
+                    putBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
                     apply()
-                    if(!checkMinNoticesSelected()){
-                        putBoolean(getString(R.string.show_yellow_notices_shared_prefs), true)
-                        apply()
-                        binding.switchYellowNotices.isChecked = true
-                        Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
-                    }
+                    binding.switchYellowNotices.isChecked = true
+                    Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                 }
             }
             if(SDO.offlineFlag){
@@ -71,16 +68,14 @@ class BottomSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.switchUnNotices.setOnCheckedChangeListener{_: CompoundButton, b:Boolean ->
             syncFlag = true
-            if(sharedPref != null){
-                with(sharedPref.edit()){
-                    putBoolean(getString(R.string.show_UN_notices_shared_prefs), b)
+            sharedPref?.edit {
+                putBoolean(getString(R.string.show_UN_notices_shared_prefs), b)
+                apply()
+                if(!checkMinNoticesSelected()){
+                    putBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
                     apply()
-                    if(!checkMinNoticesSelected()){
-                        putBoolean(getString(R.string.show_UN_notices_shared_prefs), true)
-                        apply()
-                        binding.switchUnNotices.isChecked = true
-                        Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
-                    }
+                    binding.switchUnNotices.isChecked = true
+                    Toast.makeText(activity, "You have to select at least one notice type", Toast.LENGTH_SHORT).show()
                 }
             }
             if(SDO.offlineFlag){

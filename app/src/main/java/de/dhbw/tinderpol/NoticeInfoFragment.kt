@@ -16,6 +16,7 @@ import de.dhbw.tinderpol.databinding.FragmentNoticeInfoBinding
 import de.dhbw.tinderpol.util.Util.Companion.isBlankStr
 import de.dhbw.tinderpol.util.Util.Companion.isBlankNum
 import de.dhbw.tinderpol.util.Util.Companion.sexToStr
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -119,6 +120,7 @@ class NoticeInfoFragment : BottomSheetDialogFragment() {
     }
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onDestroy() {
         super.onDestroy()
         Log.i("noticeInfo", "killing notice info fragment")

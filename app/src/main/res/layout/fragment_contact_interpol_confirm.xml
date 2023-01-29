@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_gravity="center"
-        android:text="Report criminal sighting"
+        android:text="@string/report_criminal_sighting"
         android:textAlignment="center" />
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_gravity="center"
-        android:text="You are about to report a sighting of \n[criminal name] \n You will be redirected to an external website"
+        android:text="@string/you_are_about_to_report_a_sighting_of_n_criminal_name_n_you_will_be_redirected_to_an_external_website"
         android:textAlignment="center" />
 
     <Button
@@ -30,5 +30,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Continue" />
+        android:text="@string/continue_button_text" />
 </LinearLayout>

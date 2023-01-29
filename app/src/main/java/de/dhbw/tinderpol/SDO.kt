@@ -20,7 +20,7 @@ class SDO {
         private const val NO_IMG_URL: String = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
         private val emptyNotice = Notice(EMPTY_NOTICE_ID, imgs = listOf(NO_IMG_URL))
 
-        var onUpdate: Consumer<Notice>? = null
+        private var onUpdate: Consumer<Notice>? = null
         private var isListeningToUpdates = false
 
         var offlineFlag: Boolean = true
