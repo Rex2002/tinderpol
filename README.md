@@ -3,6 +3,7 @@ This is the source code for the "TinderPol" project for the third semester's mod
 The app is written to run natively on Android, an iOS version is _not_ in development yet.
 <\n>
 TinderPol lets you swipe through Interpol's Wanted Persons Notices just like you swipe through people on any dating app. You can check out the latest mugshot fashions, find out more about each wanted person and if somebody seems familiar, you can even contact Interpol straight from the app.
+We still have loads of ideas on how to improve the app (see Issues for some concrete ones) but in the end, we're looking for you to like it. So please feel free to tell us about any feedback or suggestions you might have.
 
 ## Get started
 To get started, check out this repository in Android Studio and add a Google Maps API-Key (instructions below).
@@ -10,7 +11,7 @@ With that set, you should be able to run on any emulator or physical device runn
 You will need a stable internet connection on first startup and offline functionality is limited to around 70 pre-loaded notices at a time to keep storage use low.
 
 
-### Google Maps API:
+### Google Maps API-Key:
 The App can show a map with the general position of a criminal's birth country. In order to use the app properly, a Google Maps API-Key has to be saved to your local properties.
 In order to do this, you open the file local.properties in the package Gradle Scripts. There you add the property
 MAPS_API_KEY= _YOUR_API_KEY_
