@@ -19,6 +19,19 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabDots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imageButtonNext"
+            app:layout_constraintStart_toEndOf="@id/imageButtonPrev"
+            app:layout_constraintTop_toBottomOf="@id/textViewFullName"
+            app:tabBackground="@drawable/tab_selector"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp" />
+
         <ImageButton
             android:id="@+id/imageButtonPrev"
             android:layout_width="50dp"
@@ -42,18 +55,6 @@
             app:srcCompat="?attr/homeAsUpIndicator"
             tools:ignore="ContentDescription" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabDots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/imageButtonNext"
-            app:layout_constraintStart_toEndOf="@id/imageButtonPrev"
-            app:layout_constraintTop_toBottomOf="@id/textViewFullName"
-            app:tabBackground="@drawable/tab_selector"
-            app:tabGravity="center"
-            app:tabIndicatorHeight="0dp" />
 
         <TextView
             android:id="@+id/textViewFullName"
