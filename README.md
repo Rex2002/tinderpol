@@ -1,7 +1,7 @@
 # Tinderpol
 This is the source code for the "TinderPol" project for the third semester's module Mobile Development. 
 The app is written to run natively on Android, an iOS version is _not_ in development yet.
-<\n>
+<br />
 TinderPol lets you swipe through Interpol's Wanted Persons Notices just like you swipe through people on any dating app. You can check out the latest mugshot fashions, find out more about each wanted person and if somebody seems familiar, you can even contact Interpol straight from the app.
 We still have loads of ideas on how to improve the app (see Issues for some concrete ones) but in the end, we're looking for you to like it. So please feel free to tell us about any feedback or suggestions you might have.
 
@@ -9,6 +9,25 @@ We still have loads of ideas on how to improve the app (see Issues for some conc
 To get started, check out this repository in Android Studio and add a Google Maps API-Key (instructions below).
 With that set, you should be able to run on any emulator or physical device running Android with API-level 24 or higher.
 You will need a stable internet connection on first startup and offline functionality is limited to around 70 pre-loaded notices at a time to keep storage use low.
+
+## Features
+- Click the "Start Swiping" Button to start swiping through Interpol Red, Yellow and UN notices in a tinder-like manners
+  - Swipe left to report the sighting of a criminal
+  - If there are multiple pictures for one notice, tap on the left and right of the screen to view them all
+  - Swipe up to view more information about the notice
+    - Use the map button at the top to view countries related to the notice (like country of birth, lnationality, etc)
+    - Use the star button at the top to add this notice to your personal watchlist
+    - Swipe down or tap above the infobox to return to the previous view
+  - Swipe down to return to the main screen
+- View your starred notices at the "starred notices" box
+  - Click on the image to view the notice's image in fullscreen, if there are multiple images for one notice use the corresponding button to see them all
+  - Click on the name to view more information about the notice, unstar the notice or call the map view
+- Open the settings with the button in the top left to
+  - Select which notice-types you would like to see (UN, Yellow, Red)
+  - Clear your starred notices list
+  - Delete your swipe history
+  - Synchronize all local datastorages with the online notice database
+- Offline-Functionality: When leaving the swipeActivity (while being connected to the internet) 50 notices ahead, 20 previous notices and all your starred notices will be downloaded, so that you can continue swiping when returning without a network connection.
 
 
 ### Google Maps API-Key:
