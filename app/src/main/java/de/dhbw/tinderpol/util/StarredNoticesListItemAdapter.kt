@@ -2,6 +2,7 @@ package de.dhbw.tinderpol.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import de.dhbw.tinderpol.NoticeInfoFragment
 import de.dhbw.tinderpol.R
 import de.dhbw.tinderpol.SDO
 import de.dhbw.tinderpol.data.Notice
+import java.io.File
 
 class StarredNoticesListItemAdapter (private val context : Context, private var dataset: List<Notice>) :
     RecyclerView.Adapter<StarredNoticesListItemAdapter.ItemViewHolder>(){
@@ -37,7 +39,7 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
         val item: Notice = dataset[position]
         Log.i("starredNoticesList", "loadingStarredNotice: $item")
         holder.textViewName.text = "${item.firstName} ${item.lastName}"
-        holder.textViewBirthdate.text =  if (Util.isBlankStr(item.birthDate)) "" else item.birthDate
+        holder.textViewBirthdate.text =  if (Util.isBlankStr(item.birthDate)) "" else item.birthDate.toString()
         holder.iconImage.load(SDO.getImage(context, item)){
             placeholder(android.R.drawable.stat_sys_download)
            error(com.google.android.material.R.drawable.mtrl_ic_error)
@@ -52,14 +54,36 @@ class StarredNoticesListItemAdapter (private val context : Context, private var 
         }
         holder.iconImage.setOnClickListener{
             val imgView = ImageView(it.context)
-            imgView.load(SDO.getImage(context, item)){
+            var imgNo = 0
+            val imgLength = item.imgs?.size ?: 0
+            imgView.load(SDO.getImage(context, item, imgNo)){
                 placeholder(android.R.drawable.stat_sys_download)
-                error(com.google.android.material.R.drawable.mtrl_ic_error)
+                error(Drawable.createFromPath(File(context.getDir(
+                        "images", Context.MODE_PRIVATE),
+                        SDO.EMPTY_NOTICE_ID + "_0"
+                    ).absolutePath
+                ))
             }
             imgView.scaleType = ImageView.ScaleType.CENTER_INSIDE
             imgView.adjustViewBounds = true
 
-            AlertDialog.Builder(it.context).setPositiveButton("ok"){dialogInter, _ -> dialogInter.dismiss()}.setView(imgView).show()
+            val alert = AlertDialog.Builder(it.context).setPositiveButton("ok"){
+                    dialogInter, _ -> dialogInter.dismiss()}.setView(imgView)
+            if(imgLength > 1){
+                alert.setNeutralButton("Next picture"){
+                    _, _ ->
+                    imgNo = (imgNo+1)%imgLength
+                    imgView.load(SDO.getImage(context, item, imgNo)){
+                        placeholder(android.R.drawable.stat_sys_download)
+                        error(Drawable.createFromPath(File(context.getDir(
+                            "images", Context.MODE_PRIVATE),
+                            SDO.EMPTY_NOTICE_ID + "_0"
+                        ).absolutePath
+                        ))
+                    }
+                }
+            }
+            alert.show()
         }
     }
 

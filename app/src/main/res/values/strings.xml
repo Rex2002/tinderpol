@@ -23,5 +23,6 @@
     <string name="no_notices_starred">No Notices Starred</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="loading_starred_notices">Loading…</string>
+    <string name="offlineAnchor">offlineAnchor</string>
 
 </resources>

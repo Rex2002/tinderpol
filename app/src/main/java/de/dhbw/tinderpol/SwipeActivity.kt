@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import coil.load
-import com.google.android.material.R.drawable.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import de.dhbw.tinderpol.databinding.ActivityNoticeBinding
@@ -36,6 +35,10 @@ class SwipeActivity : AppCompatActivity() {
         binding.imageButtonPrev.setOnClickListener {
             Log.i("swipeActivity", "button prev clicked")
             try {
+                val sharedPref = getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
+                if(SDO.offlineFlag && sharedPref.getInt(getString(R.string.offlineAnchor), 0) - 20 == SDO.currentNoticeIndex){
+                    Util.errorView(this@SwipeActivity, "Reached last cached image in this direction. Please go online to load more images.", "Cache exceeded")
+                }
                 SDO.getPrevNotice()
                 updateShownImg()
             } catch (e: Exception) {
@@ -142,6 +145,12 @@ class SwipeActivity : AppCompatActivity() {
 
     fun nextNotice(){
         try{
+            val sharedPref = getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE)
+            val offlineAnchor = sharedPref.getInt(getString(R.string.offlineAnchor), 0)
+            Log.i("swipeActivity", "offlineAnchor: $offlineAnchor")
+            if(SDO.offlineFlag && sharedPref.getInt(getString(R.string.offlineAnchor), 0) + 49 == SDO.currentNoticeIndex){
+                Util.errorView(this@SwipeActivity, "Reached last cached image in this direction. Please go online to load more images.", "Cache exceeded")
+            }
             SDO.getNextNotice()
             updateShownImg()
         }catch (e: Exception){
@@ -155,7 +164,8 @@ class SwipeActivity : AppCompatActivity() {
         if (toUpdateDots) updateDots(notice.imgs?.size ?: 0, SDO.currentImgIndex)
         binding.textViewFullName.text = nameText
         binding.noticeImage.load(imgURL ?: SDO.getImage(applicationContext)){
-            placeholder(
+            placeholder(android.R.drawable.stat_sys_download)
+            error(
                 Drawable.createFromPath(
                     File(getDir(
                         "images", Context.MODE_PRIVATE),
@@ -163,7 +173,6 @@ class SwipeActivity : AppCompatActivity() {
                     ).absolutePath
                 )
             )
-            error(mtrl_ic_error)
         }
     }
 

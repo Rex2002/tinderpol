@@ -16,21 +16,22 @@ import java.util.function.Predicate
 
 class SDO {
     companion object {
-        private const val NO_IMG_URL: String = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
         const val EMPTY_NOTICE_ID = "0000/00000"
+        private const val NO_IMG_URL: String = "https://vectorified.com/images/unknown-avatar-icon-7.jpg"
         private val emptyNotice = Notice(EMPTY_NOTICE_ID, imgs = listOf(NO_IMG_URL))
 
         var onUpdate: Consumer<Notice>? = null
         private var isListeningToUpdates = false
 
         var offlineFlag: Boolean = true
+        private var localImagesChangedFlag = false
 
-        private var notices : List<Notice> = listOf()
+
         var starredNotices: MutableList<Notice> = mutableListOf()
         var localImages: HashMap<String, MutableList<ByteArray>> = hashMapOf()
-        private var currentNoticeIndex = 0
+        var currentNoticeIndex = 0
         var currentImgIndex = 0
-
+        private var notices : List<Notice> = listOf()
         private var countries: HashMap<String, Country>? = null
 
 // NOTICE-RELATED METHODS
@@ -84,14 +85,25 @@ class SDO {
 
         private suspend fun persistCurrentImages(context: Context){
             Log.i("SDO", "persisting notice images to disk")
-            val lowerBound = if (currentNoticeIndex-10 >= 0) currentNoticeIndex-10 else 0
-            val upperBound = if (currentNoticeIndex+50 < notices.size) currentNoticeIndex+50 else notices.size
+            val lowerBound = if (currentNoticeIndex - 10 >= 0) currentNoticeIndex - 10 else 0
+            val upperBound = if (currentNoticeIndex + 50 < notices.size) currentNoticeIndex + 50 else notices.size
             val toPersist: MutableSet<Notice> = notices.subList(lowerBound, upperBound).toMutableSet()
             toPersist.addAll(starredNotices)
             toPersist.add(emptyNotice)
 
             val dir = context.getDir("images", Context.MODE_PRIVATE)
+            Log.i("SDO-persist", "sending ${toPersist.size} notices to be persisted")
             LocalImageSource.persistImages(toPersist, dir)
+            with(
+                context.getSharedPreferences(
+                    context.resources.getString(R.string.shared_preferences_file),
+                    Context.MODE_PRIVATE
+                ).edit()
+            ) {
+                putInt(context.resources.getString(R.string.offlineAnchor), currentNoticeIndex)
+                apply()
+            }
+            localImagesChangedFlag = true
         }
 
     // methods that edit SDO
@@ -167,6 +179,8 @@ class SDO {
             initCurrentNoticeIndex(sharedPref, res)
             if (offlineFlag)
                 loadLocalImages(context)
+            else
+                persistCurrentImages(context)
         }
 
         suspend fun clearStarredNotices(){
@@ -253,25 +267,30 @@ class SDO {
             return notices.isEmpty()
         }
 
-        fun getImage(context: Context, n: Notice? = null): Any {
+        fun getImage(context: Context, n: Notice? = null, imgNo: Int = -1): Any {
             val notice = n ?: getCurrentNotice()
+            val imgIndex = if (imgNo == -1) currentImgIndex else imgNo
             if (offlineFlag) {
-                Log.i("SDO-imageCall", "using local image for notice ${notice.id} and index $currentImgIndex")
-                if (localImages.isEmpty()) {
+                Log.i("SDO-imageCall", "using local image for notice ${notice.id} and index $imgIndex")
+                if (localImagesChangedFlag || localImages.isEmpty()) {
+                    localImagesChangedFlag = false
                     CoroutineScope(Dispatchers.IO).launch {
                         loadLocalImages(context)
                     }
                 }
-                return if ((localImages[notice.id]?.isNotEmpty() == true) && localImages[notice.id]?.get(currentImgIndex) != null)
-                    localImages[notice.id]!![currentImgIndex]
-                else if (!localImages[EMPTY_NOTICE_ID].isNullOrEmpty())
+                return if ((localImages[notice.id]?.isNotEmpty() == true) && localImages[notice.id]?.get(imgIndex) != null)
+                    localImages[notice.id]!![imgIndex]
+                else if (!localImages[EMPTY_NOTICE_ID].isNullOrEmpty()){
                     localImages[EMPTY_NOTICE_ID]!![0]
+                    Log.i("SDO-imageCall", "used default image")
+                }
+
                 else ByteArray(1)
             }
             else {
                 return if (notice.imgs == null || notice.imgs!!.isEmpty()) NO_IMG_URL
-                else if (currentImgIndex >= notice.imgs!!.size) notice.imgs!!.last()
-                else notice.imgs!![currentImgIndex]
+                else if (imgIndex >= notice.imgs!!.size) notice.imgs!!.last()
+                else notice.imgs!![imgIndex]
             }
         }
 
