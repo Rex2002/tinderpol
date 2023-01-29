@@ -27,11 +27,13 @@ class SwipeActivity : AppCompatActivity() {
 
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i("swipeActivity", "creating instance")
         super.onCreate(savedInstanceState)
+        Log.i("swipeActivity", "creating instance")
         val middle = resources.displayMetrics.widthPixels.toFloat() / 2
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        Thread.setDefaultUncaughtExceptionHandler { _, e -> Util.errorView(applicationContext, e.message) }
 
         binding.imageButtonPrev.setOnClickListener {
             Log.i("swipeActivity", "button prev clicked")

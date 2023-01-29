@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import de.dhbw.tinderpol.databinding.ActivityMainBinding
 import de.dhbw.tinderpol.util.NetworkConnectivityObserver
 import de.dhbw.tinderpol.util.StarredNoticesListItemAdapter
+import de.dhbw.tinderpol.util.Util
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -26,9 +27,18 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(androidx.appcompat.R.style.Theme_AppCompat_DayNight_NoActionBar)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        Thread.setDefaultUncaughtExceptionHandler { t, e -> runOnUiThread {
+            Util.errorView(
+                applicationContext,
+                e.message,
+                { t.interrupt() }
+            )
+        } }
 
         val db = Room.databaseBuilder(
             applicationContext, TinderPolDatabase::class.java, "db-tinderPol"

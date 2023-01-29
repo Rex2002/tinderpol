@@ -3,6 +3,7 @@ package de.dhbw.tinderpol.data
 import android.content.Context
 import android.util.Log
 import de.dhbw.tinderpol.R
+import java.util.concurrent.TimeoutException
 import java.util.function.Consumer
 import java.util.function.Predicate
 
@@ -18,6 +19,7 @@ class NoticeRepository {
         }
 
         suspend fun syncNotices(context: Context, filter: Predicate<Notice>, forceRemoteSync: Boolean = false) {
+            throw TimeoutException("This is a test")
             val res = context.resources
             val sharedPref = context.getSharedPreferences(
                 res.getString(R.string.shared_preferences_file), Context.MODE_PRIVATE
