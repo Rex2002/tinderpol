@@ -200,6 +200,8 @@ class SDO {
             noticesToClear.forEach { it.viewedAt = Long.MAX_VALUE }
             NoticeRepository.updateStatus(*noticesToClear.toTypedArray())
             notices = notices.sortedWith(compareByDescending { it.id })
+            currentImgIndex = 0
+            currentNoticeIndex = 0
             if (sharedPref != null) {
                 with(sharedPref.edit()) {
                     putString(res.getString(R.string.current_noticeId_shared_prefs), "none")
