@@ -1,7 +1,7 @@
 
 
 # Tinderpol
-This is the source code for the "TinderPol" project for the third semester's module Mobile Development. 
+This is the source code for the "TinderPol" project for the second-year CS module Mobile Development at DHBW Mannheim. 
 The app is written to run natively on Android, an iOS version is _not_ in development yet.
 <br />
 TinderPol lets you swipe through Interpol's Wanted Persons Notices just like you swipe through people on any dating app. You can check out the latest mugshot fashions, find out more about each wanted person and if somebody seems familiar, you can even contact Interpol straight from the app.
